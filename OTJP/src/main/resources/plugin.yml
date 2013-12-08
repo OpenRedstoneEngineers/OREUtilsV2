@@ -1,0 +1,7 @@
+name: OTJP
+version: 1.0.0
+description: ORE's Tiny Java Plugin
+load: STARTUP
+author: OREStaff
+website: openredstone.org
+main: org.openredstone.OTJP

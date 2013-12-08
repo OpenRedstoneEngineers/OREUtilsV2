@@ -1,0 +1,71 @@
+{   
+    'pclaim' : 
+    {
+        'long'  : " This command is used to claim a plot. There are multiple ways of providing input as to the plot to be used. You can firstly stand upon the plot to be claimed, and type /pclaim, or you can do the same upon that plot's lamps on the plotmap. Lit up lamps show a claimed plot. You can also use the format /pclaim [X] [Z] to choose a specific plot",
+        'short' :' <X> <Z> | *Your position* | *Your position on plotmap*'
+    },
+
+    'punclaim' :
+    {
+        'long'  : " This command performs the inverse to pclaim. It will remove your ownership from any chosen plot. It uses the same syntax of input - /punclaim on a physical plot, /punclaim on the map location of a plot, or /punclaim [X] [Z] to provide a specific plot",
+        'short' : ' <X> <Z> | *Your position* | *Your position on plotmap*'
+    },
+
+    'pwarp' : 
+    {
+        'long'  : " This command will warp you to any specified plot. You can choose where to go, either by standing on where it is represented on the plot map, and doing /pwarp, using /pwarp [X] [Z] to choose plot coords, /pwarp [player] to go to someone's plot, or /pwarp [player] [plot number] to go to a plot of a player, of a specific number, e.g. Bob's second plot - /pwarp bob 2",
+        'short' : ' <X> <Z> | <Owner> [Plot#] | *Position on plotmap*'
+    },
+
+    'ploc' :
+    {
+        'long'  : " This command tells you the current location and owner of the plot you are on. Either represented on the plot map, or an actual plot.",
+        'short' : ' *Your position* | *Your position on plotmap*'
+    },
+    'pmap' :
+    {
+        'long'  : " This command uses the same format as /psearch, but it will take you to the resulting plot on the plotmap.",
+        'short' : ' <X> <Z> | <Player> | *Your position* | *Your position on plotmap*'
+    },
+    'schematic' :
+    {
+        'long'  : " This command is an alias to load one of your schematics, the first argument should be either 'load' or 'save' and the second the name of your schem",
+        'short' : ' load <schematic> | save <schematic>'
+    },
+    'mistake' :
+    {
+        'long'  : " For when you make a mistake",
+        'short' : ''
+    },
+    'hug' :
+    {
+        'long'  : " Give someone you love a little bit of how you feel",
+        'short' : ' <Object> | <Player>'
+    },
+    'slap' :
+    {
+        'long'  : " You can slap someone with any amount of objects, which will be given to them. You can also use numbers or 'some', e.g. /slap Bob 2 fishes some bread 7 stone",
+        'short' : ' <Player> [Object(s)]'
+    },
+    'psearch' :
+    {
+        'long'  : " Search for criteria of a plot, these can be two coords, or a whole or partial name of an owner. You can also search for the plot you are currently on, or one on the plotmap you are on.",
+        'short' : ' <X> <Z> | <Player> | *Your position* | *Your position on plotmap*'
+    },
+    'nameformat' :
+    {
+        'long'  : " You can use this command to change the way your name looks, you can do this by following the command with the letter codes you wish to use. These are accessible via /c. E.g. /nameformat c4c4c4c4 would give you a very red name. You can also use formats. Or, choose a preset, such as 'ice' or 'rainbow'",
+        'short' : ' <Colours> | <Preset>'
+    },
+    'derp' :
+    {
+        'long'  : " You can type /derp [number] to perform a specific derp, or you can give no arguments, in which case, you will perform a random derp.",
+        'short' : ' [Number]'
+    },
+    'derps' :
+    {
+        'long'  : "This command returns a list of all possible derps",
+        'short' : ''
+    }
+}
+

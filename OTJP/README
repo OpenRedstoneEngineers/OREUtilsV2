@@ -1,0 +1,10 @@
+ORE's Tiny Java Plugin
+======================
+
+Python's an excellent language, but is not the most efficient. This plugin contains the various methods and
+sections of ORE's plugin system where execution speed may be important.
+
+Sections:
+>Generators:
+>>Plot World
+>Listeners:

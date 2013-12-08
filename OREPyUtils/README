@@ -1,0 +1,15 @@
+OREPyUtils.
+===========
+
+OREPyUtilsV2, is a newer iteration of OREPyUtils. They both share the same function - to provide a flexible
+and manageable set of plugins, specifically for the open redstone minecraft server. Included, are commands,
+a system to interface with IRC, and provide cross server chat via it and a plot manager.
+system.
+
+As the name suggests, the plugin is written in Python. It requires the plugins PythonLoader, Pex and WorldEdit.
+
+Contributors:
+- xdot (structinf)
+- redstonewarrior (manearrior)
+- JeremyG (JeremyGee)
+- Xeomorpher (Xeom)
