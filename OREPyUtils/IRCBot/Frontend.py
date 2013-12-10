@@ -71,8 +71,10 @@ class OREBot(IRCBot.IRCBot):
 
 		if alias.IsServer:
 			args = message.split()
-
-			Bukkit.broadcastMessage(alias.GetTag(args[0][:-1]) + " ".join(args[1:]))
+			if args[0].endswith(':'):
+				Bukkit.broadcastMessage(alias.GetTag(args[0][:-1]) + " ".join(args[1:]))
+			else:
+				Bukkit.broadcastMessage(str(ChatColor.YELLOW) + " ".join(args[:2]) +" the "+ alias.Name.lower() + " server")
 		else:
 			Bukkit.broadcastMessage(alias.GetTag(name) + message)		
 
@@ -98,7 +100,7 @@ def OnCommandIRCAdmin(sender, args):
 		sender.sendMessage("No permission!")
 		return True
 
-	if len(args) == 0:
+v	if len(args) == 0:
 		sender.sendMessage("--- IRC Admin ---")
 		sender.sendMessage("status     - Connection status")
 		sender.sendMessage("disconnect - Disconnect from remote server")

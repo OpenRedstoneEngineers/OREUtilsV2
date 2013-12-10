@@ -21,7 +21,7 @@ def LoadDerps(filename):
 		Derps = [X.replace('\n', '') for X in f.xreadlines()]
 
 def BroadcastDerp(sender, message):
-	broadcastMessage(color("2") + " * " + color("f") + sender.getName() + color("l") + " DERP! " + color("r") + color("d") + message)
+	broadcastMessage(color("2") + " * " + color("f") + sender.getName() + color("l") + " DERP! " + color("d") + message)
 
 @hook.command("derp", description="Let your derp shine!")
 def OnCommandDerp(sender, args):
@@ -54,4 +54,3 @@ def OnCommandDerps(sender, args):
 		sender.sendMessage(color("1") + str(counter) + color("f") + ": " + color("a") + derp)
 
 	return True
-

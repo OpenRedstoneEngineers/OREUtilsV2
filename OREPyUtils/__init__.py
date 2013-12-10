@@ -6,62 +6,72 @@ from PersistentData import *
 
 Failiures = {}
 
-DATA_PATH = "plugins/OREPyUtilsV2.py.dir/Data/"
+DATA_PATH = "plugins/OREUtilsV2.py.dir/Data/"
 
 class ConfigFile(NodeFile):
 	def __init__(self):
-		NodeFile.__init__(self, DATA_PATH + "config.dict")
+		NodeFile.__init__(self, DATA_PATH + "config.json")
 
 		if 'properties' not in self.node:
 			self.node.properties = Node()
 	
 	def __getitem__(self, name):
-		if name in self.node.properties:
-			return self.node.properties[name]
+		path = name.split('.')
 		
-		else:
-			return None
+		node = self.node.properties
+
+		for next in path:
+			if isinstance(node, Node) and next in node:
+				node = node[next]
+
+			else:
+				return None
+
+		return node
 
 	def __setitem__(self, name, value):
+		path = name.split('.')
+
+		node = self.node.properties
+
+		for next in path[:-1]:
+			if not (next in node and isinstance(node[next], Node)):
+				
+				node[next] = Node()
+			node = node[next]
+
 		if value == None:
-			if name in self.node.properties:
-				del self.node.properties[name]
+			if path[-1] in node:
+				del node[path[-1]]
 
 		else:
-			self.node.properties[name] = value
+			node[path[-1]] = value
 
 CONFIG  = ConfigFile()
 
 Include = CONFIG['Include']
 
 if not isinstance(Include, list):
-	Include = [
-		'CommandGen',
-		'Aliases',
-		'FunCommands',
-		'Derps',
-		'NameSystem',
-		'UsefulCommands',
-		'EventHooks',
-		'ChannelChat',
-		'Plots',
-		'IRCBot',
-		'ResultCode'
-	]
 
-	CONFIG['Include'] = Include
+	Include = []
+	Severe('[!]No Include list in config!')
+	Failiures['All'] = 'No Include list found in config'
 
-for N in Include:
-        try:
-                exec 'import ' + N
 
-        except Exception, E:
-                print '[!]Error importing ' + N
+def ImportFiles():
+	for N in Include:
+        	try:
+                	exec 'import ' + N
 
-                Failiures[N] = str(E)
+        	except Exception, E:
+                	Severe('[!]Error importing ' + N)
 
-        else:
-                print '[i]Imported ' + N
+        	        Failiures[N] = str(E)
+	
+        	else:
+                	Info('[i]Imported ' + N)
+
+ImportFiles()
 
 @hook.command('property', description='Plugin properties')
 def onCommandProperty(sender, args):
@@ -73,7 +83,7 @@ def onCommandProperty(sender, args):
 		sender.sendMessage(str(CONFIG))
 
 	elif len(args) == 1:
-		sender.sendMessage(args[0] + "=" + str(CONFIG[args[0]]))
+		sender.sendMessage(args[0] + " = " + str(CONFIG[args[0]]))
 	
 	elif len(args) >= 2:
 		if args[1] == 'None':
@@ -112,43 +122,75 @@ def OnEnable():
 			Plots.Frontend.InitManagers()
 
 		except Exception , E:
-			Severe("[!]Error starting plot system")
 
+			Severe("[!]Error starting plot system")
 			Failiures['Plots'] = str(E)
 
 	if 'Derps' not in Failiures:
-		try:
-			Derps.LoadDerps(DATA_PATH + "Derps.txt")
+		if isinstance(CONFIG['DerpPath'], str):
+			DerpPath = CONFIG['DerpPath'].replace('[path]', DATA_PATH)
 
-		except Exception , E:
-			Severe('[!]Error loading derps')
+			try:
+				Derps.LoadDerps(DATA_PATH + "Derps.txt")
+	
+			except Exception , E:
 
-			Failiures['Derps'] = str(E)
+				Severe('[!]Error loading derps')
+				Failiures['Derps'] = str(E)
+		else:
+			Severe('[!]No DerpPath in config')
+			Failiures['Derps'] = 'No DerpPath in config'
 
 	if 'UsefulCommands' not in Failiures:
-		try:
-			UsefulCommands.LoadHelp(DATA_PATH + "Help.txt")
+		if isinstance(CONFIG['HelpPath'], str):
+			HelpPath = CONFIG['HelpPath'].replace('[path]', DATA_PATH)
+			
+			try:
+				UsefulCommands.LoadHelp(HelpPath)
 
-		except Exception , E:
-			Severe('[!]Error loading help')
+			except Exception , E:
 
-			Failiures['UsefulCommands'] = str(E)
+				Severe('[!]Error loading help')
+				Failiures['UsefulCommands'] = str(E)
+
+		else:
+			Severe('[!]No HelpPath in config')
+			Failiures['UsefulCommands'] = 'No HelpPath in config'
+			
 
 	if "IRCBot" not in Failiures:
-		try:
-			IRCBot.Init("irc.freenode.net", 6667, "ORETest", "****", "#OREServerChat")
 
-		except Exception , E:
-			Severe('[!]Error loading IRCBot')
+		args = []
 
-			Failiures['IRCBot'] = str(E)
+		for conf in ['Server', 'Port', 'Name', 'NamePass', 'Chan']:
+			args.append(CONFIG['IRC.'+conf])
+
+			if args[-1] == None:
+				Severe('No IRC.'+conf+' in config')
+				Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
+				
+				break
+			else:
+				try:
+					IRCBot.Init(*args)
+		
+				except Exception , E:
+
+					Severe('[!]Error loading IRCBot')
+					Failiures['IRCBot'] = str(E)
 
 @hook.disable
 def OnDisable():
-	CONFIG.Dump()
-
 	if 'Plots' not in Failiures:
-		Plots.Frontend.SaveData()
+		try:
+			Plots.Frontend.SaveData()
+
+		except Exception , E:
+			Severe('[!]Error unloading Plots: '+str(E))
 
 	if 'IRCBot' not in Failiures:
-		IRCBot.Terminate()
+		try:
+			IRCBot.Terminate()
+
+		except Exception , E:
+			Severe('[!]Error unloading IRCBot: '+str(E))

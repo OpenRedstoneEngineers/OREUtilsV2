@@ -6,15 +6,12 @@ import org.bukkit.Bukkit.dispatchCommand as dispatchCommand
 import org.bukkit.Bukkit.getPlayerExact  as getPlayerExact
 
 # Permission nodes: 
-# ore.nameformat.others
-
-#Xeo's nameformat
 
 # Color Whitelist
 colours = '123456789abcdef'
 
 # Format Whitelist
-formats = 'lmo'
+fonts = 'lnor'
 
 # Presets
 preset = {
@@ -27,77 +24,54 @@ preset = {
     'fire'      : 'e646e'
 }
 
-# Distribute colours
-def dist(nam, col):
-    nlen = len(nam)
-    clen = len(col)
- 
-    if clen > nlen:
-        col  = col[:nlen]
-        clen = nlen
+def Distribute(list1,list2):
+	len1    = len(list1)
+	change  = len1/float(len(list2))
     
-    cof = str(col)    
+	while len1 > 0:
+		len1 -= change
+		list1.insert(int(len1),list2.pop())
 
-    for i in formats: 
-        cof = cof.replace(i, '')
-    
-    a   = round(nlen / len(cof), 4)
-    nam = list(nam)
-    col = list(''.join(col))
+	return ''.join(list1)
 
-    while 1:
-        if nlen < 1:
-            return ''.join(nam)
-        
-        nlen -= a
+@hook.command("nameformat", description="Colourify your name")
+def onCommandNameFormat(target, args):
+	if args:
+		if target.hasPermission('ore.nameformat.others'):
+			player = getPlayerExact(args[0])
+	
+			if player != None:
+				target = player
 
-        while 1:
-            if len(col) > 0 and col[-1] in formats:
-                nam.insert(int(nlen), '&' + col.pop())
-            else:
-                break    
+				del args[0]
 
-        if len(col) > 0:
-            if col[-1] in colours:
-                nam.insert(int(nlen), '&' + col[-1])
+		formats = []
 
-            col.pop()
+		for format in ' '.join(args):
+			if format in colours:
+				formats.append('&'+format)
 
-# Nameformat
-@hook.command('nameformat', usage='/nameformat <colors & formats>')
-def onCommandNameformat(sender, args):
-    # Search for presets
-    for i, v in enumerate(args):
-        temp = preset.get(v)
+			elif format in fonts:
+				formats[-1] += '&'+format
 
-        if temp != None:
-            args[i] = temp
+			elif format == ' ' and formats[-1]:
+				formats.append('')
 
-    if len(args) == 0: 
-        return False
+			else:
+				sender.sendMessage('invalid colour code ('+format+')')
 
-    # Find the receiver
-    if getPlayerExact(args[0]) != None and sender.hasPermission('ore.nameformat.others'):
-        receiver = getPlayerExact(args.pop(0)).getName()
-    else:
-        receiver = sender.getName()
+				return False
 
-    colorSeq = ''.join(args)
+		name = target.getName()
 
-    if len(colorSeq) == 0: 
-        return False
+		if formats:
+			Sudo('nick '+name+' '+Distribute(list(name), formats))
 
-    # Check if the specified colors/formats are allowed
-    for i in colorSeq:
-        if i not in colours + formats:
-            sender.sendMessage('Issue found: ' + i)
-
-            return False
-
-    # Change player's display name
-    sudo(' '.join(['nick', receiver, dist(receiver, colorSeq)]))
-
-    sender.sendMessage('Nickname changed!')
+			return True
+	
+	sender.sendMessage('/nameformat [name] <colours...>')
+	
+	return False
 
 #rankdown
 @hook.command("rankup", description="Promote a user.")
@@ -120,5 +94,5 @@ def onCommandRankdown(sender,args):
 #fixname
 @hook.command('fixname', description='Fix your name formatting.')
 def onCommandFixname(sender,args):
-    sudo('nick '+sender.getName()+' off')
+    Sudo('nick '+sender.getName()+' off')
     return True

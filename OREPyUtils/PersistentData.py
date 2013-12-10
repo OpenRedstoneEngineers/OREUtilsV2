@@ -44,13 +44,6 @@ class DictBackend:
 		except:
 			data = {}
 
-	#	data = {}
-
-	#	stream = StringIO.StringIO(x)
-
-	#	for fNode in ReadDelim(stream, '}'):
-	#		print fNode
-
 		self.LoadDict(node, data)
 
 	def ToStr(self, node, embed=0):
@@ -159,3 +152,7 @@ class Node:
 
 		return new
 
+	def __iadd__(self, node):
+		if isinstance(node, Node):
+			for item,value in node.iteritems():
+				self[item] = value

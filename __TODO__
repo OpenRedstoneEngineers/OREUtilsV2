@@ -1,11 +1,12 @@
 Todo
 |-Python
-| |-Make errors only disable one subplugin
-| |-Organise files
+| |-Make errors only disable one subplugin [DONE]
+| |-Organise files [DONE]
 | |-Organise whitespace
-| |-Rewrite simple commands in scriptthing
+| |-Rewrite simple commands in scriptthing [DONE]
+| |-Integrate Config
+| |-Persistant Data in all formats
 | `-Uniform documentation/auto docs creation  
 |-Java
-| `IDFK
+|
 `-Misc
-  `IDFK

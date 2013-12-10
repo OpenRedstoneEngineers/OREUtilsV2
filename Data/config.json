@@ -1,0 +1,12 @@
+{
+'properties' :     {
+    'Include' : ['Aliases', 'ChannelChat', 'CommandGen', 'Derps', 'EventHooks', 'FunCommands', 'Help', 'IRCBot', 'NameSystem', 'Plots', 'ResultCode', 'UsefulCommands'],
+    'IRC' :         {
+        'NamePass' : '****',
+        'Name' : 'ORETest',
+        'Chan' : '#OREServerChat',
+        'Server' : 'irc.freenode.net',
+        'Port' : 6667,
+        },
+    },
+}
