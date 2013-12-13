@@ -1,11 +1,13 @@
 {
 'properties' :     {
-    'Include' : ['Aliases', 'ChannelChat', 'CommandGen', 'Derps', 'EventHooks', 'FunCommands', 'Help', 'IRCBot', 'NameSystem', 'Plots', 'ResultCode', 'UsefulCommands'],
+    'DerpPath' : '[path]Derps.txt',
+    'HelpPath' : '[path]Help.txt',
+    'Include' : ['Aliases', 'ChannelChat', 'CommandGen', 'Derps', 'EventHooks', 'FunCommands', 'IRCBot', 'NameSystem', 'Plots', 'ResultCode', 'UsefulCommands'],
     'IRC' :         {
         'NamePass' : '****',
-        'Name' : 'ORETest',
         'Chan' : '#OREServerChat',
         'Server' : 'irc.freenode.net',
+        'Name' : 'ORETest',
         'Port' : 6667,
         },
     },

@@ -1,11 +1,5 @@
 from collections import defaultdict
 
-import xml.etree.ElementTree as ET
-
-import org.apache.xerces.parsers.SAXParser as Parser
-import xml.parsers.expat as Evil
-Evil._xerces_parser = Parser
-
 import time.ctime as ctime
 
 from Helper import Info
@@ -65,50 +59,50 @@ class OwnerError(PlotError):
 """
 @brief Represents a single plot
 """
+#would turn to Plot(Node), but import's don't work that way ;-;
 class Plot:
-	def __init__(self, status = PlotStatus.FREE):
-		self.status = status
-
+	def __init__(self, node):
+		self.node = node
 	"""
 	@return whether this plot is claimable.
 	"""
 	def IsClaimable(self):
-		return self.status == PlotStatus.FREE
+		return self.node.status == PlotStatus.FREE
 
 	"""
 	@return whether this plot is claimed.
 	"""
 	def IsClaimed(self):
-		return self.status != PlotStatus.FREE
+		return self.node.status != PlotStatus.FREE
 	"""
 	@brief Claim this plot.
 	"""
 	def Claim(self, ownerName, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.owner)
+			raise OwnerError(self.node.owner)
 
-		self.reason = reason
+		self.node.reason = reason
 
-		self.status = PlotStatus.CLAIMED
+		self.node.status = PlotStatus.CLAIMED
 
-		self.owner = ownerName
+		self.node.owner = ownerName
 
-		self.date = ctime()
+		self.node.date = ctime()
 
 	"""
 	@brief Reserve this plot.
 	"""
 	def Reserve(self, ownerName, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.owner)
+			raise OwnerError(self.node.owner)
 
-		self.date   = ctime()
+		self.node.date   = ctime()
 
-		self.owner  = ownerName
+		self.node.owner  = ownerName
 		
-		self.reason = reason
+		self.node.reason = reason
 
-		self.status = PlotStatus.RESERVED
+		self.node.status = PlotStatus.RESERVED
 
 	"""
 	@brief Unclaim this plot.
@@ -117,14 +111,14 @@ class Plot:
 		if not self.IsClaimed():
 			raise UnclaimedError()
 
-		if self.status == PlotStatus.RESERVED:
-			del self.owner
-			del self.reason
-			del self.date
+		if self.node.status == PlotStatus.RESERVED:
+			del self.node.owner
+			del self.node.reason
+			del self.node.date
 
-		elif self.status == PlotStatus.CLAIMED:
-			del self.owner
-			del self.date
+		elif self.node.status == PlotStatus.CLAIMED:
+			del self.node.owner
+			del self.node.date
 
 		self.status = PlotStatus.FREE
 
@@ -135,90 +129,22 @@ class Plot:
 		desc = "Status: "+PlotStatus.ToStr(self.status)
 
 		if   self.status == PlotStatus.CLAIMED:
-			if self.reason != "":
-				desc += "\nOwner: "   +self.owner+"\nClaimed at: " +self.date+"\nDescription: "
+			if self.node.reason != "":
+				desc += "\nOwner: "   +self.node.owner+\
+				"\nClaimed at: " +self.node.date+"\nDescription: "
 			else:
-				desc += "\nOwner: "   +self.owner+"\nClaimed at: " +self.date
+				desc += "\nOwner: "   +self.node.owner+\
+				"\nClaimed at: " +self.node.date
 		
 		elif self.status == PlotStatus.RESERVED:
-			if self.reason != "":
-				desc += "\nReservee: "+self.owner+"\nReserved at: "+self.date+"\nReason: "+self.reason
+			if self.node.reason != "":
+				desc += "\nReservee: "+self.node.owner+\
+				"\nReserved at: "+self.node.date+"\nReason: "+self.node.reason
 		
 			else:
-				desc += "\nReservee: "+self.owner+"\nReserved at: "+self.date
+				desc += "\nReservee: "+self.node.owner+\
+				"\nReserved at: "+self.node.date
 		return desc
-
-	"""
-	@brief Convert a plot object to an XML tree.
-	"""
-	def Serialize(self, x, y):
-		node = ET.Element("Plot")
-
-		node.set("x", str(x))
-		node.set("y", str(y))
-
-		status = ET.SubElement(node, "Status")
-
-		status.text = str(self.status)
-
-		if self.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			owner       = ET.SubElement(node, "Owner")
-			date        = ET.SubElement(node, "Date")
-			reason      = ET.SubElement(node, "Reason")
-			
-			owner.text  = self.owner
-			date.text   = self.date
-			reason.text = self.reason
-
-		return node
-
-	"""
-	@brief Convert an XML tree to a plot object.
-	"""
-	def Deserialize(self, node):
-		pos = (int(node.get("x")),
-		       int(node.get("y")))
-
-		self.status = int(node.find("Status").text)
-
-		if self.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			self.owner  = node.find("Owner").text
-			self.date   = node.find("Date").text
-			self.reason = node.find("Reason").text
-
-		return pos
-
-class PlayerInfo:
-	def __init__(self, remPlots = 1, allowed = set()):
-		self.remPlots = remPlots
-		self.allowed  = allowed
-
-	"""
-	@brief Convert a player info object to an XML tree.
-	"""
-	def Serialize(self, name):
-		node = ET.Element("Player")
-
-		node.set("name", name)
-
-		remPlots = ET.SubElement(node, "RemPlots")
-		allowed  = ET.SubElement(node, "Allowed") 
-
-		remPlots.text = str(self.remPlots)
-		allowed.text  = str(list(self.allowed))
-
-		return node
-
-	"""
-	@brief Convert an XML tree to a player info object.
-	"""
-	def Deserialize(self, node):
-		name = node.get("name")
-
-		self.remPlots = int(node.find("RemPlots").text)
-		self.allowed  = set(list(node.find("Allowed").text))
-		
-		return name
 
 """
 @brief Keeps track of a collection of plots, and their respective owners
@@ -230,8 +156,6 @@ class PlotManager:
 		self.ploty  = ploty
 
 		self.plots = defaultdict(Plot)
-
-		self.players = defaultdict(PlayerInfo)
 
 	"""
 	@brief allow allowed to build on allower's plots 
@@ -351,86 +275,48 @@ class PlotManager:
 		        (y * self.ploty) + (self.ploty // 2))
 
 	"""
-	@brief Serialize the plot data
-	"""
-	def Serialize(self, root):
-		plotsNode = ET.SubElement(root, "Plots")
-
-		for pos, plot in self.plots.iteritems():
-			plotsNode.append(plot.Serialize(pos[0], pos[1]))
-
-		playersNode = ET.SubElement(root, "Players")
-
-		for name, info in self.players.iteritems():
-			playersNode.append(info.Serialize(name))
-
-		sizeNode = ET.SubElement(root, "PlotSize")
-
-		sizeNode.set("x", str(self.plotx))
-		sizeNode.set("y", str(self.ploty))
-
-	"""
 	@brief Deserialize the plot data
 	"""
-	def Deserialize(self, root):
-		plotsNode = root.find("Plots")
+	def Deserialize(self):
+		for name, node in self.plotsNode.iteritems():
+			plot = Plot(node)
 
-		for node in plots.findall("Plot"):
-			plot = Plot()
-
-			pos = plot.Deserialize(node)
+			pos  = [int(X) for X in name.split("_")[1:]]
 
 			self.plots[pos] = plot
 
-		playersNode = root.find("Players")
+		sizeNode = self.file.node.ORE.sizeNode
 
-		for node in players.findall("Player"):
-			info = PlayerInfo()
-
-			name = info.Serialize(node)
-
-			self.players[name] = info
-
-		sizeNode = root.find("PlotSize")
-
-		self.plotx = int(sizeNode.get("x"))
-		self.ploty = int(sizeNode.get("y"))
-
+		self.plotx = sizeNode.x
+		self.ploty = sizeNode.y 
 	"""
 	@return Save the plot data.
 	"""
 	def SaveXML(self, path):
-		root = ET.Element("ORE")
-
-		self.Serialize(root)
-
-		f = open(path)
-
-		f.write(ET.tostring(root))
-
-		f.close()
+		self.file.Dump()
 
 	"""
 	@return Load the plot data.
 	"""
-	def LoadXML(self, path):
-		f = open(path)
+	def LoadOrCreate(self, path, backend):
+		self.file = backend(path)
 		
-		root = ET.parse(f)#FUCK YOU
+		if "ORE" not in self.file.node:
+			self.file.node.New("ORE")
+		
+		if "Plots" not in self.file.node.ORE:
+			self.file.node.ORE.New("Plots")
 
-		f.close()
+		self.plotNode = self.file.node.ORE.Plots
+		
+		if "Players" not in self.file.node.ORE:
+			self.file.node.ORE.New("Players")
 
-		self.Deserialize(root.find("ORE"))	
-
+		self.players = self.file.node.ORE.Players
 	"""
-	@brief Try to load the plot data, but if the specified file doesn't exist, create it.
+	@return New plot
 	"""
-	def LoadOrCreate(self, path):
-		try:
-			self.LoadXML(path)
-
-		except Exception:
-			Info("Creating empty plot data file " + path)
-
-			self.SaveXML(path)
-
+	def New(self, x, y):
+		key = "Plot_%s_%s"%(x, y)
+		self.plotNode.New(key)
+		return self.plotNode[key]

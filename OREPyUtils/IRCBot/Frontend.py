@@ -100,7 +100,7 @@ def OnCommandIRCAdmin(sender, args):
 		sender.sendMessage("No permission!")
 		return True
 
-v	if len(args) == 0:
+	if len(args) == 0:
 		sender.sendMessage("--- IRC Admin ---")
 		sender.sendMessage("status     - Connection status")
 		sender.sendMessage("disconnect - Disconnect from remote server")

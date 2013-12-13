@@ -89,10 +89,10 @@ def GetAllCoords_Owner(owner, manager):
 			
 
 #Fucking guess.
-def InitManager(world):
+def InitManager(world, backend):
 	manager = Map.PlotMap(world, 8, (0, 16, 0), 256, 256) # Default params
 
-	manager.LoadOrCreate(world.getName() + "/PlotData.xml")
+	manager.LoadOrCreate(world.getName() + "/PlotData.xml", backend)
 
 	manager.Generate()
 
@@ -103,9 +103,9 @@ def InitManager(world):
 	Info("Initialized plot manager %s" % world.getName())
 
 
-def InitManagers():
+def InitManagers(backend):
 	for world in getWorlds():
-		InitManager(world)
+		InitManager(world, backend)
 
 def SaveData():
 	for world, manager in Managers.iteritems():

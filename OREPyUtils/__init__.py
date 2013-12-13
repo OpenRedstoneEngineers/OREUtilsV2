@@ -13,39 +13,13 @@ class ConfigFile(NodeFile):
 		NodeFile.__init__(self, DATA_PATH + "config.json")
 
 		if 'properties' not in self.node:
-			self.node.properties = Node()
+			self.node.New('properties')
 	
 	def __getitem__(self, name):
-		path = name.split('.')
-		
-		node = self.node.properties
-
-		for next in path:
-			if isinstance(node, Node) and next in node:
-				node = node[next]
-
-			else:
-				return None
-
-		return node
+		return self.node.properties.Get(name)
 
 	def __setitem__(self, name, value):
-		path = name.split('.')
-
-		node = self.node.properties
-
-		for next in path[:-1]:
-			if not (next in node and isinstance(node[next], Node)):
-				
-				node[next] = Node()
-			node = node[next]
-
-		if value == None:
-			if path[-1] in node:
-				del node[path[-1]]
-
-		else:
-			node[path[-1]] = value
+		self.node.properties.Set(name, value)
 
 CONFIG  = ConfigFile()
 
@@ -90,11 +64,12 @@ def onCommandProperty(sender, args):
 			CONFIG[args[0]] = None
 		else:
 			try:
-				CONFIG[args[0]] = Eval(' '.join(args[1:]))
+				setTo = Eval(' '.join(args[1:]))
 
 			except:
 				sender.sendMessage('/property [property] [set to]')
-
+			else:
+				CONFIG[args[0]] = setTo
 		CONFIG.Dump()
 
 @hook.command('status', description = 'View module loading failiures')
@@ -119,7 +94,7 @@ def OnCommandFail(sender,args):
 def OnEnable():
 	if 'Plots' not in Failiures:
 		try:
-			Plots.Frontend.InitManagers()
+			Plots.Frontend.InitManagers(NodeFile)
 
 		except Exception , E:
 
@@ -137,6 +112,7 @@ def OnEnable():
 
 				Severe('[!]Error loading derps')
 				Failiures['Derps'] = str(E)
+		
 		else:
 			Severe('[!]No DerpPath in config')
 			Failiures['Derps'] = 'No DerpPath in config'
@@ -159,25 +135,24 @@ def OnEnable():
 			
 
 	if "IRCBot" not in Failiures:
-
 		args = []
 
 		for conf in ['Server', 'Port', 'Name', 'NamePass', 'Chan']:
 			args.append(CONFIG['IRC.'+conf])
 
-			if args[-1] == None:
-				Severe('No IRC.'+conf+' in config')
-				Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
+		if None in args:
+			Severe('No IRC.'+conf+' in config')
+			Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
 				
-				break
-			else:
-				try:
-					IRCBot.Init(*args)
 		
-				except Exception , E:
+		else:
+			try:
+				IRCBot.Init(*args)
+		
+			except Exception , E:
 
-					Severe('[!]Error loading IRCBot')
-					Failiures['IRCBot'] = str(E)
+				Severe('[!]Error loading IRCBot')
+				Failiures['IRCBot'] = str(E)
 
 @hook.disable
 def OnDisable():

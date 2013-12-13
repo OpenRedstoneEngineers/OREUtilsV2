@@ -47,7 +47,7 @@ class DictBackend:
 		self.LoadDict(node, data)
 
 	def ToStr(self, node, embed=0):
-		toReturn = [(" " * embed) + "{\n"]
+		toReturn = ["{\n"]
 
 		for item, value in node.iteritems():
 			if isinstance(value, Node):
@@ -119,6 +119,39 @@ class Node:
 	def __getitem__(self, Item):
 		return self.__dict__[Item]
 
+        def Get(self, name):
+                path = name.split('.')
+		
+		if path[0] in self:
+                	node = self[path[0]]
+
+                	if isinstance(node, Node) and len(path) > 1:
+                        	return node.Get('.'.join(path[1:]))
+
+                	else:
+                        	return node
+
+		return None
+
+        def Set(self, name, value):
+                path = name.split('.')
+
+		if len(path) > 1:
+
+			if not (path[0] in self and isinstance(self[path[0]], Node)):
+				self[path[0]] = Node()						
+			
+			self[path[0]].Set('.'.join(path[1:]), value)
+		
+		else:
+			if value == None:
+				del self[path[0]]
+			else:
+				self[path[0]] = value
+
+	def New(self, name):
+		self[name] = Node()
+		
 	def __delitem__(self, Item):
 		del self.__dict__[Item]
 
