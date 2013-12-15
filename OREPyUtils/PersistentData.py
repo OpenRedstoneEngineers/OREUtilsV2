@@ -1,31 +1,6 @@
 from os.path import isfile as Exists
 
-import StringIO
-
 from ast import literal_eval as Eval
-
-def ReadDelim(f, delim, blocksize=1024):
-	end = ''
-
-	while True:
-		block = f.read(blocksize)
-
-		if not block:
-			break
-
-		parts = block.split(delim)
-
-		if len(parts) == 1:
-			end += parts[0]
-		else:
-			yield end + parts[0]
-
-			for p in parts[1:-1]:
-				yield p
-
-			end = parts[-1]
-
-	yield end
 
 class DictBackend:
 	def LoadDict(self, node, x):
@@ -150,7 +125,9 @@ class Node:
 				self[path[0]] = value
 
 	def New(self, name):
-		self[name] = Node()
+		new = Node()
+		self[name] = new
+		return new
 		
 	def __delitem__(self, Item):
 		del self.__dict__[Item]

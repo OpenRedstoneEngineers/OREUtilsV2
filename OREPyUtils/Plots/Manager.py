@@ -13,6 +13,36 @@ class PlotStatus:
 	def ToStr(status):
 		return ["Free", "Claimed", "Reserved"][status]
 
+class PlotBox:
+	def __init__(self, plotNode):
+		self.Dict = {}
+		self.plotNode = plotNode
+
+	def __getitem__(self, tuple):
+		try:
+			return self.Dict[tuple]
+		except Exception:
+			new  = self.plotNode.New("Plot_%s_%s"%tuple)
+			plot = Plot(new)
+			self.Dict[tuple] = plot
+			new.status = PlotStatus.FREE
+			return plot
+	def __setitem__(self, tuple, value):
+		self.Dict[tuple] = value
+
+class PlayerBox:
+	def __init__(self, playerNode):
+		self.playerNode = playerNode
+
+	def __getitem__(self, name):
+		try:
+			return self.playerNode(name)
+		except Exception:
+			new = self.playerNode.New(name)
+			new.remPlots = 1
+			return new
+
+
 """
 @brief Base class for plot exceptions
 """
@@ -126,9 +156,9 @@ class Plot:
 	@return a description of this plot.
 	"""
 	def Info(self):
-		desc = "Status: "+PlotStatus.ToStr(self.status)
+		desc = "Status: "+PlotStatus.ToStr(self.node.status)
 
-		if   self.status == PlotStatus.CLAIMED:
+		if   self.node.status == PlotStatus.CLAIMED:
 			if self.node.reason != "":
 				desc += "\nOwner: "   +self.node.owner+\
 				"\nClaimed at: " +self.node.date+"\nDescription: "
@@ -136,7 +166,7 @@ class Plot:
 				desc += "\nOwner: "   +self.node.owner+\
 				"\nClaimed at: " +self.node.date
 		
-		elif self.status == PlotStatus.RESERVED:
+		elif self.node.status == PlotStatus.RESERVED:
 			if self.node.reason != "":
 				desc += "\nReservee: "+self.node.owner+\
 				"\nReserved at: "+self.node.date+"\nReason: "+self.node.reason
@@ -150,12 +180,6 @@ class Plot:
 @brief Keeps track of a collection of plots, and their respective owners
 """
 class PlotManager:
-	def __init__(self, radius, plotx, ploty):
-		self.radius = radius
-		self.plotx  = plotx
-		self.ploty  = ploty
-
-		self.plots = defaultdict(Plot)
 
 	"""
 	@brief allow allowed to build on allower's plots 
@@ -181,7 +205,10 @@ class PlotManager:
 	@return whether the specified plot exists
 	"""
 	def IsInRange(self, x, y):
-		return (x < self.radius) and (y < self.radius) and (x >= -self.radius) and (y >= -self.radius)
+		return (x < self.size.radius) and\
+			(y < self.size.radius) and\
+			(x >= -self.size.radius) and\
+			 (y >= -self.size.radius)
 
 	"""
 	@return get a list of everyone who can build on a plot
@@ -258,37 +285,22 @@ class PlotManager:
 	@return the number of plots.
 	"""
 	def GetNumPlots(self):
-		return 4 * self.radius * self.radius
+		return 4 * self.size.radius * self.size.radius
 
 	"""
 	@return the coordinates of the plot that contains the specified block.
 	"""
 	def GetPlotCoords(self, x, z):
-		return (x // self.plotx,
-		        z // self.ploty)
+		return (x // self.size.x,
+		        z // self.size.y)
 
 	"""
 	@return the coordinates of the centre of the specified plot.
 	"""
 	def GetPlotCentre(self, x, y):
-		return ((x * self.plotx) + (self.plotx // 2),
-		        (y * self.ploty) + (self.ploty // 2))
+		return ((x * self.size.x) + (self.size.x // 2),
+		        (y * self.size.y) + (self.size.y // 2))
 
-	"""
-	@brief Deserialize the plot data
-	"""
-	def Deserialize(self):
-		for name, node in self.plotsNode.iteritems():
-			plot = Plot(node)
-
-			pos  = [int(X) for X in name.split("_")[1:]]
-
-			self.plots[pos] = plot
-
-		sizeNode = self.file.node.ORE.sizeNode
-
-		self.plotx = sizeNode.x
-		self.ploty = sizeNode.y 
 	"""
 	@return Save the plot data.
 	"""
@@ -300,23 +312,42 @@ class PlotManager:
 	"""
 	def LoadOrCreate(self, path, backend):
 		self.file = backend(path)
-		
 		if "ORE" not in self.file.node:
 			self.file.node.New("ORE")
 		
 		if "Plots" not in self.file.node.ORE:
 			self.file.node.ORE.New("Plots")
 
-		self.plotNode = self.file.node.ORE.Plots
+		self.plotsNode = self.file.node.ORE.Plots
 		
 		if "Players" not in self.file.node.ORE:
 			self.file.node.ORE.New("Players")
 
-		self.players = self.file.node.ORE.Players
-	"""
-	@return New plot
-	"""
-	def New(self, x, y):
-		key = "Plot_%s_%s"%(x, y)
-		self.plotNode.New(key)
-		return self.plotNode[key]
+		Info( str(self.file))
+		if "Size" in self.file.node.ORE:
+			self.size = self.file.node.ORE.Size
+
+		else:
+			self.size        = self.file.node.ORE.New("Size")
+			self.size.x      = 128
+			self.size.y      = 128
+			
+			self.size.New("pos")
+			self.size.pos.x = 0
+			self.size.pos.y = 16
+			self.size.pos.z = 0
+
+			self.size.radius = 0
+	
+		self.players = PlayerBox(self.file.node.ORE.Players)
+		
+		self.plots = PlotBox(self.plotsNode)
+
+		for name, node in self.plotsNode.iteritems():
+			plot = Plot(node)
+
+			pos  = tuple([int(X) for X in name.split("_")[1:]])
+
+			self.plots[pos] = plot
+
+

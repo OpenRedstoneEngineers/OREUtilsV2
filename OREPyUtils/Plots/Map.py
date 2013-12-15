@@ -4,6 +4,8 @@ import xml.etree.ElementTree as ET
 
 from Helper import Info
 
+
+
 class PlotMap(Manager.PlotManager):
 	BLOCK_RESERVED    = (159,10 ,0)
 	BLOCK_ON          = (159, 3 ,0)
@@ -14,17 +16,14 @@ class PlotMap(Manager.PlotManager):
 	BLOCK_BASE        = (1  , 0 ,0)
 
 
-	def __init__(self, world, radius, mapPos, plotx, ploty):
-		Manager.PlotManager.__init__(self, radius, plotx, ploty)
-
-		self.mapPos = mapPos
-
+	def __init__(self, world):
 		self.world = world
 	"""
 	@return if specified plot coords are on the map
 	"""
 	def IsOnMap(self, x, z):
-		return abs(x - self.mapPos[0]) < (self.radius * 3) and abs(z - self.mapPos[2]) < (self.radius * 3)
+		return abs(x - self.size.pos.x) < (self.size.radius * 3) and\
+			abs(z - self.size.pos.z) < (self.size.radius * 3)
 
 	"""
 	@return the physical location of a plot on the map
@@ -43,14 +42,14 @@ class PlotMap(Manager.PlotManager):
 		else:
 			newY += 1
 
-		return (newX + self.mapPos[0] + 2, newY + self.mapPos[2] + 2)
+		return (newX + self.size.pos.x + 2, newY + self.size.pos.z + 2)
 
 	"""
 	@return the plot coords of a physical location on the map
 	"""
 	def MapToPlotCoords(self, x, y):
-		newX = x - self.mapPos[0]
-		newY = y - self.mapPos[2]
+		newX = x - self.size.pos.x
+		newY = y - self.size.pos.z
 
 		if newX > 0:
 			newX -= 2
@@ -65,26 +64,26 @@ class PlotMap(Manager.PlotManager):
 	def MarkPlotFrame(self, x, y):
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0] - 2, self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-		self.world.getBlockAt(position[0] - 2, self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
 
-		if x == self.radius-1:
-			self.world.getBlockAt(position[0] + 1, self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-			self.world.getBlockAt(position[0] + 1, self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
+		if x == self.size.radius-1:
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
 
-		if y == self.radius-1:
-			self.world.getBlockAt(position[0],     self.mapPos[1], position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
-			self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+		if y == self.size.radius-1:
+			self.world.getBlockAt(position[0],     self.size.pos.y, position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+			self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
 
 
-		self.world.getBlockAt(position[0] - 2, self.mapPos[1], position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_CROSS)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_CROSS)
 
-		self.world.getBlockAt(position[0],     self.mapPos[1] - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1] - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0],     self.mapPos[1] - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1] - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
 
 	"""
 	@brief Mark the plot at the specified position as reserved.
@@ -95,10 +94,10 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
 
 	"""
 	@brief Mark the plot at the specified position as claimed.
@@ -109,10 +108,10 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
 
 	"""
 	@brief Mark the plot at the specified position as unclaimed.
@@ -123,22 +122,22 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0],     self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0] - 1, self.mapPos[1], position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
 
 	"""
 	@brief Generate a plot map with the specified size.
 	"""
 	def Generate(self, override=False):
-		existing = self.plots.keys()
+		existing = self.plots.Dict.keys()
 
-		for x in xrange(-self.radius, self.radius):
-			for y in xrange(-self.radius, self.radius):
+		for x in xrange(-self.size.radius, self.size.radius):
+			for y in xrange(-self.size.radius, self.size.radius):
 				if (x, y) not in existing:
 					self.MarkUnclaimed(x, y)
-				
+
 				elif override:
 					status = self.plots[(x, y)].status
 					if   status == PlotStatus.UNCLAIMED:
@@ -157,27 +156,3 @@ class PlotMap(Manager.PlotManager):
 	"""
 	def Update(self):
 		self.Generate(override=True)
-
-	"""
-	@brief Serialize the plot map.
-	"""
-	def Serialize(self, root):
-		Manager.PlotManager.Serialize(self, root)
-
-		posNode = ET.SubElement(root, "MapPos")
-
-		posNode.set("x", str(self.mapPos[0]))
-		posNode.set("y", str(self.mapPos[1]))
-		posNode.set("z", str(self.mapPos[2]))
-
-	"""
-	@brief Deserialize the plot map.
-	"""
-	def Deserialize(self, root):
-		Manager.PlotManager.Deserialize(self, root)
-
-		posNode = root.find("MapPos")
-
-		self.mapPos[0] = int(posNode.get("x"))
-		self.mapPos[1] = int(posNode.get("y"))
-		self.mapPos[2] = int(posNode.get("z"))
