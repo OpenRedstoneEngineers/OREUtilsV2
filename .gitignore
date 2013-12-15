@@ -3,3 +3,8 @@
 
 *.class
 *.pyc
+
+*.o
+*.log
+
+OREd/OREd
