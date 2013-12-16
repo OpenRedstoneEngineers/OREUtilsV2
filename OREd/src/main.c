@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 
-static char* const args[] = { "-jar craftbukkit.jar", NULL };
+static char* const args[] = { "java", "-jar craftbukkit.jar", NULL };
 
 int main()
 {
