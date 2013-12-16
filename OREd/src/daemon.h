@@ -16,37 +16,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "daemon.h"
+#ifndef _ORED_DAEMON_
+#define _ORED_DAEMON_
 
-#include "console.h"
+#include <stdio.h>
 
-#include <stdlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static char* const args[] = { "-jar craftbukkit.jar", NULL };
+/* Working directory */
+#define WORKING_DIRECTORY "/servers/ORE/"
 
-int main()
-{
-	if (daemonize() < 0)
-	{
-		exit(EXIT_FAILURE);
-	}
+/* Path to log file */
+#define LOG_PATH "OREd.log"
 
-	child_proc* server = console_init("/usr/bin/java", args);
+/* Log file handle */
+FILE* fLog;
 
-	if (server == NULL)
-	{
-		fprintf(fLog, "Could not start craftbukkit.\n");
+/**
+ * \brief Try to daemonize the process.
+ *
+ * On success, the parent process will exit and control will be given to the child process.
+ *
+ * On failure, both processes will exit with an error code.
+ */
+int daemonize(void);
 
-		fclose(fLog);
-
-		exit(EXIT_FAILURE);
-	}
-
-	console_terminate(server);
-
-	fprintf(fLog, "Exiting.\n");
-
-	fclose(fLog);
-
-	exit(EXIT_SUCCESS);
+#ifdef __cplusplus
 }
+#endif
+
+#endif

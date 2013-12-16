@@ -18,35 +18,70 @@
 
 #include "daemon.h"
 
-#include "console.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <syslog.h>
+
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
-static char* const args[] = { "-jar craftbukkit.jar", NULL };
-
-int main()
+int daemonize(void)
 {
-	if (daemonize() < 0)
+	pid_t pid = fork();
+
+	if (pid < 0)
 	{
+		printf("Fork unsuccesful.\n");
+
 		exit(EXIT_FAILURE);
 	}
 
-	child_proc* server = console_init("/usr/bin/java", args);
-
-	if (server == NULL)
+	if (pid > 0)
 	{
-		fprintf(fLog, "Could not start craftbukkit.\n");
+		printf("Fork succesful. [PID: %i]\n", pid);
+
+		exit(EXIT_SUCCESS);
+	}
+
+	umask(0);
+
+	fLog = fopen(LOG_PATH, "w");
+
+	if (fLog == NULL)
+	{
+		printf("Could not open log file %s\n", LOG_PATH);
+
+		exit(EXIT_FAILURE);
+	}
+
+	pid_t sid = setsid();
+
+	if (sid < 0)
+	{
+		fprintf(fLog, "Could not create a new session.\n");
 
 		fclose(fLog);
 
 		exit(EXIT_FAILURE);
 	}
 
-	console_terminate(server);
+	if (chdir(WORKING_DIRECTORY) < 0)
+	{
+		fprintf(fLog, "Could not change working directory to %s.\n", WORKING_DIRECTORY);
 
-	fprintf(fLog, "Exiting.\n");
+		fclose(fLog);
 
-	fclose(fLog);
+		exit(EXIT_FAILURE);
+	}
 
-	exit(EXIT_SUCCESS);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+
+	return 0;
 }

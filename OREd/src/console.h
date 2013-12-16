@@ -16,37 +16,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "daemon.h"
+#ifndef _ORED_CONSOLE_
+#define _ORED_CONSOLE_
 
-#include "console.h"
+#include <sys/types.h>
 
-#include <stdlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static char* const args[] = { "-jar craftbukkit.jar", NULL };
-
-int main()
+/**
+ * \brief Represents a child process.
+ */
+typedef struct child_proc_
 {
-	if (daemonize() < 0)
-	{
-		exit(EXIT_FAILURE);
-	}
+	/* Process ID */
+	pid_t pid;
 
-	child_proc* server = console_init("/usr/bin/java", args);
+	/* File descriptors. */
+	int pipeFd[2];
+} child_proc;
 
-	if (server == NULL)
-	{
-		fprintf(fLog, "Could not start craftbukkit.\n");
+/**
+ * \brief Create a new child process.
+ *
+ * On failure, a NULL pointer will be returned.
+ */
+child_proc* console_init(const char* filename, char* const argv[]);
 
-		fclose(fLog);
+/**
+ * \brief Terminate the specified child process.
+ *
+ * WARNING: The pointer will be invalidated.
+ */
+void console_terminate(child_proc* proc);
 
-		exit(EXIT_FAILURE);
-	}
+/**
+ * \return whether the child process is running.
+ */
+int console_is_running(child_proc* proc);
 
-	console_terminate(server);
-
-	fprintf(fLog, "Exiting.\n");
-
-	fclose(fLog);
-
-	exit(EXIT_SUCCESS);
+#ifdef __cplusplus
 }
+#endif
+
+#endif
