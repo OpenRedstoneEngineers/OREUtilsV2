@@ -226,12 +226,11 @@ void server_serve(server* serv)
 	}
 }
 
-void server_termiante(server* serv)
+void server_terminate(server* serv)
 {
 	assert(serv != NULL);
 
 	serv->serving = 0;
-
 	client_node* it = serv->firstClient;
 
 	while (it != NULL)
