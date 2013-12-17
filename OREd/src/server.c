@@ -95,7 +95,11 @@ server* server_init(int port)
 		return NULL;
 	}
 
+	#ifndef ORE_USE_IPV6
 	serv->sockFd = socket(AF_INET, SOCK_STREAM, 0);
+	#else
+	serv->sockFd = socket(AF_INET6, SOCK_STREAM, 0);
+	#endif
 
 	if (serv->sockFd < 0)
 	{
@@ -165,7 +169,7 @@ void server_serve(server* serv)
 		{
 			struct sockaddr_in cli_addr;
 
-			unsigned int clilen;
+			unsigned int clilen = sizeof(cli_addr);
 
 			int cliSockFd = accept(serv->sockFd, (struct sockaddr*) &cli_addr, &clilen);
 
@@ -231,6 +235,7 @@ void server_terminate(server* serv)
 	assert(serv != NULL);
 
 	serv->serving = 0;
+
 	client_node* it = serv->firstClient;
 
 	while (it != NULL)

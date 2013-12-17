@@ -56,13 +56,15 @@ typedef struct server_
 	/* File descriptor. */
 	int sockFd;
 
-	/* Callbacks */
+	/* Callback functions. */
 	ConnectionCB connectCb;
 	DisconnectCB disconnectCb;
 	MessageCB msgCb;
 
+	/* Client list head */
 	client_node* firstClient;
 
+	/* Boolean flag indicating whether the server is running. */
 	int serving;
 } server;
 
@@ -72,6 +74,9 @@ typedef struct server_
  * \param port Port number.
  *
  * On failure, a NULL pointer will be returned.
+ *
+ * NOTE: This function will create a standard IPv4 TCP 
+ * socket, unless the macro ORE_USE_IPV6 is defined.
  */
 server* server_init(int port);
 
@@ -87,7 +92,7 @@ void server_serve(server* serv);
  *
  * WARNING: The pointer will be invalidated.
  */
-void server_termiante(server* serv);
+void server_terminate(server* serv);
 
 #ifdef __cplusplus
 }

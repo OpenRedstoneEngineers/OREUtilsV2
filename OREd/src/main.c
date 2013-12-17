@@ -20,7 +20,13 @@
 
 #include "console.h"
 
+#include "server.h"
+
+#include "client.h"
+
 #include <stdlib.h>
+
+// Test
 
 static char* const args[] = { "java", "-jar craftbukkit.jar", NULL };
 
@@ -30,6 +36,8 @@ int main()
 	{
 		exit(EXIT_FAILURE);
 	}
+
+	server* serv = server_init(4242);
 
 	child_proc* server = console_init("/usr/bin/java", args);
 
@@ -42,7 +50,11 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
+	server_serve(serv);
+
 	console_terminate(server);
+
+	server_terminate(serv);
 
 	fprintf(fLog, "Exiting.\n");
 
