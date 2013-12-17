@@ -15,34 +15,37 @@
 ::<NAME>[|Description[|Usage]][:Line[:Line[...]]]
 ::
 
-day  |Set your time to day:  [t]Your time was set to day:  [p]Sender.setPlayerTime(6000,0)
-night|Set your time to night:[t]Your time was set to night:[p]Sender.setPlayerTime(18000,0)
+day     |Set time to day:     [t]Your time was set to day:  [p]Sender.setPlayerTime(6000,0)
+night   |Set time to night:   [t]Your time was set to night:[p]Sender.setPlayerTime(18000,0)
 
-c|View chat formatting codes:[t][c|a]a[c|b]b[c|c]c[c|d]d[c|e]e[c|f]f[c|l]l[c|r][c|m]m[c|r][c|n]n[c|r][c|o]o:[c|1]1[c|2]2[c|3]3[c|4]4[c|5]5[c|6]6[c|7]7[c|8]8[c|9]9[c|0]0
+c       |View format codes:  [t][c|a]a[c|b]b[c|c]c[c|d]d[c|e]e[c|f]f[c|l]l[c|r][c|m]m[c|r][c|n]n[c|r][c|o]o:[c|1]1[c|2]2[c|3]3[c|4]4[c|5]5[c|6]6[c|7]7[c|8]8[c|9]9[c|0]0
 
-lemur |Bark like a lemur:   [c|e][n][c|f] Barks and screeches like a lemur
-moo   |Moo like a cow:      [c|e][n][c|f] Moos like a cow
-oink  |Oink like a pig:     [c|e][n][c|f] Oinks like a pig
-cluck |Cluck like a chicken:[c|e][n][c|f] Clucks like a chicken
-bark  |Bark like a dog:     [c|e][n][c|f] Barks like a dog
-baa   |Baa like a sheep:    [c|e][n][c|f] Baas like a sheep
-brains|Brraaiinnss:         [c|e][n][c|f] Brains like a zombie
-sss   |Sss like a creeper:  [c|e][n][c|f] Sses like a creeper
+lemur   |Bark like a lemur:   [c|e][n][c|f] Barks and screeches like a lemur
+moo     |Moo like a cow:      [c|e][n][c|f] Moos like a cow
+oink    |Oink like a pig:     [c|e][n][c|f] Oinks like a pig
+cluck   |Cluck like a chicken:[c|e][n][c|f] Clucks like a chicken
+bark    |Bark like a dog:     [c|e][n][c|f] Barks like a dog
+baa     |Baa like a sheep:    [c|e][n][c|f] Baas like a sheep
+brains  |Brraaiinnss:         [c|e][n][c|f] Brains like a zombie
+sss     |Sss like a creeper:  [c|e][n][c|f] Sses like a creeper
 
-confused|errrrrm:[c|e][n][c|f] has ALL the confusion
-nope|Nope.avi:[t]Chuck testa
-forgive|I'm sorry:[c|6][n][c|5] forgives [c|6][a|n|0]
-lag|Fix the server's lag:[s]kick [n] No more lag <3, RSW
-huzza|HUZZZAH:[c|6][n][c|5] yells HUZZA:[r]suicide
-lol|haha:[c|e][n][c|6] lol'd
-cp|Such lag:[t]OMG, lagggg
-rage|grrrr:[c|red][c|l][n] [c|lred][c|l]rages
-hap|haphap:[c|pink][n] [c|purple]haphaphap'd
-facepalm|..No:[c|aqua][n] [c|lblue]facepalms
-love|Awww :3:[c|pink][n] [c|red][c|bold]<3 [c|pink][a]
-hug|A special command for someone you love:[c|d][n] [c|4][c|l]hugged [c|d][a|n|0]
-mistake|odder:[c|4]Ohder [c|6][c|l][n] [c|5]made a mistake
-waffle|tasty...:[c|e]Guess who likes waffles; [c|6][c|l][n] [c|e]does!
-massage|mmmm...:[c|d][n] [c|4]massaged [c|d][a|n|0]'s [a|1]
-snuggle|A special command for someone you love:[c|d][n] [c|4][c|l]snuggled with [c|d][a|n|0]
-hate|;-;:[c|lgreen][n] [c|green][c|bold]hates [c|lgreen][a]
+confuse |errrrrm:             [c|e][n][c|f] has ALL the confusion
+nope    |Nope.avi:            [t]Chuck testa
+forgive |I'm sorry:           [c|6][n][c|5] forgives [c|6][a|n|0]
+lag     |Fix the server's lag:[s]kick [n] No more lag <3, Mort
+huzza   |HUZZZAH:             [c|6][n][c|5] yells HUZZA:[r]suicide
+lol     |haha:                [c|e][n][c|6] lol'd
+cp      |Such lag:            [t]OMG, lagggg
+rage    |grrrr:               [c|red][c|l][n] [c|lred][c|l]rages
+hap     |haphap:              [c|pink][n] [c|purple]haphaphap'd
+facepalm|..No:                [c|aqua][n] [c|lblue]facepalms
+love    |Awww :3:             [c|pink][n] [c|red][c|bold]<3 [c|pink][a]
+hug     |for someone you love:[c|d][n] [c|4][c|l]hugged [c|d][a|n|0]
+mistake |odder:               [c|4]Ohder [c|6][c|l][n] [c|5]made a mistake
+waffle  |tasty...:            [c|e]Guess who likes waffles; [c|6][c|l][n] [c|e]does!
+massage |mmmm...:             [c|d][n] [c|4]massaged [c|d][a|n|0]'s [a|1]
+snuggle |for someone you love:[c|d][n] [c|4][c|l]snuggled with [c|d][a|n|0]
+hate    |;-;:                 [c|lgreen][n] [c|green][c|bold]hates [c|lgreen][a]
+fixname |Turn your nick off:  [s]nick [n] off
+green   |Dat colour:          [c|a]Green is [c|2][c|l]NOT [c|a]a creative colour.
+
