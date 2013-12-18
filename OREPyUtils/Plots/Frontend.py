@@ -65,7 +65,7 @@ def GetCoords_Owner(owner, manager):
 
 def GetPlayer_Match(player, manager):
 	player = player.lower()
-	players = dict((s.lower(),s) for s in manager.players.plotNode)
+	players = dict((s.lower(),s) for s in manager.players.playerNode)
 	
 	if player in players:
 		return players[player]
@@ -81,16 +81,16 @@ def GetPlayer_Match(player, manager):
 """
 def GetAllCoords_Owner(owner, manager):	
 	fullName = GetPlayer_Match(owner, manager)
+
 	if not fullName:
 		return []
+
 	return [pos for pos, plot in manager.plots.plotNode.iteritems()\
 		if plot.status == Manager.PlotStatus.CLAIMED and\
 		plot.owner == owner]
 			
-
-#Fucking guess.
 def InitManager(world, backend):
-	manager = Map.PlotMap(world) # Default params
+	manager = Map.PlotMap(world)
 
 	manager.LoadOrCreate(world.getName() + "/PlotData.xml", backend)
 

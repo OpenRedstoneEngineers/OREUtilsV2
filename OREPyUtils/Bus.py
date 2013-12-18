@@ -1,3 +1,9 @@
+"""
+Permission nodes:
+
+ore.bus
+""'
+
 LastPos = {}
 
 @hook.command("bstart")
@@ -45,24 +51,24 @@ def SetBusRedstone(x, y, z, world):
 	world.getBlockAt(x, y, z).setTypeId(1)
 	world.getBlockAt(x, y + 1, z).setTypeId(55)
 
+def SetBusRepeater(x, y, z, world, meta):
+	world.getBlockAt(x, y, z).setTypeId(1)
+	world.getBlockAt(x, y + 1, z).setTypeIdAndData(93, meta)
+
 def Bus(x0, y0, z0, x1, y1, z1, world):
-	if x0 < x1:
-		dx = 1
-	else:
-		dx = -1
+	dx = (1 if x0 < x1 else -1)
+	dy = (1 if y0 < y1 else -1)
+	dz = (1 if z0 < z1 else -1)
 
-	if y0 < y1:
-		dy = 1
-	else:
-		dy = -1
-
-	if z0 < z1:
-		dz = 1
-	else:
-		dz = -1
+	Power = 0
 
 	while y0 != y1:
-		SetBusRedstone(x0, y0, z0, world)
+		if Power == 16:
+			Power = 1
+			SetBusRepeater(x0, y0, z0, world, 0)
+		else:
+			Power += 1
+			SetBusRedstone(x0, y0, z0, world)
 
 		if x0 == x1:
 			if z0 == z1:
@@ -75,11 +81,21 @@ def Bus(x0, y0, z0, x1, y1, z1, world):
 		y0 += dy
 
 	while x0 != x1:
-		SetBusRedstone(x0, y0, z0, world)
+		if Power == 16:
+			Power = 1
+			SetBusRepeater(x0, y0, z0, world, 0)
+		else:
+			Power += 1
+			SetBusRedstone(x0, y0, z0, world)
 
 		x0 += dx
 
 	while z0 != z1:
-		SetBusRedstone(x0, y0, z0, world)
+		if Power == 16:
+			Power = 1
+			SetBusRepeater(x0, y0, z0, world, 0)
+		else:
+			Power += 1
+			SetBusRedstone(x0, y0, z0, world)
 
 		z0 += dz

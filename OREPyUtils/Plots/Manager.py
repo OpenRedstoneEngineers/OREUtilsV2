@@ -21,12 +21,15 @@ class PlotBox:
 	def __getitem__(self, tuple):
 		try:
 			return self.Dict[tuple]
+		
 		except Exception:
 			new  = self.plotNode.New("Plot_%s_%s"%tuple)
 			plot = Plot(new)
 			self.Dict[tuple] = plot
 			new.status = PlotStatus.FREE
+
 			return plot
+
 	def __setitem__(self, tuple, value):
 		self.Dict[tuple] = value
 
@@ -312,32 +315,25 @@ class PlotManager:
 	"""
 	def LoadOrCreate(self, path, backend):
 		self.file = backend(path)
-		if "ORE" not in self.file.node:
-			self.file.node.New("ORE")
 		
-		if "Plots" not in self.file.node.ORE:
-			self.file.node.ORE.New("Plots")
+		self.file.node    .Ensure("ORE")
 
-		self.plotsNode = self.file.node.ORE.Plots
+		self.file.node.ORE.Ensure("Players")   
+
+		self.plotsNode = self.file.node.ORE.Ensure("Plots")
+
+		self.size = self.file.node.ORE.Ensure("Size")
+
+		self.size.Ensure("x", 128)
+		self.size.Ensure("y", 128)
+
+		self.size.Ensure("radius", 0)
+
+		self.size.Ensure("pos")
 		
-		if "Players" not in self.file.node.ORE:
-			self.file.node.ORE.New("Players")
-
-		if "Size" in self.file.node.ORE:
-			self.size = self.file.node.ORE.Size
-
-		else:
-			print "AAAAAAAAAAAAAAAAAA"
-			self.size        = self.file.node.ORE.New("Size")
-			self.size.x      = 128
-			self.size.y      = 128
-			
-			self.size.New("pos")
-			self.size.pos.x = 0
-			self.size.pos.y = 16
-			self.size.pos.z = 0
-
-			self.size.radius = 0
+		self.size.pos.Ensure("x", 0)
+		self.size.pos.Ensure("y", 16)
+		self.size.pos.Ensure("z", 0)  
 	
 		self.players = PlayerBox(self.file.node.ORE.Players)
 		

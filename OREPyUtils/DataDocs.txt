@@ -1,0 +1,72 @@
+- NodeManager(data=None, backend=DictBackend)
+	An interface for the management and conversion of Nodes to and from other formats
+
+	data is a data format to load from, such as a dict, or a string
+	backend is the backend to use for converting the data
+	
+	- str(NodeManager)
+		Returns the data of the node, converted by the backend to a string
+
+	- .Dict()
+		Returns the dict of the node, converted by the node
+
+	- .node
+		Access the node controlled by this manager
+
+- NodeFile(filename, backend=DictBackend, read=True)
+	An interface for the automated loading and saving too and from a file to a Node
+	
+	filename is the path to load and save the data to and from
+	backend is the backend to use for converting the data
+	read is whether the data should be loaded rather than overwritten
+
+	- .Dump()
+		saves the current node to file
+
+- Node()
+	- Node.iteritems()
+		Returns an object for iterating through key, value pairs
+	
+	- Node.itervalues()
+		Returns an object for iterating through values
+
+	- Node.iterkeys()
+		Returns an object for iterating through keys
+
+	- for X in Node
+		Iterates over every item in the node, one level only
+
+	- X in Node
+		Sees if an object is in the node, one level only
+
+	- Node["X"]
+		Returns an object of key X, can be used for getting or setting or delling.
+
+	- Node.X
+		Returns an object of key X, can be used for getting or setting or delling.
+
+	- Node.Get(name)
+		Returns an object of key name, multiple layers can be accessed by use of .s
+
+	- Node.Set(name, value)
+		Sets the object at key name, to value multiple layers can be accessed by use of .s 
+
+	- Node.Ensure(name, default=None)
+		Gets an object at key name. If it does not exist, it will be set to an empty node,
+		or default if supplied
+
+	- Node.New(name)
+		Creates a Node at key name
+
+	
+	- len(Node)
+		Return the number of items in the node, one level only
+
+	- Node.Dict() 
+		Return a dict format of this node and its children
+	
+	- Node.copy()
+		Return a copy of the node without connection to the last one
+
+	- Node + Node
+		Combines the two nodes, the latter overwrites the former

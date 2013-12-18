@@ -27,10 +27,8 @@ class DictBackend:
 		for item, value in node.iteritems():
 			if isinstance(value, Node):
 				toReturn.append((" " * embed) + "'" + item + "' : " + self.ToStr(value, embed + 4) + ",\n")
-			elif isinstance(value, str):
-				toReturn.append((" " * embed) + "'" + item + "' : '" + value + "',\n")
 			else:
-				toReturn.append((" " * embed) + "'" + item + "' : " + str(value) + ",\n")
+				toReturn.append((" " * embed) + "'" + item + "' : " + repr(value) + ",\n")
 
 		toReturn.append((" " * embed) + "}")
 
@@ -52,12 +50,6 @@ class NodeManager:
 	def Dict(self):
 		return self.node.Dict()
 
-class ExternalNodeManager(NodeManager):
-	def __init__(self, node, data=None, backend=DictBackend):
-		self.backend = backend()
-		self.node = node
-		self.backend.Load(self.node, data)
-
 class NodeFile(NodeManager):
 	def __init__(self, filename, backend=DictBackend, read=True):
 		if Exists(filename) and read:
@@ -71,6 +63,7 @@ class NodeFile(NodeManager):
 
 	def Dump(self):
 		open(self.filename, 'w').write(str(self))
+		print str(self)
 
 class Node:
 	def iteritems(self):
@@ -123,6 +116,18 @@ class Node:
 				del self[path[0]]
 			else:
 				self[path[0]] = value
+
+	def Ensure(self, name, default=None):
+		if name not in self:
+			if default == None:
+				return self.New(name)
+		
+			else:
+				self[name] = default
+				
+				return default
+		
+		return self[name]
 
 	def New(self, name):
 		new = Node()

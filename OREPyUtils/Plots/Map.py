@@ -139,14 +139,14 @@ class PlotMap(Manager.PlotManager):
 					self.MarkUnclaimed(x, y)
 
 				elif override:
-					status = self.plots[(x, y)].status
-					if   status == PlotStatus.UNCLAIMED:
+					status = self.plots[(x, y)].node.status
+					if   status == Manager.PlotStatus.FREE:
 						self.MarkUnclaimed(x, y, frame=True)
 
-					elif status == PlotStatus.CLAIMED:
+					elif status == Manager.PlotStatus.CLAIMED:
 						self.MarkClaimed(x, y, frame=True)
 
-					elif status == PlotStatus.RESERVED:
+					elif status == Manager.PlotStatus.RESERVED:
 						self.MarkReserved(x, y, frame=True)		
 
 		Info("Generated map")
