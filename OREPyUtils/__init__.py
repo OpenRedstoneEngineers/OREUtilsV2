@@ -45,6 +45,23 @@ def ImportFiles():
         	else:
                 	Info('[i]Imported ' + N)
 
+def TryExec(plugin, code):
+	if plugin not in Failiures:
+		try:
+			exec plugin+'.'+code
+		
+		except Exception, E:
+			Severe('[!]Error with '+plugin+' '+str(E))
+			Failiures[plugin] = str(E)
+			
+def CheckIsString(property, plugin):
+	if isinstance(CONFIG[property], str):
+		return True
+	else:
+		Severe('[!]No '+property+' in config')
+		Failiures[plugin] = 'No '+property+' in config'
+		return False
+
 ImportFiles()
 
 @hook.command('property', description='Plugin properties')
@@ -92,47 +109,15 @@ def OnCommandFail(sender,args):
 	
 @hook.enable
 def OnEnable():
-	if 'Plots' not in Failiures:
-		try:
-			Plots.Frontend.InitManagers(NodeFile)
-
-		except Exception , E:
-
-			Severe("[!]Error starting plot system")
-			Failiures['Plots'] = str(E)
-
-	if 'Derps' not in Failiures:
-		if isinstance(CONFIG['DerpPath'], str):
-			DerpPath = CONFIG['DerpPath'].replace('[path]', DATA_PATH)
-
-			try:
-				Derps.LoadDerps(DATA_PATH + "Derps.txt")
+	TryExec('Plots','Frontend.InitManagers(NodeFile)')
 	
-			except Exception , E:
+	CheckIsString('DerpPath', 'Derps')
+	TryExec('Derps',
+		'LoadDerps(CONFIG["DerpPath"].replace("[path]", DATA_PATH))')
 
-				Severe('[!]Error loading derps')
-				Failiures['Derps'] = str(E)
-		
-		else:
-			Severe('[!]No DerpPath in config')
-			Failiures['Derps'] = 'No DerpPath in config'
-
-	if 'UsefulCommands' not in Failiures:
-		if isinstance(CONFIG['HelpPath'], str):
-			HelpPath = CONFIG['HelpPath'].replace('[path]', DATA_PATH)
-			
-			try:
-				UsefulCommands.LoadHelp(HelpPath)
-
-			except Exception , E:
-
-				Severe('[!]Error loading help')
-				Failiures['UsefulCommands'] = str(E)
-
-		else:
-			Severe('[!]No HelpPath in config')
-			Failiures['UsefulCommands'] = 'No HelpPath in config'
-			
+	CheckIsString('HelpPath', 'UsefulCommands')
+	TryExec('UsefulCommands', 
+		'LoadHelp(CONFIG["HelpPath"].replace("[path]", DATA_PATH)')
 
 	if "IRCBot" not in Failiures:
 		args = []
@@ -146,26 +131,9 @@ def OnEnable():
 				
 		
 		else:
-			try:
-				IRCBot.Init(*args)
-		
-			except Exception , E:
-
-				Severe('[!]Error loading IRCBot')
-				Failiures['IRCBot'] = str(E)
+			TryExec('IRCBot', 'Init(*args)', args=args)
 
 @hook.disable
 def OnDisable():
-	if 'Plots' not in Failiures:
-		try:
-			Plots.Frontend.SaveData()
-
-		except Exception , E:
-			Severe('[!]Error unloading Plots: '+str(E))
-
-	if 'IRCBot' not in Failiures:
-		try:
-			IRCBot.Terminate()
-
-		except Exception , E:
-			Severe('[!]Error unloading IRCBot: '+str(E))
+	TryExec('Plots', 'Frontend.SaveData()')
+	TryExec('IRCBot', 'Terminate()')
