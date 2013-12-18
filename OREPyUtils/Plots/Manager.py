@@ -323,11 +323,11 @@ class PlotManager:
 		if "Players" not in self.file.node.ORE:
 			self.file.node.ORE.New("Players")
 
-		Info( str(self.file))
 		if "Size" in self.file.node.ORE:
 			self.size = self.file.node.ORE.Size
 
 		else:
+			print "AAAAAAAAAAAAAAAAAA"
 			self.size        = self.file.node.ORE.New("Size")
 			self.size.x      = 128
 			self.size.y      = 128

@@ -45,7 +45,7 @@ def ImportFiles():
         	else:
                 	Info('[i]Imported ' + N)
 
-def TryExec(plugin, code):
+def TryExec(plugin, code, meta=None):
 	if plugin not in Failiures:
 		try:
 			exec plugin+'.'+code
@@ -61,6 +61,9 @@ def CheckIsString(property, plugin):
 		Severe('[!]No '+property+' in config')
 		Failiures[plugin] = 'No '+property+' in config'
 		return False
+
+def ConvertPath(path):
+	return path.replace('[path]', DATA_PATH)
 
 ImportFiles()
 
@@ -113,25 +116,27 @@ def OnEnable():
 	
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',
-		'LoadDerps(CONFIG["DerpPath"].replace("[path]", DATA_PATH))')
+		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
 
 	CheckIsString('HelpPath', 'UsefulCommands')
 	TryExec('UsefulCommands', 
-		'LoadHelp(CONFIG["HelpPath"].replace("[path]", DATA_PATH)')
+		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
 
 	if "IRCBot" not in Failiures:
 		args = []
 
 		for conf in ['Server', 'Port', 'Name', 'NamePass', 'Chan']:
-			args.append(CONFIG['IRC.'+conf])
-
-		if None in args:
-			Severe('No IRC.'+conf+' in config')
-			Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
-				
+			item = CONFIG['IRC.'+conf]
+			
+			if item == None:
+				Severe('No IRC.'+conf+' in config')
+				Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
+			
+				return
+			
+			args.append(item)
 		
-		else:
-			TryExec('IRCBot', 'Init(*args)', args=args)
+		TryExec('IRCBot', 'Init(*meta)', args)
 
 @hook.disable
 def OnDisable():
