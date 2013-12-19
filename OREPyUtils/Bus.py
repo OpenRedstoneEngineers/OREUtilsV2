@@ -16,7 +16,7 @@ def onCommandBusStart(sender, args):
 
 	LastPos[sender.getName()] = loc
 
-	sender.sendMessage("Bus start: %i %i %i" % (loc.getX(), loc.getY(), loc.getZ()))
+	sender.sendMessage("Bus start: %d %d %d" % (loc.getX(), loc.getY(), loc.getZ()))
 
 	return True
 
@@ -38,64 +38,51 @@ def onCommandBusWaypoint(sender, args):
 
 	if first.getWorld() != second.getWorld():
 		sender.sendMessage("World mismatch!")
-		return True
+		
+	else:
+		sender.sendMessage("Waypoint: %d %d %d" % (second.getX(), second.getY(), second.getZ()))
 
-	sender.sendMessage("Waypoint: %i %i %i" % (second.getX(), second.getY(), second.getZ()))
-
-	Bus(first.getBlockX(), first.getBlockY(), first.getBlockZ(),\
-	    second.getBlockX(), second.getBlockY(), second.getBlockZ(), first.getWorld())
+		Bus(first.getBlockX(), first.getBlockY(), first.getBlockZ(),\
+	   		second.getBlockX(), second.getBlockY(), second.getBlockZ(), first.getWorld())
 
 	return True
 
-def SetBusRedstone(x, y, z, world):
-	world.getBlockAt(x, y, z).setTypeId(1)
-	world.getBlockAt(x, y + 1, z).setTypeId(55)
+class Bus(x0, y0, z0, x1, y1, z1, world):
+	def __init__(self, x0, y0, z0, x1, y1, z1, world):
+		dx = (1 if x0 < x1 else -1)
+		dy = (1 if y0 < y1 else -1)
+		dz = (1 if z0 < z1 else -1)
 
-def SetBusRepeater(x, y, z, world, meta):
-	world.getBlockAt(x, y, z).setTypeId(1)
-	world.getBlockAt(x, y + 1, z).setTypeIdAndData(93, meta)
+		self.x, self.y, self.z = x0, y0, z0
+		self.power = 0
 
-def Bus(x0, y0, z0, x1, y1, z1, world):
-	dx = (1 if x0 < x1 else -1)
-	dy = (1 if y0 < y1 else -1)
-	dz = (1 if z0 < z1 else -1)
+		while self.y != y1:
+			self.Draw()
 
-	Power = 0
-
-	while y0 != y1:
-		if Power == 16:
-			Power = 1
-			SetBusRepeater(x0, y0, z0, world, 0)
-		else:
-			Power += 1
-			SetBusRedstone(x0, y0, z0, world)
-
-		if x0 == x1:
-			if z0 == z1:
-				break
+			if self.x == x1:
+				if self.z == z1:
+					break
+				else:
+					self.z += dz
 			else:
-				z0 += dz
-		else:
-			x0 += dx
+				self.x += dx
+		while self.x != x1:
+			self.Draw()
+			self.x += dx
 
-		y0 += dy
+		while self.z != z1:
+			self.Draw()
+			self.z != dz
+	
+	def Redstone(self):
+		self.world.getBlockAt(self.x, self.y    , self.z).setTypeId(1)
+		self.world.getBlockAt(self.x, self.y + 1, self.z).setTypeId(55)
 
-	while x0 != x1:
-		if Power == 16:
-			Power = 1
-			SetBusRepeater(x0, y0, z0, world, 0)
-		else:
-			Power += 1
-			SetBusRedstone(x0, y0, z0, world)
+	def Repeater(self):
+		self.world.getBlockAt(self.x, self.y    , self.z).setTypeId(1)
+		self.world.getBlockAt(self.x, self.y + 1, self.z).setTypeId(93)#Wanna put some self.dir shit here.
 
-		x0 += dx
+	def Draw(self):
+		self.power = (self.power + 1) % 5
 
-	while z0 != z1:
-		if Power == 16:
-			Power = 1
-			SetBusRepeater(x0, y0, z0, world, 0)
-		else:
-			Power += 1
-			SetBusRedstone(x0, y0, z0, world)
-
-		z0 += dz
+		self.Repeater() if self.power == 15 else self.Redstone()
