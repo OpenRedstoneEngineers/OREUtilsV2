@@ -2,15 +2,15 @@ import sys
 
 from Helper import Info, Severe
 
-from PersistentData import *
+import PersistentData
 
 Failiures = {}
 
 DATA_PATH = "plugins/OREUtilsV2.py.dir/Data/"
 
-class ConfigFile(NodeFile):
+class ConfigFile(PersistentData.NodeFile):
 	def __init__(self):
-		NodeFile.__init__(self, DATA_PATH + "config.json")
+		PersistentData.NodeFile.__init__(self, DATA_PATH + "config.json")
 
 		if 'properties' not in self.node:
 			self.node.New('properties')
@@ -112,7 +112,7 @@ def OnCommandFail(sender,args):
 	
 @hook.enable
 def OnEnable():
-	TryExec('Plots','Frontend.InitManagers(NodeFile)')
+	TryExec('Plots','Frontend.InitManagers(PersistentData.NodeFile)')
 	
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',

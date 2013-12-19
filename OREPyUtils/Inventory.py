@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-import PersistentData as Data
+import PersistentData
 
 """
 Permission nodes:
@@ -8,7 +8,7 @@ Permission nodes:
 ore.inv
 """
 
-PresetFile = Data.NodeFile("changeme.jpg")
+PresetFile = PersistentData.NodeFile("changeme.jpg")
 Presets = PresetFile.node
 
 def GetItems(player):

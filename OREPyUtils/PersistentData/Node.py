@@ -1,70 +1,3 @@
-from os.path import isfile as Exists
-
-from ast import literal_eval as Eval
-
-class DictBackend:
-	def LoadDict(self, node, x):
-		for item, value in x.iteritems():
-			if isinstance(value, dict):
-				node[item] = Node()
-
-				self.LoadDict(node[item], value)		
-			else:
-				node[item] = value
-
-	def FromStr(self, node, x):
-		try:
-			data = Eval(x)
-
-		except:
-			data = {}
-
-		self.LoadDict(node, data)
-
-	def ToStr(self, node, embed=0):
-		toReturn = ["{\n"]
-
-		for item, value in node.iteritems():
-			if isinstance(value, Node):
-				toReturn.append((" " * embed) + "'" + item + "' : " + self.ToStr(value, embed + 4) + ",\n")
-			else:
-				toReturn.append((" " * embed) + "'" + item + "' : " + repr(value) + ",\n")
-
-		toReturn.append((" " * embed) + "}")
-
-		return ''.join(toReturn)
-
-class NodeManager:
-	def __init__(self, data=None, backend=DictBackend):
-		self.backend = backend()
-		self.node = Node()
-
-		if isinstance(data, dict): 
-			self.backend.LoadDict(self.node, data)
-		elif isinstance(data, str):
-			self.backend.FromStr(self.node, data)
-
-	def __str__(self):
-		return self.backend.ToStr(self.node)
-
-	def Dict(self):
-		return self.node.Dict()
-
-class NodeFile(NodeManager):
-	def __init__(self, filename, backend=DictBackend, read=True):
-		if Exists(filename) and read:
-			data = open(filename).read()
-		else:
-			data = None
-
-		self.filename = filename
-
-		NodeManager.__init__(self, data, backend)
-
-	def Dump(self):
-		open(self.filename, 'w').write(str(self))
-		print str(self)
-
 class Node:
 	def iteritems(self):
 		return self.__dict__.iteritems()
@@ -131,7 +64,9 @@ class Node:
 
 	def New(self, name):
 		new = Node()
+
 		self[name] = new
+
 		return new
 		
 	def __delitem__(self, Item):

@@ -4,20 +4,18 @@ import xml.etree.ElementTree as ET
 
 from Helper import Info
 
-
-
 class PlotMap(Manager.PlotManager):
-	BLOCK_RESERVED    = (159,10 ,0)
-	BLOCK_ON          = (159, 3 ,0)
-	BLOCK_OFF         = (159, 0 ,0)
-	BLOCK_FRAME_X     = (1  , 0 ,0)
-	BLOCK_FRAME_Y     = (1  , 0 ,0)
-	BLOCK_FRAME_CROSS = (1  , 0 ,0)
-	BLOCK_BASE        = (1  , 0 ,0)
-
+	BLOCK_RESERVED    = (159,10, 0)
+	BLOCK_ON          = (159, 3, 0)
+	BLOCK_OFF         = (159, 0, 0)
+	BLOCK_FRAME_X     = (1,   0, 0)
+	BLOCK_FRAME_Y     = (1,   0, 0)
+	BLOCK_FRAME_CROSS = (1,   0, 0)
+	BLOCK_BASE        = (1,   0, 0)
 
 	def __init__(self, world):
 		self.world = world
+
 	"""
 	@return if specified plot coords are on the map
 	"""
