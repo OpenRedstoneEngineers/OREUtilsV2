@@ -2,7 +2,7 @@ from Node import *
 
 from ast import literal_eval as Eval
 
-class DictBackend:
+class JSONBackend:
 	def LoadDict(self, node, x):
 		for item, value in x.iteritems():
 			if isinstance(value, dict):
@@ -12,7 +12,7 @@ class DictBackend:
 			else:
 				node[item] = value
 
-	def FromStr(self, node, x):
+	def Load(self, node, x):
 		try:
 			data = Eval(x)
 
@@ -21,15 +21,16 @@ class DictBackend:
 
 		self.LoadDict(node, data)
 
-	def ToStr(self, node, embed=0):
+	def Save(self, node, embed=0):
 		toReturn = ["{\n"]
 
 		for item, value in node.iteritems():
 			if isinstance(value, Node):
-				toReturn.append((" " * embed) + "'" + item + "' : " + self.ToStr(value, embed + 4) + ",\n")
+				toReturn.append(("\t" * embed) + "'" + item + "' : " + self.Save(value, embed + 1) + ",\n")
 			else:
-				toReturn.append((" " * embed) + "'" + item + "' : " + repr(value) + ",\n")
+				toReturn.append(("\t" * embed) + "'" + item + "' : " + repr(value) + ",\n")
 
-		toReturn.append((" " * embed) + "}")
+		toReturn.append(("\t" * embed) + "}")
+
 
 		return ''.join(toReturn)

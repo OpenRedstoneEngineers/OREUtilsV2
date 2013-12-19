@@ -45,21 +45,28 @@ def ImportFiles():
         	else:
                 	Info('[i]Imported ' + N)
 
-def TryExec(plugin, code, meta=None):
+def Load(plugin, **kwargs):
 	if plugin not in Failiures:
 		try:
-			exec plugin+'.'+code
+			exec plugin + '.OnEnable(**kwargs)'
 		
 		except Exception, E:
-			Severe('[!]Error with '+plugin+' '+str(E))
+			Severe('[!]Error with ' + plugin + ' '+str(E))
+
 			Failiures[plugin] = str(E)
-			
+
+#temp
+def TryExec(*args):pass
+		
 def CheckIsString(property, plugin):
 	if isinstance(CONFIG[property], str):
 		return True
+
 	else:
-		Severe('[!]No '+property+' in config')
-		Failiures[plugin] = 'No '+property+' in config'
+		Severe('[!]No ' + property + ' in config')
+
+		Failiures[plugin] = 'No ' + property + ' in config'
+
 		return False
 
 def ConvertPath(path):
@@ -82,18 +89,21 @@ def onCommandProperty(sender, args):
 	elif len(args) >= 2:
 		if args[1] == 'None':
 			CONFIG[args[0]] = None
+
 		else:
 			try:
-				setTo = Eval(' '.join(args[1:]))
-
+				value = Eval(' '.join(args[1:]))
 			except:
-				sender.sendMessage('/property [property] [set to]')
+				sender.sendMessage('Usage: /property [name] [value]')
 			else:
-				CONFIG[args[0]] = setTo
+				CONFIG[args[0]] = value
+
 		CONFIG.Dump()
 
+	return True
+
 @hook.command('status', description = 'View module loading failiures')
-def OnCommandFail(sender,args):
+def OnCommandFail(sender, args):
 	if len(args) == 1:
 		if args[0] in Failiures:
 			sender.sendMessage('[!!]Module failed: ' + Failiures[Args[0]])
@@ -105,8 +115,12 @@ def OnCommandFail(sender,args):
 			sender.sendMessage('[!]Unknown module')
 
 	else:	
-		for Fail, Reason in Failiures.iteritems():
-			sender.sendMessage('[!!]' + Fail + ' has failed: ' + Reason)
+		if not Failiures:
+			sender.sendMessage("All is good")
+
+		else:
+			for Fail, Reason in Failiures.iteritems():
+				sender.sendMessage('[!!]' + Fail + ' has failed: ' + Reason)
 
 	return True
 	
@@ -122,21 +136,7 @@ def OnEnable():
 	TryExec('UsefulCommands', 
 		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
 
-	if "IRCBot" not in Failiures:
-		args = []
-
-		for conf in ['Server', 'Port', 'Name', 'NamePass', 'Chan']:
-			item = CONFIG['IRC.'+conf]
-			
-			if item == None:
-				Severe('No IRC.'+conf+' in config')
-				Failiures['IRCBot'] = 'No IRC.'+conf+' in config'
-			
-				return
-			
-			args.append(item)
-		
-		TryExec('IRCBot', 'Init(*meta)', args)
+	Load('IRCBot', conf = CONFIG)
 
 @hook.disable
 def OnDisable():

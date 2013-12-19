@@ -19,12 +19,12 @@ appeneded = False
 Times = {}
 
 
-def LoadHelp(path):
+def OnEnable(**kwargs):
 	global help,keys
 	try:
 		keys = help.keys()
 		keys.sort()
-		help = open(path).read()
+		help = open(kwargs['path']).read()
 	except:
 		Info("[!]Could not find help file")
 		
@@ -319,16 +319,17 @@ def passset(sender, args):
     return True
 
 @hook.command('orehelp')
-def onCommandFineGuy(sender,args):
+def onCommandOREHelp(sender,args):
 	if len(args) == 0:
 		matches = len(keys)
+
 		for i in keys:
 			sender.sendMessage(color("e") + '/' + color("6") + i + color("e") + help[i]['short'])
 
 	elif args[0] in keys:
 		matches = 1
-		sender.sendMessage(color("a") + '/' + color("2") + args[0] + color("a") + help[args[0]]['long'])
 
+		sender.sendMessage(color("a") + '/' + color("2") + args[0] + color("a") + help[args[0]]['long'])
 	else:       
 		matches = 0 
 
@@ -348,6 +349,3 @@ def onCommandFineGuy(sender,args):
 		sender.sendMessage(color("e") + '====' + color("c") + str(matches) + color("6") + 'matches found' + color("e") + '====')
 
 	return True
-
-
-
