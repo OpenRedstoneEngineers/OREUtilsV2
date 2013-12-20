@@ -48,3 +48,5 @@ snuggle |for someone you love:[c|d][n] [c|4][c|l]snuggled with [c|d][a|n|0]
 hate    |;-;:                 [c|lgreen][n] [c|green][c|bold]hates [c|lgreen][a]
 fixname |Turn your nick off:  [s]nick [n] off
 art     |Dat colour:          [c|a]Green is [c|2][c|l]NOT [c|a]a creative colour.
+rankup  |Increment a rank:    [r]pex promote [a|0]
+rankdown|Decrement a rank:    [r]pex demote [a|0]

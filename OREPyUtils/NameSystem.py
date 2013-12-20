@@ -72,27 +72,3 @@ def onCommandNameFormat(target, args):
 	sender.sendMessage('/nameformat [name] <colours...>')
 	
 	return False
-
-#rankdown
-@hook.command("rankup", description="Promote a user.")
-def onCommandRankup(sender, args):
-    if len(args) == 1:
-        dispatchCommand(sender, "pex promote "+args[0])
-        return True
-
-    return False
-
-#rankdown
-@hook.command("rankdown", description="Demote a user.")
-def onCommandRankdown(sender,args):
-    if len(args) == 1:
-        dispatchCommand(sender, "pex demote "+args[0])
-        return True
-
-    return False
-
-#fixname
-@hook.command('fixname', description='Fix your name formatting.')
-def onCommandFixname(sender,args):
-    Sudo('nick '+sender.getName()+' off')
-    return True

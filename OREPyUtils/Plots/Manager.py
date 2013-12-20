@@ -42,9 +42,12 @@ class PlayerBox:
 	def __getitem__(self, name):
 		try:
 			return self.playerNode(name)
+
 		except Exception:
 			new = self.playerNode.New(name)
+
 			new.remPlots = 1
+
 			return new
 
 
@@ -94,10 +97,11 @@ class OwnerError(PlotError):
 """
 @brief Represents a single plot
 """
-#would turn to Plot(Node), but import's don't work that way ;-;
+#would turn to Plot(Node), but import's don't work that way ;-; #They do
 class Plot:
 	def __init__(self, node):
 		self.node = node
+
 	"""
 	@return whether this plot is claimable.
 	"""
@@ -210,10 +214,8 @@ class PlotManager:
 	@return whether the specified plot exists
 	"""
 	def IsInRange(self, x, y):
-		return (x < self.size.radius) and\
-			(y < self.size.radius) and\
-			(x >= -self.size.radius) and\
-			 (y >= -self.size.radius)
+		return (x <   self.size.radius) and (y <   self.size.radius) and\
+		       (x >= -self.size.radius) and (y >= -self.size.radius)
 
 	"""
 	@return get a list of everyone who can build on a plot
@@ -242,7 +244,7 @@ class PlotManager:
 	def Unclaim(self, x, y, name):
 		plot = self.plots[(x, y)]
 
-		if plot.node.status in (PlotStatus.CLAIMED,PlotStatus.RESERVED):
+		if plot.node.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
 			if plot.node.owner == name:
 				plot.Unclaim()
 
@@ -284,7 +286,7 @@ class PlotManager:
 	def Info(self, x, y):
 		plot = self.plots[(x, y)]
 
-		return "Plot ("+str(x)+", "+str(y)+")\n"+plot.Info()
+		return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info()
 
 	"""
 	@return the number of plots.
@@ -310,8 +312,6 @@ class PlotManager:
 	@return Save the plot data.
 	"""
 	def Save(self, path):
-		print "HREEEEEEEEEEEEEEEEEEEEEEY " + self.file.filename
-
 		self.file.Dump()
 
 	"""

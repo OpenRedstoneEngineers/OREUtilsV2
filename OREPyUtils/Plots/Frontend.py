@@ -25,7 +25,6 @@ Managers = defaultdict(Map.PlotMap)
 def GetCoords_AbsOrMap(x, y, manager):
 	if manager.IsOnMap(x, y):
 		return manager.MapToPlotCoords(x, y)
-
 	else:
 		return manager.GetPlotCoords(x, y)
 
@@ -33,7 +32,7 @@ def GetCoords_AbsOrMap(x, y, manager):
 @brief Get the actual plot coords of a player
 """
 def GetCoords_Player(sender, manager):
-	loc = sender.getLocaiton()
+	loc = sender.getLocation()
 
 	x = int(loc.getX())
 	y = int(loc.getZ())
@@ -229,6 +228,8 @@ def onCommandPInfo(sender, args):
 
 	if not manager.IsInRange(x, y):
 		sender.sendMessage("Out of range.")
+		sender.sendMessage("Yours: (" + str(X) + ", " + str(y) + ")")
+		sender.sendMessage("Radius :" + str(manager.radius))
 		return True
 
 	sender.sendMessage(manager.Info(x, y))
@@ -563,7 +564,7 @@ def onCommandPgive(sender, args):
 	if len(args) < 1:
 		return False
 
-	info = manager.players.get(args[0])
+	info = manager.players.Dict.get(args[0])
 
 	if info == None:
 		sender.sendMessage("No such user.")
@@ -591,7 +592,7 @@ def onCommandPtake(sender, args):
 	if len(args) < 1:
 		return False
 
-	info = manager.players.get(args[0])
+	info = manager.players.Dict.get(args[0])
 
 	if info == None:
 		sender.sendMessage("No such user.")
