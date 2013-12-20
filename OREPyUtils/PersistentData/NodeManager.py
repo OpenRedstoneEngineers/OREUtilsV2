@@ -50,4 +50,5 @@ class NodeFile(NodeManager):
 
 	def Dump(self):
 		open(self.filename, 'w').write(str(self))
+
 		print str(self)

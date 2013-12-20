@@ -2,7 +2,7 @@
 'properties' :     {
     'DerpPath' : '[path]Derps.txt',
     'HelpPath' : '[path]Help.txt',
-    'Include' : ['Aliases', 'ChannelChat', 'CommandGen', 'Derps', 'EventHooks', 'FunCommands', 'IRCBot', 'NameSystem', 'Plots', 'ResultCode', 'UsefulCommands', 'Bus', 'Inventory'],
+    'Include' : ['Aliases', 'ChannelChat', 'CommandGen', 'Derps', 'EventHooks', 'FunCommands', 'IRCBot', 'NameSystem', 'Plots', 'ResultCode', 'UsefulCommands'],
     'IRC' :         {
         'NamePass' : '****',
         'Chan' : '#OREServerChat',

@@ -26,7 +26,6 @@ CONFIG  = ConfigFile()
 Include = CONFIG['Include']
 
 if not isinstance(Include, list):
-
 	Include = []
 	Severe('[!]No Include list in config!')
 	Failiures['All'] = 'No Include list found in config'
@@ -55,6 +54,13 @@ def Load(plugin, **kwargs):
 
 			Failiures[plugin] = str(E)
 
+def Unload(plugin, **kwargs):
+	if plugin not in Failiures:
+		try:
+			exec plugin + '.OnDisable(**kwargs)'
+
+		except Exception, E:
+			Severe('[!]Error with ' + plugin + ' ' + str(E))
 #temp
 def TryExec(*args):pass
 		
@@ -81,7 +87,7 @@ def onCommandProperty(sender, args):
 		return True
 
 	if len(args) == 0:
-		sender.sendMessage(str(CONFIG))
+		sender.sendMessage(str(CONFIG).replace('\t',' '))
 
 	elif len(args) == 1:
 		sender.sendMessage(args[0] + " = " + str(CONFIG[args[0]]))
@@ -126,8 +132,8 @@ def OnCommandFail(sender, args):
 	
 @hook.enable
 def OnEnable():
-	TryExec('Plots','Frontend.InitManagers(PersistentData.NodeFile)')
-	
+	Load('Plots')
+ 	
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',
 		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
@@ -136,9 +142,11 @@ def OnEnable():
 	TryExec('UsefulCommands', 
 		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
 
-	Load('IRCBot', conf = CONFIG)
+	Load('IRCBot', conf=CONFIG)
 
 @hook.disable
 def OnDisable():
-	TryExec('Plots', 'Frontend.SaveData()')
+	Unload('Plots')
+
+#	TryExec('Plots', 'Frontend.SaveData()')
 	TryExec('IRCBot', 'Terminate()')

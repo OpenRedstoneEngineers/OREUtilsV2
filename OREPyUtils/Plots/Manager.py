@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from .. import PersistentData
+
 import time.ctime as ctime
 
 from Helper import Info
@@ -153,7 +155,7 @@ class Plot:
 			del self.node.owner
 			del self.node.date
 
-		self.status = PlotStatus.FREE
+		self.node.status = PlotStatus.FREE
 
 	"""
 	@return a description of this plot.
@@ -240,15 +242,15 @@ class PlotManager:
 	def Unclaim(self, x, y, name):
 		plot = self.plots[(x, y)]
 
-		if plot.status in (PlotStatus.CLAIMED,PlotStatus.RESERVED):
-			if plot.owner == name:
+		if plot.node.status in (PlotStatus.CLAIMED,PlotStatus.RESERVED):
+			if plot.node.owner == name:
 				plot.Unclaim()
 
 				owner = self.players[name]
 				owner.remPlots += 1
 
 			else:
-				raise OwnerError(plot.owner)
+				raise OwnerError(plot.node.owner)
 		else:
 			raise UnclaimedError
 
@@ -258,10 +260,10 @@ class PlotManager:
 	def UnclaimAdmin(self, x, y):
 		plot = self.plots[(x, y)]
 
-		hasOwner = plot.status == PlotStatus.CLAIMED
+		hasOwner = plot.node.status == PlotStatus.CLAIMED
 
 		if hasOwner:
-			owner = self.players[plot.owner]
+			owner = self.players[plot.node.owner]
 
 		plot.Unclaim()
 	
@@ -307,16 +309,18 @@ class PlotManager:
 	"""
 	@return Save the plot data.
 	"""
-	def SaveXML(self, path):
+	def Save(self, path):
+		print "HREEEEEEEEEEEEEEEEEEEEEEY " + self.file.filename
+
 		self.file.Dump()
 
 	"""
 	@return Load the plot data.
 	"""
-	def LoadOrCreate(self, path, backend):
-		self.file = backend(path)
+	def LoadOrCreate(self, path):
+		self.file = PersistentData.NodeFile(path)
 		
-		self.file.node    .Ensure("ORE")
+		self.file.node.Ensure("ORE")
 
 		self.file.node.ORE.Ensure("Players")   
 

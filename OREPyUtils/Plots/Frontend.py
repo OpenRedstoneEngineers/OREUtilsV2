@@ -56,8 +56,10 @@ def GetCoords_Player_AbsOrMap(sender, manager):
 """
 def GetCoords_Owner(owner, manager):
 	fullName = GetPlayer_Match(owner, manager)
+
 	if not fullName:
 		return None
+
 	for pos, plot in manager.plots.plotNode.iteritems():
 		if plot.status == Manager.PlotStatus.CLAIMED:
 			if fullName == plot.owner:
@@ -74,6 +76,7 @@ def GetPlayer_Match(player, manager):
 		for match in players:
 			if player in match:
 				return players[match]
+
 	return None
 
 """
@@ -86,13 +89,15 @@ def GetAllCoords_Owner(owner, manager):
 		return []
 
 	return [pos for pos, plot in manager.plots.plotNode.iteritems()\
-		if plot.status == Manager.PlotStatus.CLAIMED and\
-		plot.owner == owner]
-			
-def InitManager(world, backend):
+		if plot.status == Manager.PlotStatus.CLAIMED and plot.owner == owner]
+
+def GetManager_ByPlayer(sender):
+	return Managers[str(sender.getWorld().getName())]
+
+def InitManager(world):
 	manager = Map.PlotMap(world)
 
-	manager.LoadOrCreate(world.getName() + "/PlotData.xml", backend)
+	manager.LoadOrCreate(world.getName() + "/PlotData.json")
 
 	manager.Generate()
 
@@ -102,18 +107,17 @@ def InitManager(world, backend):
 
 	Info("Initialized plot manager %s" % world.getName())
 
-
-def InitManagers(backend):
+def InitManagers():
 	for world in getWorlds():
-		InitManager(world, backend)
+		InitManager(world)
 
 def SaveData():
 	for world, manager in Managers.iteritems():
-		manager.SaveXML(world + "/PlotData.xml")
+		manager.Save(world + "/PlotData.json")
 
 @hook.command("pallow")
 def onCommandPallow(sender, args):
-	manager = Managers[sender.getWorld().getName()] 
+	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
 	
@@ -129,15 +133,18 @@ def onCommandPallow(sender, args):
 			manager.addallowed(name, args[1])
 			sender.sendMessage(args[1]+' can build on your plot(s)')
 
+	return True
+
 @hook.command("punallow")
 def onCommandPunallow(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender) 
 
 	name = sender.getName()
 
 	if name not in manager.players:
 		sender.sendMessage('Who the hell are you?!')
 		return False
+
 	else:
 		if not args:
 			manager.RemAllowed(name, '*')
@@ -146,10 +153,11 @@ def onCommandPunallow(sender, args):
 			manager.RemAllowed(name, args[1])
 			sender.sendMessage(args[1]+' cannot build on your plot unless otherwise specified')
 
+	return True
+
 @hook.command("pwho")
 def onCommandPWho(sender, args):
-
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 	
 	name = sender.getName()
 
@@ -177,10 +185,11 @@ def onCommandPWho(sender, args):
 	for ban in banned:
 		sender.sendMessage(' '+ban)
 
+	return True
 	
 @hook.command("pban")
 def onCommandPallow(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
 
@@ -196,6 +205,7 @@ def onCommandPallow(sender, args):
 			manager.addallowed(name, '- '+args[1])
 			sender.sendMessage(args[1]+' can not build on your plot(s)')
 
+	return True
 
 """
 @brief /pinfo
@@ -204,8 +214,8 @@ def onCommandPallow(sender, args):
 /pinfo
 """
 @hook.command("pinfo")
-def onCommandPloc(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+def onCommandPInfo(sender, args):
+	manager = GetManager_ByPlayer(sender)
 
 	try:
 		x = int(args[0])
@@ -236,8 +246,10 @@ def onCommandPreserve(sender, args):
 	if not sender.hasPermission("ore.plot.reserve"):
 		sender.sendMessage("No permission!")
 	
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
+
 	reason = ''
+
 	try:
 		x = int(args[0])
 		z = int(args[1])
@@ -265,7 +277,6 @@ def onCommandPreserve(sender, args):
 	
 	return True
 
-
 """
 @brief /pmap
 
@@ -275,7 +286,7 @@ def onCommandPreserve(sender, args):
 """
 @hook.command("pmap")
 def onCommandPmap(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	try:
 		x = int(args[0])
@@ -340,7 +351,7 @@ def onCommandPmap(sender, args):
 """
 @hook.command("pwarp")
 def onCommandPwarp(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	try:
 		x = int(args[0])
@@ -401,7 +412,7 @@ def onCommandPwarp(sender, args):
 """
 @hook.command("pclaimas")
 def onCommandPclaimAs(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.claimas"):
 		sender.sendMessage("No permission!")
@@ -446,7 +457,7 @@ def onCommandPclaimAs(sender, args):
 """
 @hook.command("pclaim")
 def onCommandPclaim(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	try:
 		x = int(args[0])
@@ -481,7 +492,7 @@ def onCommandPclaim(sender, args):
 """
 @hook.command("punclaim")
 def onCommandPunclaim(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	try:
 		x = int(args[0])
@@ -515,7 +526,7 @@ def onCommandPunclaim(sender, args):
 """
 @hook.command("pgenerate")
 def onCommandPgenerate(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.generate"):
 		sender.sendMessage("No permission!")
@@ -543,7 +554,7 @@ def onCommandPgenerate(sender, args):
 """
 @hook.command("pgive")
 def onCommandPgive(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
 		sender.sendMessage("No permission!")
@@ -571,7 +582,7 @@ def onCommandPgive(sender, args):
 """
 @hook.command("ptake")
 def onCommandPtake(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
 		sender.sendMessage("No permission!")
@@ -599,7 +610,7 @@ def onCommandPtake(sender, args):
 """
 @hook.command("psearch")
 def onCommandPsearch(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
 	if len(args) < 1:
 		return False
@@ -620,13 +631,17 @@ def onCommandPsearch(sender, args):
 """
 @hook.command("pusers")
 def onCommandPusers(sender, args):
-	manager = Managers[sender.getWorld().getName()]
+	manager = GetManager_ByPlayer(sender)
 
-	names = []
+	if not manager.plays:
+		sender.sendMessage("No users!")
 
-	for name in manager.players.iterkeys():
-		names.append(name)
+	else:
+		names = []
 
-	sender.sendMessage(', '.join(names))
+		for name in manager.players.iterkeys():
+			names.append(name)
+
+		sender.sendMessage(', '.join(names))
 
 	return True
