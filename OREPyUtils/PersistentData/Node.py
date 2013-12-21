@@ -96,13 +96,12 @@ class Node:
 	def __add__(self, node):
 		new = self.copy()
 
-		if isinstance(node, Node):
-			for item, value in node.iteritems():
-				new[item] = value
+		for item, value in node.iteritems():
+			new[item] = value
 
 		return new
 
 	def __iadd__(self, node):
-		if isinstance(node, Node):
-			for item,value in node.iteritems():
-				self[item] = value
+		for item,value in node.iteritems():
+			self[item] = value
+			print item, value

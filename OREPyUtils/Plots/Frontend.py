@@ -100,8 +100,6 @@ def InitManager(world):
 
 	manager.Generate()
 
-	manager.Update()
-
 	Managers[world.getName()] = manager
 
 	Info("Initialized plot manager %s" % world.getName())
@@ -114,14 +112,14 @@ def SaveData():
 	for world, manager in Managers.iteritems():
 		manager.Save(world + "/PlotData.json")
 
-@hook.command("pallow")
+@hook.command("pallow", usage="Usage: /pallow <name>")
 def onCommandPallow(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
 	
 	if name not in manager.players:
-		sender.sendMessage('Who the hell are you?!')
+		sender.sendMessage('You do not own any plots')
 		return False
 
 	else:
@@ -134,15 +132,15 @@ def onCommandPallow(sender, args):
 
 	return True
 
-@hook.command("punallow")
+@hook.command("punallow", usage="Usage: /punallow <name>")
 def onCommandPunallow(sender, args):
 	manager = GetManager_ByPlayer(sender) 
 
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('Who the hell are you?!')
-		return False
+		sender.sendMessage('You do not own any plots')
+		return True
 
 	else:
 		if not args:
@@ -154,15 +152,15 @@ def onCommandPunallow(sender, args):
 
 	return True
 
-@hook.command("pwho")
+@hook.command("pwho", usage="Usage: /pwho")
 def onCommandPWho(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('Who the hell are you?!')
-		return False
+		sender.sendMessage('You do not own any plots')
+		return True
 
 	allowed = []
 	banned  = []
@@ -177,32 +175,34 @@ def onCommandPWho(sender, args):
 	banned.sort()
 
 	sender.sendMessage('Allowed players:')
+
 	for allow in allowed:
-		 sender.sendMessage(' '+allow)
+		 sender.sendMessage(' ' + allow)
 
 	sender.sendMessage('Banned players:')
+
 	for ban in banned:
-		sender.sendMessage(' '+ban)
+		sender.sendMessage(' ' + ban)
 
 	return True
 	
-@hook.command("pban")
+@hook.command("pban", usage="Usage: /pban <name>")
 def onCommandPallow(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('Who the hell are you?!')
-		return False
+		sender.sendMessage('You do not own any plots')
+		return True
 
 	else:
 		if not args:
-			sender.sendMessage('/pban player')
 			return False
+
 		else:
 			manager.addallowed(name, '- '+args[1])
-			sender.sendMessage(args[1]+' can not build on your plot(s)')
+			sender.sendMessage(args[1] + ' can not build on your plot(s)')
 
 	return True
 
@@ -212,7 +212,7 @@ def onCommandPallow(sender, args):
 /pinfo X Z
 /pinfo
 """
-@hook.command("pinfo")
+@hook.command("pinfo", usage="Usage: /pinfo [x] [y]")
 def onCommandPInfo(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -228,8 +228,6 @@ def onCommandPInfo(sender, args):
 
 	if not manager.IsInRange(x, y):
 		sender.sendMessage("Out of range.")
-		sender.sendMessage("Yours: (" + str(X) + ", " + str(y) + ")")
-		sender.sendMessage("Radius :" + str(manager.radius))
 		return True
 
 	sender.sendMessage(manager.Info(x, y))
@@ -242,10 +240,11 @@ def onCommandPInfo(sender, args):
 /preserve X Z
 /preserve
 """
-@hook.command("preserve")
+@hook.command("preserve", usage="Usage: /preserve [x] [y]")
 def onCommandPreserve(sender, args):
 	if not sender.hasPermission("ore.plot.reserve"):
 		sender.sendMessage("No permission!")
+		return True
 	
 	manager = GetManager_ByPlayer(sender)
 
@@ -257,11 +256,12 @@ def onCommandPreserve(sender, args):
 		
 		if not manager.IsInRange(x,z):
 			sender.sendMessage("Out of range")
-		
+			return True		
+
 		if len(args) > 2:
 			reason = ' '.join(args[2:])
 	except:
-		x,y = GetCoords_Player_AbsOrMap(sender, manager)
+		x, y = GetCoords_Player_AbsOrMap(sender, manager)
 		
 		if args:
 			reason = ' '.join(args)
@@ -271,9 +271,10 @@ def onCommandPreserve(sender, args):
 	
 	except Manager.PlotError, E:
 		sender.sendMessage(str(E))
-		return False
+		return True
 	
         sender.sendMessage("Plot reserved.")
+
 	manager.MarkReserved(x, y)
 	
 	return True
@@ -285,7 +286,7 @@ def onCommandPreserve(sender, args):
 /pmap OwnerName
 /pmap
 """
-@hook.command("pmap")
+@hook.command("pmap", usage="Usage: /pmap [x] [y] OR /pmap <owner>")
 def onCommandPmap(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -304,7 +305,6 @@ def onCommandPmap(sender, args):
 			if pos == None:
 				sender.sendMessage("No such plot.")
 				return True
-
 			
 			x = pos[0]
 			y = pos[1]
@@ -315,11 +315,10 @@ def onCommandPmap(sender, args):
 				index = int(args[1])
 				
 				if index not in range(len(poses)):
-			
 					sender.sendMessage("No such plot.")
 					return True
 
-				x,y = poses[index]
+				x, y = poses[index]
 
 		else:
 			pos = GetCoords_Player_AbsOrMap(sender, manager)
@@ -350,7 +349,7 @@ def onCommandPmap(sender, args):
 /pwarp OwnerName
 /pwarp
 """
-@hook.command("pwarp")
+@hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner>")
 def onCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -382,7 +381,7 @@ def onCommandPwarp(sender, args):
 				sender.sendMessage("No such plot.")
 				return True
 
-			x,y = poses[index]
+			x, y = poses[index]
 
 		else:
 			pos = GetCoords_Player_AbsOrMap(sender, manager)
@@ -411,7 +410,7 @@ def onCommandPwarp(sender, args):
 /pclaimas X Z Name
 /pclaimas Name
 """
-@hook.command("pclaimas")
+@hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
 def onCommandPclaimAs(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -442,21 +441,23 @@ def onCommandPclaimAs(sender, args):
 
 	try:
 		manager.Claim(x, y, name)
-	except Manager.PlotError , E:
+
+	except Manager.PlotError, E:
 		sender.sendMessage(str(E))
-		return False
+		return True
 		
 	sender.sendMessage("Plot claimed.")
 	manager.MarkClaimed(x, y)
 	
 	return True
+
 """
 @brief /pclaim
 
 /pclaim X Z
 /pclaim
 """
-@hook.command("pclaim")
+@hook.command("pclaim", usage="Usage: /pclaim [x] [z]")
 def onCommandPclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -476,9 +477,10 @@ def onCommandPclaim(sender, args):
 
 	try:
 		manager.Claim(x, y, sender.getName())
-	except Manager.PlotError  , E:
+
+	except Manager.PlotError, E:
 		sender.sendMessage(str(E))
-		return False
+		return True
 
 	sender.sendMessage("Plot claimed.")
 	manager.MarkClaimed(x, y)
@@ -491,7 +493,7 @@ def onCommandPclaim(sender, args):
 /punclaim X Z
 /punclaim
 """
-@hook.command("punclaim")
+@hook.command("punclaim", usage="Usage: /punclaim [x] [z]")
 def onCommandPunclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -511,9 +513,10 @@ def onCommandPunclaim(sender, args):
 
 	try:
 		manager.Unclaim(x, y, sender.getName())
-	except Manager.PlotError  , E:
+
+	except Manager.PlotError, E:
 		sender.sendMessage(str(E))
-		return False
+		return True
 
 	sender.sendMessage("Plot unclaimed.")
 	manager.MarkUnclaimed(x, y)
@@ -524,8 +527,10 @@ def onCommandPunclaim(sender, args):
 @brief /pgenerate
 
 /pgenerate Radius
+/pgenerate override
+/pgenerate
 """
-@hook.command("pgenerate")
+@hook.command("pgenerate", usage="Usage: /pgenerate [radius]")
 def onCommandPgenerate(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -533,27 +538,24 @@ def onCommandPgenerate(sender, args):
 		sender.sendMessage("No permission!")
 		return True
 
-	if len(args) < 1:
-		return False
-
 	try:
 		manager.size.radius = int(args[0])
 	except:
-		return False
+		pass
 
 	manager.Generate()
-	manager.Update()
 
-	sender.sendMessage("Generated "+str(manager.GetNumPlots())+" plots")
+
+	sender.sendMessage("Generated " + str(manager.GetNumPlots()) + " plots")
 
 	return True
 
 """
 @brief /pgive
 
-/pgive Name
+/pgive Name Amount
 """
-@hook.command("pgive")
+@hook.command("pgive", usage="Usage: /pgive <name> <amount>")
 def onCommandPgive(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -564,11 +566,7 @@ def onCommandPgive(sender, args):
 	if len(args) < 1:
 		return False
 
-	info = manager.players.Dict.get(args[0])
-
-	if info == None:
-		sender.sendMessage("No such user.")
-		return True
+	info = manager.players[args[0]]
 
 	info.remPlots += 1
 
@@ -579,9 +577,9 @@ def onCommandPgive(sender, args):
 """
 @brief /ptake
 
-/ptake Name
+/ptake Name Amount
 """
-@hook.command("ptake")
+@hook.command("ptake", usage="Usage: /ptake <name> <amount>")
 def onCommandPtake(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -592,11 +590,7 @@ def onCommandPtake(sender, args):
 	if len(args) < 1:
 		return False
 
-	info = manager.players.Dict.get(args[0])
-
-	if info == None:
-		sender.sendMessage("No such user.")
-		return True
+	info = manager.players[args[0]]
 
 	info.remPlots -= 1
 
@@ -609,7 +603,7 @@ def onCommandPtake(sender, args):
 
 /psearch Name
 """
-@hook.command("psearch")
+@hook.command("psearch", usage="Usage: /psearch <name>")
 def onCommandPsearch(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
@@ -630,7 +624,7 @@ def onCommandPsearch(sender, args):
 
 /pusers
 """
-@hook.command("pusers")
+@hook.command("pusers", usage="Usage: /pusers")
 def onCommandPusers(sender, args):
 	manager = GetManager_ByPlayer(sender)
 

@@ -46,13 +46,13 @@ def ImportFiles():
 
 def Load(plugin, **kwargs):
 	if plugin not in Failiures:
-		try:
-			exec plugin + '.OnEnable(**kwargs)'
+		#try:
+		exec plugin + '.OnEnable(**kwargs)'
 		
-		except Exception, E:
-			Severe('[!]Error with ' + plugin + ' '+str(E))
+		#except Exception, E:
+		#	Severe('[!]Error with ' + plugin + ' '+str(E))
 
-			Failiures[plugin] = str(E)
+		#	Failiures[plugin] = str(E)
 
 def Unload(plugin, **kwargs):
 	if plugin not in Failiures:
@@ -147,6 +147,3 @@ def OnEnable():
 @hook.disable
 def OnDisable():
 	Unload('Plots')
-
-#	TryExec('Plots', 'Frontend.SaveData()')
-	TryExec('IRCBot', 'Terminate()')

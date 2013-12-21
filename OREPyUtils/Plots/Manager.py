@@ -16,24 +16,31 @@ class PlotStatus:
 		return ["Free", "Claimed", "Reserved"][status]
 
 class PlotBox:
-	def __init__(self, plotNode):
-		self.Dict = {}
-		self.plotNode = plotNode
+	def __init__(self, node):
+		self.node = node
 
 	def __getitem__(self, tuple):
-		try:
-			return self.Dict[tuple]
-		
-		except Exception:
-			new  = self.plotNode.New("Plot_%s_%s"%tuple)
-			plot = Plot(new)
-			self.Dict[tuple] = plot
-			new.status = PlotStatus.FREE
+		name = "Plot_%s_%s" % tuple
+		if name in self.node:
+
+			return self.node[name]
+			
+		else:
+			plot = Plot()
+
+			self.node[name] = plot
 
 			return plot
 
+	def __delitem__(self, tuple):
+		name = "Plot_%s_%s"%tuple
+
+		if name in self.node:
+			del self.node[name]
+
 	def __setitem__(self, tuple, value):
-		self.Dict[tuple] = value
+		self.node["Plot_%s_%s"%tuple] = value
+
 
 class PlayerBox:
 	def __init__(self, playerNode):
@@ -41,7 +48,7 @@ class PlayerBox:
 
 	def __getitem__(self, name):
 		try:
-			return self.playerNode(name)
+			return self.playerNode[name]
 
 		except Exception:
 			new = self.playerNode.New(name)
@@ -49,7 +56,6 @@ class PlayerBox:
 			new.remPlots = 1
 
 			return new
-
 
 """
 @brief Base class for plot exceptions
@@ -92,104 +98,82 @@ class OwnerError(PlotError):
 		if owner:
 			self.args = ('%s owns this plot' % owner,)
 		else:
-			self.args = ('This plot is already owned',)
+			self.args = ('This plot is already owned')
 
 """
 @brief Represents a single plot
 """
-#would turn to Plot(Node), but import's don't work that way ;-; #They do
-class Plot:
-	def __init__(self, node):
-		self.node = node
+class Plot(PersistentData.Node):
+	def __init__(self, node={}):
+		self.status = PlotStatus.FREE
+		self += node
 
 	"""
 	@return whether this plot is claimable.
 	"""
 	def IsClaimable(self):
-		return self.node.status == PlotStatus.FREE
+		return self.status == PlotStatus.FREE
 
 	"""
 	@return whether this plot is claimed.
 	"""
 	def IsClaimed(self):
-		return self.node.status != PlotStatus.FREE
+		return self.status != PlotStatus.FREE
+
 	"""
 	@brief Claim this plot.
 	"""
 	def Claim(self, ownerName, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.node.owner)
+			raise OwnerError(self.owner)
 
-		self.node.reason = reason
+		if reason:
+			self.reason = reason
 
-		self.node.status = PlotStatus.CLAIMED
+		self.status = PlotStatus.CLAIMED
 
-		self.node.owner = ownerName
+		self.owner = ownerName
 
-		self.node.date = ctime()
+		self.date = ctime()
 
 	"""
 	@brief Reserve this plot.
 	"""
 	def Reserve(self, ownerName, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.node.owner)
+			raise OwnerError(self.owner)
+ 
+		self.date   = ctime()
+		self.owner  = ownerName	
+		self.status = PlotStatus.RESERVED
 
-		self.node.date   = ctime()
-
-		self.node.owner  = ownerName
-		
-		self.node.reason = reason
-
-		self.node.status = PlotStatus.RESERVED
-
-	"""
-	@brief Unclaim this plot.
-	"""
-	def Unclaim(self):
-		if not self.IsClaimed():
-			raise UnclaimedError()
-
-		if self.node.status == PlotStatus.RESERVED:
-			del self.node.owner
-			del self.node.reason
-			del self.node.date
-
-		elif self.node.status == PlotStatus.CLAIMED:
-			del self.node.owner
-			del self.node.date
-
-		self.node.status = PlotStatus.FREE
+		if reason:
+			self.reason = reason
 
 	"""
 	@return a description of this plot.
 	"""
 	def Info(self):
-		desc = "Status: "+PlotStatus.ToStr(self.node.status)
+		desc = "Status: " + PlotStatus.ToStr(self.status)
 
-		if   self.node.status == PlotStatus.CLAIMED:
-			if self.node.reason != "":
-				desc += "\nOwner: "   +self.node.owner+\
-				"\nClaimed at: " +self.node.date+"\nDescription: "
+		if self.status == PlotStatus.CLAIMED:
+			if "reason" in self:
+				desc += "\nOwner: "   + self.owner + "\nClaimed at: " + self.date + "\nDescription: "
 			else:
-				desc += "\nOwner: "   +self.node.owner+\
-				"\nClaimed at: " +self.node.date
+				desc += "\nOwner: "   + self.owner + "\nClaimed at: " + self.date
 		
-		elif self.node.status == PlotStatus.RESERVED:
-			if self.node.reason != "":
-				desc += "\nReservee: "+self.node.owner+\
-				"\nReserved at: "+self.node.date+"\nReason: "+self.node.reason
-		
+		elif self.status == PlotStatus.RESERVED:
+			if "reason" in self:
+				desc += "\nReservee: " + self.owner + "\nReserved at: " + self.date + "\nReason: " + self.reason
 			else:
-				desc += "\nReservee: "+self.node.owner+\
-				"\nReserved at: "+self.node.date
+				desc += "\nReservee: " + self.owner + "\nReserved at: " + self.date
+
 		return desc
 
 """
 @brief Keeps track of a collection of plots, and their respective owners
 """
 class PlotManager:
-
 	"""
 	@brief allow allowed to build on allower's plots 
 	"""
@@ -236,7 +220,9 @@ class PlotManager:
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
-		plot.Claim(name,reason)
+		owner.remPlots -= 1
+
+		plot.Claim(name, reason)
 
 	"""
 	@brief Unclaim the specified plot.
@@ -244,15 +230,15 @@ class PlotManager:
 	def Unclaim(self, x, y, name):
 		plot = self.plots[(x, y)]
 
-		if plot.node.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			if plot.node.owner == name:
-				plot.Unclaim()
+		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
+			if plot.owner == name:
+				del self.plots[(x, y)]
 
 				owner = self.players[name]
 				owner.remPlots += 1
 
 			else:
-				raise OwnerError(plot.node.owner)
+				raise OwnerError(plot.owner)
 		else:
 			raise UnclaimedError
 
@@ -262,16 +248,12 @@ class PlotManager:
 	def UnclaimAdmin(self, x, y):
 		plot = self.plots[(x, y)]
 
-		hasOwner = plot.node.status == PlotStatus.CLAIMED
+		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
+			owner = self.players[plot.owner]
+			owner.remplots += 1
 
-		if hasOwner:
-			owner = self.players[plot.node.owner]
-
-		plot.Unclaim()
+		del self.plots[(x,y)]
 	
-		if hasOwner:
-			owner.remPlots += 1
-
 	"""
 	@brief Reserve the specified plot.
 	"""
@@ -342,12 +324,7 @@ class PlotManager:
 		self.players = PlayerBox(self.file.node.ORE.Players)
 		
 		self.plots = PlotBox(self.plotsNode)
-
-		for name, node in self.plotsNode.iteritems():
-			plot = Plot(node)
-			print name
-			pos  = tuple([int(X) for X in name.split("_")[1:]])
-
-			self.plots[pos] = plot
-
-
+		
+		for plot,value in self.plotsNode.iteritems():
+			self.plotsNode[plot] = Plot(value)
+			

@@ -21,7 +21,7 @@ class PlotMap(Manager.PlotManager):
 	"""
 	def IsOnMap(self, x, z):
 		return abs(x - self.size.pos.x) < (self.size.radius * 3) and\
-			abs(z - self.size.pos.z) < (self.size.radius * 3)
+		       abs(z - self.size.pos.z) < (self.size.radius * 3)
 
 	"""
 	@return the physical location of a plot on the map
@@ -123,29 +123,21 @@ class PlotMap(Manager.PlotManager):
 	"""
 	@brief Generate a plot map with the specified size.
 	"""
-	def Generate(self, override=False):
-		existing = self.plots.Dict.keys()
-
+	def Generate(self):
 		for x in xrange(-self.size.radius, self.size.radius):
 			for y in xrange(-self.size.radius, self.size.radius):
-				if (x, y) not in existing:
-					self.MarkUnclaimed(x, y, frame=True)
+				if "Plot_%s_%s"%(x, y) in self.plots.node:
+					status = self.plots[(x, y)].status
 
-				elif override:
-					status = self.plots[(x, y)].node.status
-					if   status == Manager.PlotStatus.FREE:
+					if status == Manager.PlotStatus.FREE:
 						self.MarkUnclaimed(x, y, frame=True)
-
+	
 					elif status == Manager.PlotStatus.CLAIMED:
 						self.MarkClaimed(x, y, frame=True)
-
+	
 					elif status == Manager.PlotStatus.RESERVED:
 						self.MarkReserved(x, y, frame=True)		
-
+				else:
+					self.MarkUnclaimed(x, y, frame=True)
+				
 		Info("Generated map")
-
-	"""
-	@brief Update the plot map.
-	"""
-	def Update(self):
-		self.Generate(override=True)
