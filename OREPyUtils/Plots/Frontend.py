@@ -17,7 +17,7 @@ ore.plot.claimas
 ore.plot.generate
 """
 
-Managers = defaultdict(Map.PlotMap)
+Managers = {}
 
 """
 @brief Get plot coords, either actual, or representative on the map

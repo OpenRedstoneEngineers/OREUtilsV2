@@ -46,10 +46,16 @@ class IRCBot(Connection.Connection):
 		self.Send("NICK %s\r\n" % nick)
 
 	def OnMessage(self, data):
+		cmds = data.split("\r\n")
+
+		for cmd in cmds:
+			self.HandleIRCCmd(cmd)
+
+	def HandleIRCCmd(self, data):
 		args = data.split()
 
 		if len(args) > 1 and args[0] == "PING":
-			self.Send("PONG " + ' '.join(args[1:]))
+			self.Send("PONG " + ' '.join(args[1:]) + "\r\n")
 
 		elif len(args) > 1 and args[1] == "JOIN":
 			self.OnJoin(args[0].split('!')[0][1:])

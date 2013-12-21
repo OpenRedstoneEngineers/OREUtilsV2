@@ -78,11 +78,6 @@ class PlotMap(Manager.PlotManager):
 
 		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_CROSS)
 
-		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_BASE)
-
 	"""
 	@brief Mark the plot at the specified position as reserved.
 	"""
@@ -134,7 +129,7 @@ class PlotMap(Manager.PlotManager):
 		for x in xrange(-self.size.radius, self.size.radius):
 			for y in xrange(-self.size.radius, self.size.radius):
 				if (x, y) not in existing:
-					self.MarkUnclaimed(x, y)
+					self.MarkUnclaimed(x, y, frame=True)
 
 				elif override:
 					status = self.plots[(x, y)].node.status

@@ -1,10 +1,22 @@
 ~*
 \#*
 
+# Temp
+*.save
+
+# Java
 *.class
+
+# Python
 *.pyc
 
+# Object files
 *.o
+
+# Log files
 *.log
 
 OREd/OREd
+
+# Config
+Data/config.json

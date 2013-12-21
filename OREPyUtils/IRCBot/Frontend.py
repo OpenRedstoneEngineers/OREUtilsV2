@@ -18,7 +18,7 @@ class AliasInfo:
 		self.IsServer = isServer
 
 		self.SrvColor = srvcolor
-		self.BraColor = ChatColor.getByChar(hex(int(ChatColor.getChar(srvcolor), 16) ^ 8)[-1]) #Xeo maaayyyy be drunk
+		self.BraColor = ChatColor.getByChar(hex(int(ChatColor.getChar(srvcolor), 16) ^ 8)[-1])
 		self.NamColor = ChatColor.AQUA
 		self.MsgColor = ChatColor.WHITE
 
@@ -71,10 +71,11 @@ class OREBot(IRCBot.IRCBot):
 
 		if alias.IsServer:
 			args = message.split()
+
 			if args[0].endswith(':'):
 				Bukkit.broadcastMessage(alias.GetTag(args[0][:-1]) + " ".join(args[1:]))
 			else:
-				Bukkit.broadcastMessage(str(ChatColor.YELLOW) + " ".join(args[:2]) +" the "+ alias.Name.lower() + " server")
+				Bukkit.broadcastMessage(str(ChatColor.YELLOW) + " ".join(args[:2]) + " " + alias.Name.lower())
 		else:
 			Bukkit.broadcastMessage(alias.GetTag(name) + message)		
 

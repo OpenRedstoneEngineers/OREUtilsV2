@@ -345,7 +345,7 @@ class PlotManager:
 
 		for name, node in self.plotsNode.iteritems():
 			plot = Plot(node)
-
+			print name
 			pos  = tuple([int(X) for X in name.split("_")[1:]])
 
 			self.plots[pos] = plot

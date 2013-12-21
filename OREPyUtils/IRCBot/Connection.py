@@ -59,20 +59,29 @@ class Connection(object):
 		self.Disconnect()
 
 	def Send(self, message):
-		status = self.socket.send(message)
+		if self.running == False:
+			return
+
+		try:
+			self.socket.sendall(message)
+
+		except:
+			self.running = False
+
+			Info("Could not send packet")
 
 	def Loop(self):
 		while self.running:
 			try:
 				data = self.socket.recv(self.BUFFER_SIZE).strip().encode("ascii", "ignore")
 
-			except Exception, E: # Socket is dead THEN FUCKING RECONNECT.
+			except Exception, E:
 				self.running = False
 
 				Info("IRC Socket is dead")
 				break
 
-			if len(data) == 0: # Disconnected
+			if len(data) == 0:
 				self.running = False
 
 				Info("IRC Socket disconnected")
