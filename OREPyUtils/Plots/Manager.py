@@ -131,10 +131,8 @@ class Plot(PersistentData.Node):
 			self.reason = reason
 
 		self.status = PlotStatus.CLAIMED
-
-		self.owner = ownerName
-
-		self.date = ctime()
+		self.owner  = ownerName
+		self.date   = ctime()
 
 	"""
 	@brief Reserve this plot.
@@ -142,10 +140,10 @@ class Plot(PersistentData.Node):
 	def Reserve(self, ownerName, reason):
 		if not self.IsClaimable():
 			raise OwnerError(self.owner)
- 
+
+		self.owner  = ownerName 
+		self.status = PlotStatus.RESERVED 
 		self.date   = ctime()
-		self.owner  = ownerName	
-		self.status = PlotStatus.RESERVED
 
 		if reason:
 			self.reason = reason
@@ -158,9 +156,9 @@ class Plot(PersistentData.Node):
 
 		if self.status == PlotStatus.CLAIMED:
 			if "reason" in self:
-				desc += "\nOwner: "   + self.owner + "\nClaimed at: " + self.date + "\nDescription: "
+				desc += "\nOwner: " + self.owner + "\nClaimed at: " + self.date + "\nDescription: "
 			else:
-				desc += "\nOwner: "   + self.owner + "\nClaimed at: " + self.date
+				desc += "\nOwner: " + self.owner + "\nClaimed at: " + self.date
 		
 		elif self.status == PlotStatus.RESERVED:
 			if "reason" in self:

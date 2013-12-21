@@ -13,28 +13,30 @@ Formats =  {
 	'NoFlag':'broadcastMessage(%s)'
 }
 
-Colours = {'black'    :'0',
-               'blue'     :'1',
-               'green'    :'2',
-               'cyan'     :'3',
-               'red'      :'4',
-               'purple'   :'5',
-               'orange'   :'6',
-               'lgrey'    :'7',
-               'grey'     :'8',
-               'lblue'    :'9',
-               'lgreen'   :'a',
-               'aqua'     :'b',
-               'lred'     :'c',
-               'pink'     :'d',
-               'yellow'   :'e',
-               'white'    :'f',
-               'bold'     :'l',
-               'underline':'n',
-               'strike'   :'m',
-               'italic'   :'o',
-               'random'   :'k',
-               'clear'    :'r'}
+Colours = {
+	'black'	  :'0',
+	'blue'    :'1',
+	'green'   :'2',
+	'cyan'    :'3',
+	'red'     :'4',
+	'purple'  :'5',
+	'orange'  :'6',
+	'lgrey'   :'7',
+	'grey'    :'8',
+	'lblue'   :'9',
+	'lgreen'  :'a',
+	'aqua'    :'b',
+	'lred'    :'c',
+	'pink'    :'d',
+	'yellow'  :'e',
+	'white'   :'f',
+	'bold'    :'l',
+	'underline':'n',
+	'strike'  :'m',
+	'italic'  :'o',
+	'random'  :'k',
+	'clear'   :'r'
+}
 
 GlobalHat = '''
 from Helper import Sudo
@@ -67,9 +69,9 @@ class Command:
 
 		Hat = ["@hook.command('%s')"            % "',descripion = '".join(Args),
 		       "def onCommand%s(sender, args):" % Args[0]]
-        
+		
 		if self.ArgsNeeded:
-			Hat += ["\tif len(args) < %s :"                           % self.ArgsNeeded,
+			Hat += ["\tif len(args) < %s :"	                          % self.ArgsNeeded,
 			        "\t\tsender.sendMessage('You need %s arguments')" % self.ArgsNeeded,
 			        "\t\treturn False"]
 		
@@ -81,7 +83,7 @@ class Command:
 	def GenCode(self):
 		for Line in self.Lines[1:]:
 			LineFormat = Formats['NoFlag'] 
-			Special    = set(Arg.findall(Line))
+			Special	   = set(Arg.findall(Line))
 
 			for Command in Special:
 				Original = Command
@@ -164,6 +166,7 @@ def GenCommands(fileIn = None,fileOut = None, *extra):
 
 if __name__ == "__main__":
 	print GenCommands('/servers/test/plugins/OREUtilsV2.py.dir/Data/Commands.txt','ResultCode.py')
+
 	exit()
 
 @hook.command('gencommands')
@@ -172,5 +175,5 @@ def onCommandGen(sender,args):
 		sender.sendMessage(GenCommands('Commands.txt','plugins/OREUtilsV2.py.dir/OREPyUtils/ResultCode.py'))
 	else:
 		sender.sendMessage('No permission')
+
 	return True
-		

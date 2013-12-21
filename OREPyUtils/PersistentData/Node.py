@@ -20,22 +20,21 @@ class Node:
 	def __getitem__(self, Item):
 		return self.__dict__[Item]
 
-        def Get(self, name):
-                path = name.split('.')
+	def Get(self, name):
+		path = name.split('.')
 		
 		if path[0] in self:
-                	node = self[path[0]]
+			node = self[path[0]]
 
-                	if isinstance(node, Node) and len(path) > 1:
-                        	return node.Get('.'.join(path[1:]))
-
-                	else:
-                        	return node
+			if isinstance(node, Node) and len(path) > 1:
+				return node.Get('.'.join(path[1:]))
+			else:
+				return node
 
 		return None
 
-        def Set(self, name, value):
-                path = name.split('.')
+	def Set(self, name, value):
+		path = name.split('.')
 
 		if len(path) > 1:
 
@@ -81,17 +80,16 @@ class Node:
 
 		return new
 
-        def Dict(self):
-                toReturn = {}
+	def Dict(self):
+		toReturn = {}
 
-                for item, value in self.iteritems():
-                        if isinstance(value, Node):
-                                toReturn[item] = value.Dict()
+		for item, value in self.iteritems():
+			if isinstance(value, Node):
+				toReturn[item] = value.Dict()
+			else:
+				toReturn[item] = value
 
-                        else:
-                                toReturn[item] = value
-
-                return toReturn
+		return toReturn
 	
 	def __add__(self, node):
 		new = self.copy()

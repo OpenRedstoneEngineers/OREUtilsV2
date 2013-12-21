@@ -21,7 +21,7 @@ class ConfigFile(PersistentData.NodeFile):
 	def __setitem__(self, name, value):
 		self.node.properties.Set(name, value)
 
-CONFIG  = ConfigFile()
+CONFIG	= ConfigFile()
 
 Include = CONFIG['Include']
 
@@ -33,16 +33,16 @@ if not isinstance(Include, list):
 
 def ImportFiles():
 	for N in Include:
-        	try:
-                	exec 'import ' + N
+		try:
+			exec 'import ' + N
 
-        	except Exception, E:
-                	Severe('[!]Error importing ' + N)
+		except Exception, E:
+			Severe('[!]Error importing ' + N)
 
-        	        Failiures[N] = str(E)
+			Failiures[N] = str(E)
 	
-        	else:
-                	Info('[i]Imported ' + N)
+		else:
+			Info('[i]Imported ' + N)
 
 def Load(plugin, **kwargs):
 	if plugin not in Failiures:
@@ -133,7 +133,9 @@ def OnCommandFail(sender, args):
 @hook.enable
 def OnEnable():
 	Load('Plots')
- 	
+
+	Load('IRCBot', conf=CONFIG)
+	
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',
 		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
@@ -142,8 +144,8 @@ def OnEnable():
 	TryExec('UsefulCommands', 
 		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
 
-	Load('IRCBot', conf=CONFIG)
-
 @hook.disable
 def OnDisable():
 	Unload('Plots')
+
+	Unload('IRCBot')

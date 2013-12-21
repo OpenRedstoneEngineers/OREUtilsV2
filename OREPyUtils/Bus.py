@@ -55,11 +55,11 @@ class Bus:
 			self.z += dz
 	
 	def Redstone(self):
-		self.world.getBlockAt(self.x, self.y    , self.z).setTypeId(1)
+		self.world.getBlockAt(self.x, self.y,     self.z).setTypeId(1)
 		self.world.getBlockAt(self.x, self.y + 1, self.z).setTypeId(55)
 
 	def Repeater(self):
-		self.world.getBlockAt(self.x, self.y    , self.z).setTypeId(1)
+		self.world.getBlockAt(self.x, self.y,     self.z).setTypeId(1)
 		self.world.getBlockAt(self.x, self.y + 1, self.z).setTypeIdAndData(93, self.dir, True)
 
 	def Draw(self):

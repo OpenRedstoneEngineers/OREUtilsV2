@@ -81,7 +81,7 @@ def GetPlayer_Match(player, manager):
 """
 @brief Get the coords of all plots of a player
 """
-def GetAllCoords_Owner(owner, manager):	
+def GetAllCoords_Owner(owner, manager): 
 	fullName = GetPlayer_Match(owner, manager)
 
 	if not fullName:
@@ -166,7 +166,7 @@ def onCommandPWho(sender, args):
 	banned  = []
 
 	for allow in manager.players[name].allow:
-		if  allow.startswith('- '):
+		if allow.startswith('- '):
 			banned.append(allow)
 		else:
 			allowed.append(allow)
@@ -273,7 +273,7 @@ def onCommandPreserve(sender, args):
 		sender.sendMessage(str(E))
 		return True
 	
-        sender.sendMessage("Plot reserved.")
+	sender.sendMessage("Plot reserved.")
 
 	manager.MarkReserved(x, y)
 	

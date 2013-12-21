@@ -3,7 +3,7 @@ from __future__ import division
 from Helper import Sudo 
 
 import org.bukkit.Bukkit.dispatchCommand as dispatchCommand 
-import org.bukkit.Bukkit.getPlayerExact  as getPlayerExact
+import org.bukkit.Bukkit.getPlayerExact	 as getPlayerExact
 
 # Permission nodes: 
 
@@ -15,19 +15,19 @@ fonts = 'lnor'
 
 # Presets
 preset = {
-    'rainbow'   : '4c6e23915d',
-    'ice'       : 'f7b3b7f',
-    'greyscale' : '87f',
-    'england'   : 'f4f4f4f4f4f4f4f4f4f',
-    'pink'      : 'dl',
-    'reset'     : 'f',
-    'fire'      : 'e646e'
+	'rainbow'   : '4c6e23915d',
+	'ice'       : 'f7b3b7f',
+	'greyscale' : '87f',
+	'england'   : 'f4f4f4f4f4f4f4f4f4f',
+	'pink'      : 'dl',
+	'reset'     : 'f',
+	'fire'      : 'e646e'
 }
 
 def Distribute(list1,list2):
-	len1    = len(list1)
-	change  = len1/float(len(list2))
-    
+	len1   = len(list1)
+	change = len1/float(len(list2))
+	
 	while len1 > 0:
 		len1 -= change
 		list1.insert(int(len1),list2.pop())
@@ -49,10 +49,10 @@ def onCommandNameFormat(target, args):
 
 		for format in ' '.join(args):
 			if format in colours:
-				formats.append('&'+format)
+				formats.append('&' + format)
 
 			elif format in fonts:
-				formats[-1] += '&'+format
+				formats[-1] += '&' + format
 
 			elif format == ' ' and formats[-1]:
 				formats.append('')
@@ -65,7 +65,7 @@ def onCommandNameFormat(target, args):
 		name = target.getName()
 
 		if formats:
-			Sudo('nick '+name+' '+Distribute(list(name), formats))
+			Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
 
 			return True
 	

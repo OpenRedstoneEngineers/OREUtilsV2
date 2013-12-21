@@ -51,272 +51,272 @@ def Decode(sender,args):
 	return True
 
 def Calc(calc,sender):
-    calc = calc.lower()
-    lbs = calc.count('(')
-    rbs = calc.count(')')
+	calc = calc.lower()
+	lbs = calc.count('(')
+	rbs = calc.count(')')
 
-    if lbs > 0 and rbs > 0:
-        c=0
+	if lbs > 0 and rbs > 0:
+		c=0
 
-        for i in calc:
-            if i == '(':
-                c+=1
+		for i in calc:
+			if i == '(':
+				c+=1
 
-            elif i == ')':
-                c-=1
+			elif i == ')':
+				c-=1
 
-                if c<0:
-                    return None
+				if c<0:
+					return None
 
-        if c>0:
-            return None
-    
-    wlist = '0123456789*+-/^|&~.,() '
+		if c>0:
+			return None
+	
+	wlist = '0123456789*+-/^|&~.,() '
 
-    calc = calc.replace('abs(','fabs(')
-    calc = calc.replace('deg(','dEgrEEs(')
-    calc = calc.replace('rad(','radians(')
-    calc = calc.replace('rand()','random()')
-    calc = calc.replace('ceil()','cEil(')
-    calc = calc.replace('^','**')
-    calc = calc.replace(' xor ','^')
-    calc = calc.replace(' and ','&')
-    calc = calc.replace(' or ','|')
-    calc = calc.replace('not ','~')
-    calc = calc.replace('pi','('+str(m.pi)+')')
-    calc = calc.replace('e','('+str(m.e)+')')
-    calc = calc.lower()
-    
+	calc = calc.replace('abs(','fabs(')
+	calc = calc.replace('deg(','dEgrEEs(')
+	calc = calc.replace('rad(','radians(')
+	calc = calc.replace('rand()','random()')
+	calc = calc.replace('ceil()','cEil(')
+	calc = calc.replace('^','**')
+	calc = calc.replace(' xor ','^')
+	calc = calc.replace(' and ','&')
+	calc = calc.replace(' or ','|')
+	calc = calc.replace('not ','~')
+	calc = calc.replace('pi','('+str(m.pi)+')')
+	calc = calc.replace('e','('+str(m.e)+')')
+	calc = calc.lower()
+	
 
-    funcs = ['cos','sin','tan','acos','asin','atan','sqrt','acosh','asinh','atanh','cosh','sinh','tanh','ceil','floor','fabs','gamma','lgamma','degrees','radians','log']
-    calc2=calc
+	funcs = ['cos','sin','tan','acos','asin','atan','sqrt','acosh','asinh','atanh','cosh','sinh','tanh','ceil','floor','fabs','gamma','lgamma','degrees','radians','log']
+	calc2=calc
 
-    for j in funcs:
-        i=j+'('
-        calc = calc.replace(i,'(')
-        calc2= calc2.replace(i,'m.'+i)
+	for j in funcs:
+		i=j+'('
+		calc = calc.replace(i,'(')
+		calc2= calc2.replace(i,'m.'+i)
 
-    rfuncs = ['random','randint','uniform','randrange']
+	rfuncs = ['random','randint','uniform','randrange']
 
-    for j in rfuncs:
-        i=j+'('
-        calc = calc.replace(i,'(')
-        calc2= calc2.replace(i,'random.'+i)
-    
-    for i in calc:
-        if not i in wlist:
-            sender.sendMessage("The character %s is not allowed! Allowed characters: "%i+wlist)
+	for j in rfuncs:
+		i=j+'('
+		calc = calc.replace(i,'(')
+		calc2= calc2.replace(i,'random.'+i)
+	
+	for i in calc:
+		if not i in wlist:
+			sender.sendMessage("The character %s is not allowed! Allowed characters: "%i+wlist)
 
-            return ValueError
+			return ValueError
 
-    try:
-        q = eval(calc2)
+	try:
+		q = eval(calc2)
 
-    except:
-        return None
-    return q
+	except:
+		return None
+	return q
 
 @hook.command("calc", description="Calculate things!")
 def onCommandCalc(sender,args):
-    global colour, appended, comp
+	global colour, appended, comp
 
-    if len(args)==0:
-        sender.sendMessage('This function requires an expression to calculate!')
-        return False
+	if len(args)==0:
+		sender.sendMessage('This function requires an expression to calculate!')
+		return False
 
-    if ''.join(args).count('*') > 1:
-        sender.sendMessage('NO. * *s')
-        return False
+	if ''.join(args).count('*') > 1:
+		sender.sendMessage('NO. * *s')
+		return False
 
-    if '^' in ''.join(args):
-        sender.sendMessage('NO. ^s')
-        return False
+	if '^' in ''.join(args):
+		sender.sendMessage('NO. ^s')
+		return False
 
-    c=Calc(' '.join(args),sender)
+	c=Calc(' '.join(args),sender)
 
-    if c==None:
-        sender.sendMessage('Invalid expression!')
-        return False
+	if c==None:
+		sender.sendMessage('Invalid expression!')
+		return False
 
-    elif c==ValueError:
-        return False
+	elif c==ValueError:
+		return False
 
-    sta = ''.join(args)
-    sta = sta.replace('deg(','dEgrEEs(')
-    sta = sta.replace('ceil()','cEil(')
-    sta = list(sta.replace('pi','PI'))
-    comp = []
-    colour = '7'
-    cs = random.choice(colourschemes)
+	sta = ''.join(args)
+	sta = sta.replace('deg(','dEgrEEs(')
+	sta = sta.replace('ceil()','cEil(')
+	sta = list(sta.replace('pi','PI'))
+	comp = []
+	colour = '7'
+	cs = random.choice(colourschemes)
 
-    for a in sta:
-        appended = False
+	for a in sta:
+		appended = False
 
-        if a.isdigit():
-            coladd(cs[0])
+		if a.isdigit():
+			coladd(cs[0])
 
-        if 'ePI'.find(a) != -1:
-            coladd(cs[1])
+		if 'ePI'.find(a) != -1:
+			coladd(cs[1])
 
-        if '(),.'.find(a) != -1:
-            coladd(cs[2])
+		if '(),.'.find(a) != -1:
+			coladd(cs[2])
 
-        if not appended:
-            coladd(cs[3])
-        comp.append(a)
+		if not appended:
+			coladd(cs[3])
+		comp.append(a)
 
-    sender.sendMessage(color('7') + ''.join(comp).lower() + color('7') + " = " + color('3') + color('l') + str(c))
+	sender.sendMessage(color('7') + ''.join(comp).lower() + color('7') + " = " + color('3') + color('l') + str(c))
 
-    return True 
+	return True 
 
 def coladd(c):
-    global colour, comp, appended
-    appended = True
+	global colour, comp, appended
+	appended = True
 
-    if colour != c:
-        colour = c
-        comp.append(color("c"))#?
+	if colour != c:
+		colour = c
+		comp.append(color("c"))#?
 
 #Rename
 @hook.command('rename', description='Rename the item in your hand')
 def onCommandLore(sender, args):
-    if len(args) == 0:
-        sender.sendMessage(color("c") + 'You must have a name!')
-        return False
+	if len(args) == 0:
+		sender.sendMessage(color("c") + 'You must have a name!')
+		return False
 
-    argstring = ' '.join(args).replace('#f',u'\u00A7')
-    I = sender.getItemInHand()
-    Imeta = I.getItemMeta()
-    Imeta.setDisplayName(argstring)
-    I.setItemMeta(Imeta)
-    return True
+	argstring = ' '.join(args).replace('#f',u'\u00A7')
+	I = sender.getItemInHand()
+	Imeta = I.getItemMeta()
+	Imeta.setDisplayName(argstring)
+	I.setItemMeta(Imeta)
+	return True
 
 @hook.command('e')
 def onCommandBookGet(sender, args):
-    item = sender.getItemInHand()
+	item = sender.getItemInHand()
 
-    if item.getTypeId() not in (386,387):
-        sender.sendMessage(color("c") + 'You must have a book')
-        return False
+	if item.getTypeId() not in (386,387):
+		sender.sendMessage(color("c") + 'You must have a book')
+		return False
 
-    # YAY for descriptive names -Dot
-    metadata = item.getItemMeta()
-    s = ''    
+	# YAY for descriptive names -Dot
+	metadata = item.getItemMeta()
+	s = ''	  
 
-    for i in metadata.getPages():
-        s = s+'\n'+i
+	for i in metadata.getPages():
+		s = s+'\n'+i
 
-    n = 0
+	n = 0
 
-    while 1:
-        a = '#a'+str(n)
+	while 1:
+		a = '#a'+str(n)
 
-        if len(args) <= n:
-            break
+		if len(args) <= n:
+			break
 
-        s = s.replace(a, args[n])
-        n += 1
+		s = s.replace(a, args[n])
+		n += 1
 
-    n = 0
+	n = 0
 
-    while 1:
-        a = '#r'+str(n)
+	while 1:
+		a = '#r'+str(n)
 
-        if len(args) <= n:
-            break
+		if len(args) <= n:
+			break
 
-        s = s.replace(a, ' '.join(args[n:]))
-        n += 1
+		s = s.replace(a, ' '.join(args[n:]))
+		n += 1
 
-    n = 0
+	n = 0
 
-    while 1:
-        a = '#n'+str(n)
+	while 1:
+		a = '#n'+str(n)
 
-        if len(args) <= n:
-            break
+		if len(args) <= n:
+			break
 
-        name = getPlayer(args[n])
+		name = getPlayer(args[n])
 
-        if name != None:
-            s = s.replace(a, name.getName())
+		if name != None:
+			s = s.replace(a, name.getName())
 
-        n += 1
+		n += 1
 
-    s = s.replace('#a', ' '.join(args))
-    s = s.replace('#p', 'ping &b')
-    s = s.replace('#m', sender.getName())
-    s = s.split('\n')[1:]
-    n = 0
+	s = s.replace('#a', ' '.join(args))
+	s = s.replace('#p', 'ping &b')
+	s = s.replace('#m', sender.getName())
+	s = s.split('\n')[1:]
+	n = 0
 
-    if len(args) > 0 and '@'+args[0] in s:
-        n = s.index('@'+args[0])+1
-        no = 0
+	if len(args) > 0 and '@'+args[0] in s:
+		n = s.index('@'+args[0])+1
+		no = 0
 
-        while True:
-            if n == len(s):
-                break
+		while True:
+			if n == len(s):
+				break
 
-            if no == 3 and not sender.hasPermission('xeoperms.give'):
-                break
-            
-            command = s[n]
-            if command[0:2] == '#b':
-                bcast(color("e") + s[n][2:] + color("6") + ' ('+ sender.getName() + ')')
-            elif command.split()[0] != 'e':
-                runas(sender, command)
+			if no == 3 and not sender.hasPermission('xeoperms.give'):
+				break
+			
+			command = s[n]
+			if command[0:2] == '#b':
+				bcast(color("e") + s[n][2:] + color("6") + ' ('+ sender.getName() + ')')
+			elif command.split()[0] != 'e':
+				runas(sender, command)
  
-            if not n+1 == len(s) and s[n+1][0] == '@':
-                break
+			if not n+1 == len(s) and s[n+1][0] == '@':
+				break
  
-            n += 1
-            no += 1
-        sender.sendMessage('Command(s) run!')
-        return True
+			n += 1
+			no += 1
+		sender.sendMessage('Command(s) run!')
+		return True
 
-    for i in s:
-        if n == 3 and not sender.hasPermission('xeoperms.give'):
-            break
-        if len(i) == 0:
-            break
-        if i[0] == '@':
-            break
+	for i in s:
+		if n == 3 and not sender.hasPermission('xeoperms.give'):
+			break
+		if len(i) == 0:
+			break
+		if i[0] == '@':
+			break
 
-        if i[0:2] == '#b':
-            bcast(color("e") + i[2:] + color("6") + ' ('+sender.getName()+')')
-        elif i.split()[0] != 'e':
-            runas(sender, i)
-        n += 1
+		if i[0:2] == '#b':
+			bcast(color("e") + i[2:] + color("6") + ' ('+sender.getName()+')')
+		elif i.split()[0] != 'e':
+			runas(sender, i)
+		n += 1
 
-    sender.sendMessage(color("a") + 'Command(s) run!')
+	sender.sendMessage(color("a") + 'Command(s) run!')
 
-    return True
+	return True
 
 @hook.command('schems')
 def onCommandSchems(sender, args):
-    Name = sender.getName()
-    try:
-        UserSchems = os.listdir('/var/www/schems/files/'+Name)
-    except:return False
-    if len(args) == 2:
-        Sub = args[0]
-        if Sub   in ('load','save'):
-            runas(sender,'/schematic '+Sub+' '+Name+'/'+args[1].split('/')[0])
-            return True
-    elif len(args) == 1:
-        Sub = args[0]
-        if Sub ==  'list':
-            sender.sendMessage('List of your schematics:')
-            for item in UserSchems:
-                sender.sendMessage(item)
-            return True
+	Name = sender.getName()
+	try:
+		UserSchems = os.listdir('/var/www/schems/files/'+Name)
+	except:return False
+	if len(args) == 2:
+		Sub = args[0]
+		if Sub	 in ('load','save'):
+			runas(sender,'/schematic '+Sub+' '+Name+'/'+args[1].split('/')[0])
+			return True
+	elif len(args) == 1:
+		Sub = args[0]
+		if Sub ==  'list':
+			sender.sendMessage('List of your schematics:')
+			for item in UserSchems:
+				sender.sendMessage(item)
+			return True
 
-    sender.sendMessage('/schems list | load <name> | save <name>')
+	sender.sendMessage('/schems list | load <name> | save <name>')
 
 @hook.command('pass')
 def passset(sender, args):
-    runas(sender,'dbp set '+' '.join(args))
-    return True
+	runas(sender,'dbp set '+' '.join(args))
+	return True
 
 @hook.command('orehelp')
 def onCommandOREHelp(sender,args):
@@ -330,7 +330,7 @@ def onCommandOREHelp(sender,args):
 		matches = 1
 
 		sender.sendMessage(color("a") + '/' + color("2") + args[0] + color("a") + help[args[0]]['long'])
-	else:       
+	else:		
 		matches = 0 
 
 	for i in keys:
