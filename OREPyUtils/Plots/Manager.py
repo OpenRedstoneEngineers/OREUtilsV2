@@ -41,6 +41,11 @@ class PlotBox:
 	def __setitem__(self, tuple, value):
 		self.node["Plot_%s_%s"%tuple] = value
 
+	def iteritems(self):
+		for name, item in self.node.iteritems():
+			pos = [int(x) for x in name.split("_")[1:]]
+			yield pos, item
+
 
 class PlayerBox:
 	def __init__(self, playerNode):
@@ -285,6 +290,7 @@ class PlotManager:
 	@return the coordinates of the centre of the specified plot.
 	"""
 	def GetPlotCentre(self, x, y):
+		print x, y
 		return ((x * self.size.x) + (self.size.x // 2),
 		        (y * self.size.y) + (self.size.y // 2))
 

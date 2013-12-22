@@ -59,7 +59,7 @@ def GetCoords_Owner(owner, manager):
 	if not fullName:
 		return None
 
-	for pos, plot in manager.plots.plotNode.iteritems():
+	for pos, plot in manager.plots.iteritems():
 		if plot.status == Manager.PlotStatus.CLAIMED:
 			if fullName == plot.owner:
 				return pos
@@ -87,7 +87,7 @@ def GetAllCoords_Owner(owner, manager):
 	if not fullName:
 		return []
 
-	return [pos for pos, plot in manager.plots.plotNode.iteritems()\
+	return [pos for pos, plot in manager.plots.node.iteritems()\
 		if plot.status == Manager.PlotStatus.CLAIMED and plot.owner == owner]
 
 def GetManager_ByPlayer(sender):
@@ -372,7 +372,7 @@ def onCommandPwarp(sender, args):
 			x = pos[0]
 			y = pos[1]
 
-		if len(args) == 2 and args[1].isdigit():
+		elif len(args) == 2 and args[1].isdigit():
 			poses = GetAllCoords_Owner(args[0], manager)
 			
 			index = int(args[1])
@@ -612,7 +612,7 @@ def onCommandPsearch(sender, args):
 
 	owner = str(args[0])
 
-	for pos, plot in manager.plots.plotNode.iteritems():
+	for pos, plot in manager.plots.node.iteritems():
 		if plot.status == Manager.PlotStatus.CLAIMED:
 			if plot.owner == owner:
 				sender.sendMessage(manager.Info(pos[0], pos[1]))
