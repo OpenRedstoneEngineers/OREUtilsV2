@@ -4,8 +4,6 @@ from .. import PersistentData
 
 import time.ctime as ctime
 
-from Helper import Info
-
 class PlotStatus:
 	FREE     = 0
 	CLAIMED  = 1
@@ -243,7 +241,7 @@ class PlotManager:
 			else:
 				raise OwnerError(plot.owner)
 		else:
-			raise UnclaimedError
+			raise UnclaimedError()
 
 	"""
 	@brief Forcefully unclaim the specified plot.

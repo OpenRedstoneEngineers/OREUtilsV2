@@ -9,7 +9,7 @@ import IRCBot
 from org.bukkit import Bukkit
 from org.bukkit import ChatColor
 
-from Helper import Info, Color
+from .. import Helper
 
 class AliasInfo:
 	def __init__(self, name, isServer, srvcolor):
@@ -61,7 +61,7 @@ class OREBot(IRCBot.IRCBot):
 		Bukkit.broadcastMessage(str(ChatColor.YELLOW) + name + " left IRC")
 
 	def OnPrivMsg(self, name, message):
-		Info("Private IRC message from %s: %s" % (name, message))
+		Helper.Info("Private IRC message from %s: %s" % (name, message))
 
 	def OnChanMsg(self, name, message):
 		if name in self.Muted:

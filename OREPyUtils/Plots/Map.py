@@ -2,7 +2,7 @@ import Manager
 
 import xml.etree.ElementTree as ET
 
-from Helper import Info
+from .. import Helper
 
 class PlotMap(Manager.PlotManager):
 	BLOCK_RESERVED    = (159,10, 0)
@@ -140,4 +140,4 @@ class PlotMap(Manager.PlotManager):
 				else:
 					self.MarkUnclaimed(x, y, frame=True)
 				
-		Info("Generated map")
+		Helper.Info("Generated map")

@@ -1,7 +1,7 @@
 import Manager
 import Map
 
-from Helper import Info
+from .. import Helper
 
 from collections import defaultdict
 
@@ -102,7 +102,7 @@ def InitManager(world):
 
 	Managers[world.getName()] = manager
 
-	Info("Initialized plot manager %s" % world.getName())
+	Helper.Info("Initialized plot manager %s" % world.getName())
 
 def InitManagers():
 	for world in getWorlds():

@@ -1,7 +1,7 @@
 import socket
 import threading
 
-from Helper import Info
+from .. import Helper
 
 """
 @brief Client socket wrapper.
@@ -33,7 +33,7 @@ class Connection(object):
 		except:
 			self.running = False
 
-			Info("Couldn't connect to %s" % hostname)
+			Helper.Info("Couldn't connect to %s" % hostname)
 
 	def Reconnect(self, hostname, port):
 		self.Stop()
@@ -68,7 +68,7 @@ class Connection(object):
 		except:
 			self.running = False
 
-			Info("Could not send packet")
+			Helper.Info("Could not send packet")
 
 	def Loop(self):
 		while self.running:
@@ -78,13 +78,13 @@ class Connection(object):
 			except Exception, E:
 				self.running = False
 
-				Info("IRC Socket is dead")
+				Helper.Info("IRC Socket is dead")
 				break
 
 			if len(data) == 0:
 				self.running = False
 
-				Info("IRC Socket disconnected")
+				Helper.Info("IRC Socket disconnected")
 				break
 
 			if self.LOG_FILE != None:

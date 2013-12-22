@@ -106,7 +106,6 @@ def Calc(calc,sender):
 	for i in calc:
 		if not i in wlist:
 			sender.sendMessage("The character %s is not allowed! Allowed characters: "%i+wlist)
-
 			return ValueError
 
 	try:
