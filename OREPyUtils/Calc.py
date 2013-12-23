@@ -1,40 +1,114 @@
-# Math expr parser
-
 import re
+import math
+import tokenize
+import StringIO
 
-class TokenLiteral:
-	def __init__(self, value):
-		self.value = int(value)
+class SymbolBase:
+	NAME = None
 
 	def nud(self, parser):
-		return self.value
+		raise SyntaxError("Syntax error %s" % self.NAME)
 
-class TokenEnd:
-	lbp = 0
-
-class TokenOpAdd:
-	lbp = 10
 	def led(self, parser, LHS):
-		return LHS + parser.Expr(10)
+		raise SyntaxError("Unknown operator %s" % self.NAME)
 
-class TokenOpSub:
-	lbp = 10
-	def led(self, parser, LHS):
-		return LHS - parser.Expr(10) 
+SymbolTable = {}
+FuncTable = {}
 
-class TokenOpMul:
-	lbp = 20
-	def led(self, parser, LHS):
-		return LHS * parser.Expr(20)
+def DefineSymbol(name, bp=0):
+	try:
+		sym = SymbolTable[name]
 
-class TokenOpDiv:
-	lbp = 20
-	def led(self, parser, LHS):
-		return LHS / parser.Expr(20)
+	except:
+		class sym(SymbolBase):
+			pass
+
+		sym.NAME = name
+		sym.lbp = bp
+
+		sym.__name__ = "Symbol-" + name
+
+		SymbolTable[name] = sym
+
+	else:
+		sym.lbp = max(bp, sym.lbp)
+
+	return sym
+
+def DefineConstant(name, value, bp=0):
+	def nud(self, parser):
+		return value
+
+	DefineSymbol(name, bp).nud = nud
+
+def DefineFunction(name, func, bp=0):
+	def nud(self, parser):
+		return parser.Expr(self.lbp)
+
+	DefineSymbol(name, bp).nud = nud
+
+	FuncTable[name] = func
+
+def OpAddLED(self, parser, LHS):
+	return LHS + parser.Expr(self.lbp)
+def OpSubLED(self, parser, LHS):
+	return LHS - parser.Expr(self.lbp)
+def OpMulLED(self, parser, LHS):
+	return LHS * parser.Expr(self.lbp)
+def OpDivLED(self, parser, LHS):
+	return LHS / parser.Expr(self.lbp)
+def OpPowLED(self, parser, LHS):
+	return LHS ** parser.Expr(self.lbp - 1)
+def OpAddNUD(self, parser):
+	return +parser.Expr(self.lbp)
+def OpSubNUD(self, parser):
+	return -parser.Expr(self.lbp)
+def LiteralNUD(self, parser):
+	return self.value
+def ParenthNUD(self, parser):
+	expr = parser.Expr()
+	parser.Advance(")")
+	return expr
+
+def FunctionLED(self, parser, LHS):
+	args = []
+
+	if parser.currToken.NAME != ")":
+		while True:
+			args.append(parser.Expr())
+
+			if parser.currToken.NAME != ",":
+				break
+
+			parser.Advance(",")
+
+	parser.Advance(")")
+
+	func = FuncTable.get(LHS)
+
+	if func == None:
+		raise SyntaxError("Unknown function %s" % LHS)
+
+	return func(*args)
+
+DefineSymbol("LITERAL").nud = LiteralNUD
+DefineSymbol("+", 10).led = OpAddLED
+DefineSymbol("-", 10).led = OpSubLED
+DefineSymbol("*", 20).led = OpMulLED
+DefineSymbol("/", 20).led = OpDivLED
+DefineSymbol("+").nud = OpAddNUD
+DefineSymbol("-").nud = OpSubNUD
+DefineSymbol("**", 30).led = OpPowLED
+DefineSymbol("(").nud = ParenthNUD
+DefineSymbol("(").led = FunctionLED
+DefineSymbol(")")
+DefineSymbol(",")
+DefineSymbol("END")
+
+DefineConstant("PI", math.pi)
+DefineConstant("E",  math.e)
 
 class Parser:
-	REGEX = re.compile("\s*(?:(\d+)|(.))")
-
 	def Expr(self, rbp=0):
 		token          = self.currToken
 		self.currToken = self.NextToken()
@@ -47,25 +121,39 @@ class Parser:
 
 			result = token.led(self, result)
 
-		return result			
+		return result
+
+	def Advance(self, name):
+		if name and name != self.currToken.NAME:
+			raise SyntaxError("Expected %s" % name)
+
+		self.currToken = self.NextToken()			
 
 	def Tokenize(self, expr):
-		for number, operator in self.REGEX.findall(expr):
-			if number:
-				yield TokenLiteral(number)
+		for token in tokenize.generate_tokens(StringIO.StringIO(expr).next):
+			if token[0] == tokenize.ENDMARKER:
+				break
 
-			elif operator == "+":
-				yield TokenOpAdd()
-			elif operator == "-":
-				yield TokenOpSub()
-			elif operator == "*":
-				yield TokenOpMul()
-			elif operator == "/":
-				yield TokenOpDiv()
+			elif token[0] == tokenize.NUMBER:
+				symbol = SymbolTable["LITERAL"]
+
+				tok = symbol()
+
+				tok.value = float(token[1])
+
+				yield tok
+
 			else:
-				raise SyntaxError("Unknown operator " + str(operator))
+				symbol = SymbolTable.get(token[1])
 
-		yield TokenEnd()
+				if symbol == None:
+					raise SyntaxError("Unknown operator " + str(token[1]))
+
+				yield symbol()
+
+		symbol = SymbolTable["END"]
+
+		yield symbol()
 
 	def Parse(self, expr):
 		self.NextToken = self.Tokenize(expr).next
