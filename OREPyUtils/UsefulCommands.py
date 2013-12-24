@@ -1,34 +1,27 @@
 from __future__ import division
-import math as m
-import random, os
-import org.bukkit.Bukkit.dispatchCommand  as runas
-import org.bukkit.Bukkit.getPlayer        as getPlayer
-import org.bukkit.Bukkit.broadcastMessage as bcast
 
-from Helper import color,Info
+import os
 
+from org.bukkit.Bukkit import dispatchCommand
+from org.bukkit.Bukkit import getPlayer
+from org.bukkit.Bukkit import broadcastMessage
+
+from Helper import Color, Colorify, Info
 
 help = {}
 keys = []
 
-#[Numbers,Constants,().,+-]
-colourschemes = [['3','1','9','7']]
-colour = 'f'
-comp = []
-appeneded = False
-Times = {}
-
-
 def OnEnable(**kwargs):
-	global help,keys
+	global help, keys
+
 	try:
 		keys = help.keys()
 		keys.sort()
 		help = open(kwargs['path']).read()
+
 	except:
 		Info("[!]Could not find help file")
 		
-
 @hook.command("encode")
 def Encode(sender,args):
 	sender.sendMessage(' '.join(args).encode('hex'))
@@ -39,48 +32,49 @@ def Decode(sender,args):
 	String = ''.join(args)
 	Final  = []
 
-	for Ind in range(0,len(String),2):
+	for Ind in range(0, len(String), 2):
 		try:
-			Final.append(chr(int(String[Ind:Ind+2],16)))
+			Final.append(chr(int(String[Ind:Ind + 2], 16)))
 
 		except:
 			sender.sendMessage('Invalid Char!')
-			break
+			return True
+
 	sender.sendMessage(''.join(Final))
 
 	return True
 
-def coladd(c):
-	global colour, comp, appended
-	appended = True
-
-	if colour != c:
-		colour = c
-		comp.append(color("c"))#?
-
-#Rename
-@hook.command('rename', description='Rename the item in your hand')
+@hook.command('rename', description='Rename the item in your hand', usage="Usage: /rename <name>")
 def onCommandLore(sender, args):
-	if len(args) == 0:
-		sender.sendMessage(color("c") + 'You must have a name!')
+	if not args:
 		return False
 
-	argstring = ' '.join(args).replace('#f',u'\u00A7')
-	I = sender.getItemInHand()
-	Imeta = I.getItemMeta()
-	Imeta.setDisplayName(argstring)
-	I.setItemMeta(Imeta)
+	argstring = Colorify(' '.join(args))
+
+	item = sender.getItemInHand()
+
+	meta = item.getItemMeta()
+
+	if meta == None:
+		sender.sendMessage("No item in hand")
+		return True
+
+	meta.setDisplayName(argstring)
+
+	item.setItemMeta(meta)
+
+	sender.sendMessage("Renamed item!")
+
 	return True
 
 @hook.command('e')
 def onCommandBookGet(sender, args):
 	item = sender.getItemInHand()
 
-	if item.getTypeId() not in (386,387):
-		sender.sendMessage(color("c") + 'You must have a book')
+	if item.getTypeId() not in (386, 387):
+		sender.sendMessage(Color("c") + 'You must have a book')
 		return False
 
-	# YAY for descriptive names -Dot
 	metadata = item.getItemMeta()
 	s = ''	  
 
@@ -143,9 +137,9 @@ def onCommandBookGet(sender, args):
 			
 			command = s[n]
 			if command[0:2] == '#b':
-				bcast(color("e") + s[n][2:] + color("6") + ' ('+ sender.getName() + ')')
+				broadcastMessage(Color("e") + s[n][2:] + Color("6") + ' ('+ sender.getName() + ')')
 			elif command.split()[0] != 'e':
-				runas(sender, command)
+				dispatchCommand(sender, command)
  
 			if not n+1 == len(s) and s[n+1][0] == '@':
 				break
@@ -164,39 +158,43 @@ def onCommandBookGet(sender, args):
 			break
 
 		if i[0:2] == '#b':
-			bcast(color("e") + i[2:] + color("6") + ' ('+sender.getName()+')')
+			broadcastMessage(Color("e") + i[2:] + Color("6") + ' ('+sender.getName()+')')
 		elif i.split()[0] != 'e':
-			runas(sender, i)
+			dispatchCommand(sender, i)
 		n += 1
 
-	sender.sendMessage(color("a") + 'Command(s) run!')
+	sender.sendMessage(Color("a") + 'Command(s) run!')
 
 	return True
 
-@hook.command('schems')
+@hook.command('schems', usage="Usage: /schems <list|load|save> name")
 def onCommandSchems(sender, args):
 	Name = sender.getName()
-	try:
-		UserSchems = os.listdir('/var/www/schems/files/'+Name)
-	except:return False
-	if len(args) == 2:
-		Sub = args[0]
-		if Sub	 in ('load','save'):
-			runas(sender,'/schematic '+Sub+' '+Name+'/'+args[1].split('/')[0])
-			return True
-	elif len(args) == 1:
-		Sub = args[0]
-		if Sub ==  'list':
-			sender.sendMessage('List of your schematics:')
-			for item in UserSchems:
-				sender.sendMessage(item)
+
+	if len(args) == 2 and args[0] in ("load", "save"):
+		dispatchCommand(sender, '/schematic ' + args[0] + ' ' + Name + '/' + args[1].split('/')[0])
+	
+		return True
+
+	elif len(args) == 1 and args[0] == "list":
+		try:
+			UserSchems = os.listdir('/var/www/schems/files/' + Name)
+		except:
+			sender.sendMessage("No schematics!")
 			return True
 
-	sender.sendMessage('/schems list | load <name> | save <name>')
+		sender.sendMessage('List of your schematics:')
+
+		for item in UserSchems:
+			sender.sendMessage(item)
+
+		return True
+
+	return False
 
 @hook.command('pass')
 def passset(sender, args):
-	runas(sender,'dbp set '+' '.join(args))
+	dispatchCommand(sender, 'dbp set ' + ' '.join(args))
 	return True
 
 @hook.command('orehelp')
@@ -205,28 +203,28 @@ def onCommandOREHelp(sender,args):
 		matches = len(keys)
 
 		for i in keys:
-			sender.sendMessage(color("e") + '/' + color("6") + i + color("e") + help[i]['short'])
+			sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
 
 	elif args[0] in keys:
 		matches = 1
 
-		sender.sendMessage(color("a") + '/' + color("2") + args[0] + color("a") + help[args[0]]['long'])
+		sender.sendMessage(Color("a") + '/' + Color("2") + args[0] + Color("a") + help[args[0]]['long'])
 	else:		
 		matches = 0 
 
 	for i in keys:
 		if i.find(args[0]) == 0:
 			matches += 1
-			sender.sendMessage(color("e") + '/' + color("6") + i + color("e") + help[i]['short'])
+			sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
 
 	for i in keys:
 		if i.find(args[0]) > 0:
 			matches += 1
-			sender.sendMessage(color("f") + '/' + ChatColor.GRAY + color("f") + help[i]['short'])
+			sender.sendMessage(Color("f") + '/' + ChatColor.GRAY + Color("f") + help[i]['short'])
 
 	if matches == 0:
-		sender.sendMessage(color("c") + '====' + color("4") + 'No matches found' + color("c") + '====')
+		sender.sendMessage(Color("c") + '====' + Color("4") + 'No matches found' + Color("c") + '====')
 	else:
-		sender.sendMessage(color("e") + '====' + color("c") + str(matches) + color("6") + 'matches found' + color("e") + '====')
+		sender.sendMessage(Color("e") + '====' + Color("c") + str(matches) + Color("6") + 'matches found' + Color("e") + '====')
 
 	return True

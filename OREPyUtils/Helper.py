@@ -1,5 +1,7 @@
 import org.bukkit.Bukkit as Bukkit
 
+import re
+
 from java.util.logging import Level
 
 # Deprecated

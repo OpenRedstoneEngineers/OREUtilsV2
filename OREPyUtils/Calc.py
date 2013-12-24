@@ -193,8 +193,14 @@ class Parser:
 
 		yield symbol()
 
+	def NextToken(self):
+		try:
+			return self.NextTokenRaw()
+		except:
+			raise SyntaxError("Unexpected end of input")
+
 	def Parse(self, expr):
-		self.NextToken = self.Tokenize(expr).next
+		self.NextTokenRaw = self.Tokenize(expr).next
 
 		self.currToken = self.NextToken()
 
