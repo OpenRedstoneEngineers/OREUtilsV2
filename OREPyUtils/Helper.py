@@ -7,6 +7,11 @@ def Color(colors):
 	return ''.join([u'\u00A7' + color for color in colors])
 def color(colors):
 	return Color(colors)
+	
+# lets you use &-coded strings
+def colorify(text):
+	return re.sub("&(?=[?\da-fk-or])", u"\u00A7", text)
+
 
 # Execute a command with root permissions
 def Sudo(command):
