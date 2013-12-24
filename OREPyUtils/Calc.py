@@ -13,7 +13,12 @@ class SymbolBase:
 		raise SyntaxError("Unknown operator %s" % self.NAME)
 
 SymbolTable = {}
-FuncTable = {}
+
+FuncTable = {
+	"sin" : math.sin,
+	"cos" : math.cos,
+	"tan" : math.tan
+}
 
 def DefineSymbol(name, bp=0):
 	try:
@@ -41,14 +46,6 @@ def DefineConstant(name, value, bp=0):
 
 	DefineSymbol(name, bp).nud = nud
 
-def DefineFunction(name, func, bp=0):
-	def nud(self, parser):
-		return parser.Expr(self.lbp)
-
-	DefineSymbol(name, bp).nud = nud
-
-	FuncTable[name] = func
-
 def OpAddLED(self, parser, LHS):
 	return LHS + parser.Expr(self.lbp)
 def OpSubLED(self, parser, LHS):
@@ -57,21 +54,41 @@ def OpMulLED(self, parser, LHS):
 	return LHS * parser.Expr(self.lbp)
 def OpDivLED(self, parser, LHS):
 	return LHS / parser.Expr(self.lbp)
+
 def OpPowLED(self, parser, LHS):
 	return LHS ** parser.Expr(self.lbp - 1)
+
 def OpAddNUD(self, parser):
 	return +parser.Expr(self.lbp)
 def OpSubNUD(self, parser):
 	return -parser.Expr(self.lbp)
+
+def OpAndLED(self, parser, LHS):
+	RHS = parser.Expr(self.lbp) # Force jython not to optimize the op
+	return LHS and RHS
+def OpOrLED(self, parser, LHS):
+	RHS = parser.Expr(self.lbp)
+	return LHS or RHS
+def OpNotNUD(self, parser):
+	return not parser.Expr(self.lbp)
+
+def OpEqualLED(self, parser, LHS):
+	return LHS == parser.Expr(self.lbp)
+def OpNEqualLED(self, parser, LHS):
+	return LHS != parser.Expr(self.lbp)
+
 def LiteralNUD(self, parser):
 	return self.value
-def ParenthNUD(self, parser):
-	expr = parser.Expr()
-	parser.Advance(")")
-	return expr
 
-def FunctionLED(self, parser, LHS):
+def NameNUD(self, parser):
+	func = FuncTable.get(self.value)
+
+	if func == None:
+		raise SyntaxError("Unknown function %s" % self.value)
+
 	args = []
+
+	parser.Advance("(")
 
 	if parser.currToken.NAME != ")":
 		while True:
@@ -84,29 +101,40 @@ def FunctionLED(self, parser, LHS):
 
 	parser.Advance(")")
 
-	func = FuncTable.get(LHS)
+	try:
+		return func(*args)
+	except Exception, E:
+		raise SyntaxError(str(E))	
 
-	if func == None:
-		raise SyntaxError("Unknown function %s" % LHS)
-
-	return func(*args)
+def ParenthNUD(self, parser):
+	expr = parser.Expr()
+	parser.Advance(")")
+	return expr
 
 DefineSymbol("LITERAL").nud = LiteralNUD
+DefineSymbol("NAME").nud = NameNUD
 DefineSymbol("+", 10).led = OpAddLED
 DefineSymbol("-", 10).led = OpSubLED
 DefineSymbol("*", 20).led = OpMulLED
 DefineSymbol("/", 20).led = OpDivLED
+DefineSymbol("^", 30).led = OpPowLED
 DefineSymbol("+").nud = OpAddNUD
 DefineSymbol("-").nud = OpSubNUD
-DefineSymbol("**", 30).led = OpPowLED
 DefineSymbol("(").nud = ParenthNUD
-DefineSymbol("(").led = FunctionLED
 DefineSymbol(")")
 DefineSymbol(",")
+DefineSymbol("and", 50).led = OpAndLED
+DefineSymbol("or", 50).led = OpOrLED
+DefineSymbol("not", 60).nud = OpNotNUD
+DefineSymbol("==", 40).led = OpEqualLED
+DefineSymbol("!=", 40).led = OpNEqualLED
 DefineSymbol("END")
 
 DefineConstant("PI", math.pi)
 DefineConstant("E",  math.e)
+
+DefineConstant("True", True)
+DefineConstant("False", False)
 
 class Parser:
 	def Expr(self, rbp=0):
@@ -146,10 +174,20 @@ class Parser:
 			else:
 				symbol = SymbolTable.get(token[1])
 
-				if symbol == None:
+				if symbol != None:
+					tok = symbol()
+
+				elif token[0] == tokenize.NAME:
+					symbol = SymbolTable["NAME"]
+
+					tok = symbol()
+
+					tok.value = token[1]
+
+				else:
 					raise SyntaxError("Unknown operator " + str(token[1]))
 
-				yield symbol()
+				yield tok
 
 		symbol = SymbolTable["END"]
 
@@ -162,8 +200,11 @@ class Parser:
 
 		return self.Expr()
 
-@hook.command("ecalc")
+@hook.command("calc", usage="Usage: /calc <expression>")
 def OnCommandCalc(sender, args):
+	if not args:
+		return False
+
 	parser = Parser()
 
 	expr = ' '.join(args)
@@ -174,6 +215,6 @@ def OnCommandCalc(sender, args):
 		sender.sendMessage("Syntax error: " + str(E))
 		return True
 
-	sender.sendMessage(expr + " = " + str(result))
+	sender.sendMessage(expr + " -> " + str(result))
 
 	return True

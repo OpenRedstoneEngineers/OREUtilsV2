@@ -9,7 +9,7 @@ class YAMLBackend:
 	def LoadSection(self, node, lines, indent=0):
 		while lines:
 			line = lines[0]
-			
+
 			strip = line.lstrip()
 			
 			newIndent = len(line) - len(strip)
@@ -24,7 +24,7 @@ class YAMLBackend:
 
 			if line.endswith(":"):
 				node[key] = Node()
-				self.LoadSection(node[key], lines, indent+1)
+				self.LoadSection(node[key], lines, indent + 1)
 			
 			else:
 				try:

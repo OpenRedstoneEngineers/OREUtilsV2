@@ -9,7 +9,7 @@ def color(colors):
 	return Color(colors)
 	
 # lets you use &-coded strings
-def colorify(text):
+def Colorify(text):
 	return re.sub("&(?=[?\da-fk-or])", u"\u00A7", text)
 
 
