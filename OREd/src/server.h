@@ -37,7 +37,7 @@ typedef int (*ConnectionCB)(int sockFd);
 typedef void (*DisconnectCB)(int sockFd);
 
 /* Incmoning message callback. */
-typedef void (*MessageCB)(int sockFd, char* msg);
+typedef void (*MessageCB)(int sockFd, const char* msg);
 
 /* Double-linked list */
 typedef struct client_node_

@@ -125,6 +125,8 @@ server* server_init(int port)
 		return NULL;
 	}
 
+	serv->firstClient = NULL;
+
 	serv->serving = 0;
 
 	return serv;

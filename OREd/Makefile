@@ -1,7 +1,7 @@
 CC = cc
 CFLAGS = -O3 -Wall
 
-OBJS = main.o daemon.o console.o server.o client.o
+OBJS = main.o daemon.o console.o server.o client.o proto_server.o
 
 build: $(OBJS) 
 	$(CC) -o OREd $(OBJS)
@@ -20,6 +20,9 @@ server.o: src/server.c src/server.h
 
 client.o: src/client.c src/client.h
 	$(CC) $(CFLAGS) -c src/client.c
+
+proto_server.o: src/proto_server.c src/proto_server.h
+	$(CC) $(CFLAGS) -c src/proto_server.c
 
 main.o: src/main.c
 	$(CC) $(CFLAGS) -c src/main.c
