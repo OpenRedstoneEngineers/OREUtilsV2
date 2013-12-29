@@ -335,7 +335,7 @@ def onCommandPmap(sender, args):
 	loc = sender.getLocation()
 
 	loc.setX(pos[0])
-	loc.setY(manager.mapPos[1] + 1)
+	loc.setY(manager.size.pos.y + 1)
 	loc.setZ(pos[1])
 
 	sender.teleport(loc)
@@ -610,12 +610,22 @@ def onCommandPsearch(sender, args):
 	if len(args) < 1:
 		return False
 
-	owner = str(args[0])
+	find = ' '.join(args)
+	reasonMatch = []
+
+
+	sender.sendMessage("Matches for owner:")
 
 	for pos, plot in manager.plots.node.iteritems():
-		if plot.status == Manager.PlotStatus.CLAIMED:
-			if plot.owner == owner:
-				sender.sendMessage(manager.Info(pos[0], pos[1]))
+		if "owner"  in plot and find in plot.owner:
+			sender.sendMessage(plot.Info())
+		if "reason" in plot and find in plot.reason:
+			reasonMatch.append(plot.Info())
+
+	sender.sendMessage("Matches for reason:")
+
+	for reason in reasonMatch:
+		sender.sendMessage(reason)
 
 	return True
 

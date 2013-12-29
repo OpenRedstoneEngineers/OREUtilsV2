@@ -303,7 +303,7 @@ class PlotManager:
 	"""
 	def LoadOrCreate(self, path):
 		self.file = PersistentData.NodeFile(path)
-		
+
 		self.file.node.Ensure("ORE")
 
 		self.file.node.ORE.Ensure("Players")   
@@ -329,4 +329,3 @@ class PlotManager:
 		
 		for plot,value in self.plotsNode.iteritems():
 			self.plotsNode[plot] = Plot(value)
-			

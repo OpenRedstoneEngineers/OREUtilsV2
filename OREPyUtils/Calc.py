@@ -17,34 +17,35 @@ SymbolTable = {}
 FuncTable = {
 	"sin" : math.sin,
 	"cos" : math.cos,
-	"tan" : math.tan
+	"tan" : math.tan,
+	"log" : math.log,
+
+	"sqrt" : math.sqrt
 }
 
-def DefineSymbol(name, bp=0):
-	try:
-		sym = SymbolTable[name]
+def DefineSymbol(name, nud=None, led=None, bp=0):
+	class Sym(SymbolBase):
+		pass
 
-	except:
-		class sym(SymbolBase):
-			pass
+	Sym.__name__ = "Symbol-" + name
 
-		sym.NAME = name
-		sym.lbp = bp
+	Sym.NAME = name
 
-		sym.__name__ = "Symbol-" + name
+	Sym.lbp = bp
 
-		SymbolTable[name] = sym
+	if nud:
+		Sym.nud = nud
 
-	else:
-		sym.lbp = max(bp, sym.lbp)
+	if led:
+		Sym.led = led
 
-	return sym
+	SymbolTable[name] = Sym
 
 def DefineConstant(name, value, bp=0):
 	def nud(self, parser):
 		return value
 
-	DefineSymbol(name, bp).nud = nud
+	DefineSymbol(name, bp=bp, nud=nud)
 
 def OpAddLED(self, parser, LHS):
 	return LHS + parser.Expr(self.lbp)
@@ -84,7 +85,7 @@ def NameNUD(self, parser):
 	func = FuncTable.get(self.value)
 
 	if func == None:
-		raise SyntaxError("Unknown function %s" % self.value)
+		raise SyntaxError("Unknown function/operator/constant  %s" % self.value)
 
 	args = []
 
@@ -111,29 +112,31 @@ def ParenthNUD(self, parser):
 	parser.Advance(")")
 	return expr
 
-DefineSymbol("LITERAL").nud = LiteralNUD
-DefineSymbol("NAME").nud = NameNUD
-DefineSymbol("+", 10).led = OpAddLED
-DefineSymbol("-", 10).led = OpSubLED
-DefineSymbol("*", 20).led = OpMulLED
-DefineSymbol("/", 20).led = OpDivLED
-DefineSymbol("^", 30).led = OpPowLED
-DefineSymbol("+").nud = OpAddNUD
-DefineSymbol("-").nud = OpSubNUD
-DefineSymbol("(").nud = ParenthNUD
+DefineSymbol("LITERAL", nud=LiteralNUD)
+DefineSymbol("NAME",    nud=NameNUD)
+DefineSymbol("END")
+
+DefineSymbol("+", bp=10, led=OpAddLED, nud=OpAddNUD)
+DefineSymbol("-", bp=10, led=OpSubLED, nud=OpSubNUD)
+DefineSymbol("*", bp=20, led=OpMulLED)
+DefineSymbol("/", bp=20, led=OpDivLED)
+DefineSymbol("^", bp=30, led=OpPowLED)
+
+DefineSymbol("(", nud=ParenthNUD)
 DefineSymbol(")")
 DefineSymbol(",")
-DefineSymbol("and", 50).led = OpAndLED
-DefineSymbol("or", 50).led = OpOrLED
-DefineSymbol("not", 60).nud = OpNotNUD
-DefineSymbol("==", 40).led = OpEqualLED
-DefineSymbol("!=", 40).led = OpNEqualLED
-DefineSymbol("END")
+
+DefineSymbol("or",  bp=50, led=OpOrLED)
+DefineSymbol("and", bp=50, led=OpAndLED)
+DefineSymbol("not", bp=60, nud=OpNotNUD)
+
+DefineSymbol("==", bp=40, led=OpEqualLED)
+DefineSymbol("!=", bp=40, led=OpNEqualLED)
 
 DefineConstant("PI", math.pi)
 DefineConstant("E",  math.e)
 
-DefineConstant("True", True)
+DefineConstant("True",  True)
 DefineConstant("False", False)
 
 class Parser:

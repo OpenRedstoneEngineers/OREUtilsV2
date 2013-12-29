@@ -23,12 +23,12 @@ def OnEnable(**kwargs):
 		Info("[!]Could not find help file")
 		
 @hook.command("encode")
-def Encode(sender,args):
+def OnCommandEncode(sender,args):
 	sender.sendMessage(' '.join(args).encode('hex'))
 	return True
 
 @hook.command("decode")
-def Decode(sender,args):
+def OnCommandDecode(sender,args):
 	String = ''.join(args)
 	Final  = []
 
@@ -45,7 +45,7 @@ def Decode(sender,args):
 	return True
 
 @hook.command('rename', description='Rename the item in your hand', usage="Usage: /rename <name>")
-def onCommandLore(sender, args):
+def OnCommandRename(sender, args):
 	if not args:
 		return False
 
@@ -64,6 +64,43 @@ def onCommandLore(sender, args):
 	item.setItemMeta(meta)
 
 	sender.sendMessage("Renamed item!")
+
+	return True
+
+@hook.command("execbook")
+def OnCommandExecBook(sender, args):
+	if not sender.hasPermission("ore.execbook"):
+		sender.sendMessage("No permission!")
+		return
+
+	item = sender.getItemInHand()
+
+	if item.getTypeId() not in (386, 387):
+		sender.sendMessage(Color("c") + 'You must have a book')
+		return True
+
+	meta = item.getItemMeta()
+
+	pages = []
+
+	for page in meta.getPages():
+		pages.append(page)
+
+	program = '\n'.join(pages)
+
+	cmds = program.split('\n')
+
+	if len(cmds) > 3 and not sender.hasPermission("ore.execbook.admin"):
+		sender.sendMessage("Cannot execute more than three commands")
+		return True
+
+	for cmd in cmds:
+		if cmd in ("execbook", ""):
+			continue
+
+		dispatchCommand(sender, cmd)
+
+	sender.sendMessage("Exectued %d commands!" % len(cmds))
 
 	return True
 
@@ -168,7 +205,7 @@ def onCommandBookGet(sender, args):
 	return True
 
 @hook.command('schems', usage="Usage: /schems <list|load|save> name")
-def onCommandSchems(sender, args):
+def OnCommandSchems(sender, args):
 	Name = sender.getName()
 
 	if len(args) == 2 and args[0] in ("load", "save"):
@@ -193,12 +230,12 @@ def onCommandSchems(sender, args):
 	return False
 
 @hook.command('pass')
-def passset(sender, args):
+def OnCommandPass(sender, args):
 	dispatchCommand(sender, 'dbp set ' + ' '.join(args))
 	return True
 
 @hook.command('orehelp')
-def onCommandOREHelp(sender,args):
+def OnCommandOREHelp(sender,args):
 	if len(args) == 0:
 		matches = len(keys)
 
