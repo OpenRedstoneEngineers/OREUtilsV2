@@ -1,54 +1,56 @@
-#Something is wrong
-class ServerException(BaseEvent):
-    pass
+from Events import Event
+
+#Something has gone wrong.
+class ServerException(Event):
+	pass
 
 #An error produced by a plugin
 class PluginException(ServerException):
-    pass
+	pass
 
 #An error produced by our plugin @@@
 class PythonException(PluginException):
-    pass
+	pass
 
 #An error produced by a plugin while enabling @@@
 class EnableException(PluginException):
-    pass
+	pass
 
 #An error produced by a plugin while disabling @@@
 class DisableException(PluginException):
-    pass
+	pass
 
 #An error produced by our plugin while enabling @@@
 class PythonEnableException(PythonException, EnableException):
-    pass
+	pass
 
 #An error produced by our plugin while disabling @@@
 class PythonDisableException(PythonException, DisableException):
-    pass
+	pass
 
 #The server has become inoperable
 class ServerCriticalException(ServerException):
-    pass
+	pass
 
 #The server is no longer responding @@@
 class ServerTimeoutException(ServerCriticalException):
-    pass
+	pass
 
 #The server has eaten all the RAM
 class ServerRAMException(ServerCriticalException):
-    pass
+	pass
 
 #The server has eaten all RAM and Java is stupid @@@
 class ServerUnhandledRAMException(ServerRAMException):
-    pass
+	pass
 
 #The server has eaten all RAM and Java has killed itself @@@
 class ServerHandledRAMException(ServerRAMException):
-    pass
+	pass
 
 #The server is eating all CPU @@@
 class ServerCPUException(ServerCriticalException):
-    pass
+	pass
 
 
     
