@@ -16,35 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ORED_DAEMON_
-#define _ORED_DAEMON_
+#ifndef _ORED_LOG_
+#define _ORED_LOG_
 
-#include <stdio.h>
+#include <fstream>
+#include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace OREd
+{
+	namespace Log
+	{
+		extern std::ofstream STREAM;
 
-/* Working directory */
-#define WORKING_DIRECTORY "/servers/ORE/"
+		/**
+		 * \brief Initialize the log file stream.
+		 */
+		bool Init(const std::string& path);
 
-/* Path to log file */
-#define LOG_PATH "OREd.log"
-
-/* Log file handle */
-FILE* fLog;
-
-/**
- * \brief Try to daemonize the process.
- *
- * On success, the parent process will exit and control will be given to the child process.
- *
- * On failure, both processes will exit with an error code.
- */
-int daemonize(void);
-
-#ifdef __cplusplus
-}
-#endif
+		// TODO: Helpers
+	} /* Log */
+} /* OREd */
 
 #endif

@@ -49,6 +49,10 @@ namespace OREd
 			return;
 		}
 
+		const std::string& hostname = args[0];
+
+		// Propagate hostname
+
 		HandlerMap::iterator it = m_Handlers.find(args[1]);
 
 		if (it == m_Handlers.end())
@@ -75,5 +79,21 @@ namespace OREd
 	void ProtoServer::RegisterHandler(const std::string& cmd, CmdHandler handler)
 	{
 		m_Handlers[cmd] = handler;
+	}
+
+	void ProtoServer::BroadcastCommand(const std::string& host, const ArgsList& args)
+	{
+		std::stringstream stream;
+
+		stream << host << std::endl;
+
+		for (ArgsList::const_iterator it = args.begin(); it != args.end(); ++it)
+		{
+			stream << " " << *it;
+		}
+
+		stream << "\n";
+
+		BroadcastMessage(stream.str());
 	}
 } /* OREd */

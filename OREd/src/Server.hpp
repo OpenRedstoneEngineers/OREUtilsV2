@@ -32,7 +32,7 @@ namespace OREd
 	class Server
 	{
 	public:
-		typedef std::list<Client> ClientList;
+		typedef std::list<Client*> ClientList;
 
 	protected:
 		/**
@@ -85,6 +85,11 @@ namespace OREd
 		 * \return whether the server is running.
 		 */
 		bool IsRunning() const;
+
+		/**
+		 * \brief Broadcast a message to all clients.
+		 */
+		void BroadcastMessage(const std::string& msg);
 
 	protected:
 		/** Connected clients */

@@ -16,30 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Daemon.hpp"
-#include "Manager.hpp"
-#include "Log.hpp"
+#ifndef _ORED_DAEMON_
+#define _ORED_DAEMON_
 
-#include <stdlib.h>
+#include <string>
 
-static char* const args[] = { "java", "-jar", "craftbukkit.jar", NULL };
-
-std::string JavaPath = "/usr/bin/java";
-
-using namespace OREd;
-
-int main()
+namespace OREd
 {
-	if (!Daemonize("/servers/ORE/"))
-	{
-		exit(EXIT_FAILURE);
-	}
+	/**
+	 * \brief Try to daemonize the process.
+	 *
+	 * On success, the parent process will exit and control will be given to the child process.
+	 *
+	 * On failure, both processes will exit with an error code.
+	 */
+	bool Daemonize(const std::string& wdir);
+} /* OREd */
 
-	Manager manager(4242);
-
-	manager.Start();
-
-	Log::STREAM << "Exiting..." << std::endl;
-
-	exit(EXIT_SUCCESS);
-}
+#endif

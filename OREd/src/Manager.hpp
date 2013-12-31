@@ -16,51 +16,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ORED_CONSOLE_
-#define _ORED_CONSOLE_
+#ifndef _ORED_MANAGER_
+#define _ORED_MANAGER_
 
+#include "ProtoServer.hpp"
+
+#include "Console.hpp"
+
+#include <map>
 #include <string>
-
-#include <sys/types.h>
 
 namespace OREd
 {
 	/**
-	 * \brief Represents a child process.
+	 * \brief Manages the server consoles.
 	 */
-	class Console
+	class Manager : public ProtoServer
 	{
 	public:
-		Console(const std::string& path, char* const argv[]);
+		typedef std::map<const std::string, Console*> ConsoleMap;
 
-		~Console();
+	public:
+		static bool HandleQuery(Client* cli, const ArgsList& args);
 
-		/**
-		 * \return whether the process is valid.
-		 */
-		bool IsValid() const;
+		static bool HandleEvent(Client* cli, const ArgsList& args);
 
-		/**
-		 * \return whether the process is running.
-		 */
-		bool IsRunning() const;
+	public:
+		Manager(const int port);
 
 		/**
-		 * \brief Read from the standard output of the process.
+		 * \brief Init a console instance.
 		 */
-		bool Read(std::string& msg);
+		void InitConsole(const std::string& name, Console* console);
 
 		/**
-		 * \brief Write to the standard input of the process.
+		 * \return the console with the specified name.
 		 */
-		bool Write(const std::string& msg);
+		Console* GetConsole(const std::string& name);
 
 	protected:
-		/** Process handle */
-		pid_t m_Handle;
-
-		/** File descriptors */
-		int m_PipeFd[2];
+		/** Associated consoles */
+		ConsoleMap m_Consoles;
 	};
 } /* OREd */
 

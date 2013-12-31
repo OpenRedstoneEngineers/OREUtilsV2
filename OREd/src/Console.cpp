@@ -94,4 +94,40 @@ namespace OREd
 
 		return !(WIFEXITED(status) || WIFSIGNALED(status));
 	}
+
+	bool Console::Read(std::string& msg)
+	{
+		if (!IsValid())
+		{
+			return false;
+		}
+
+		char buffer[256];
+
+		bzero(buffer, sizeof(buffer));
+
+		if (read(m_PipeFd[1], buffer, sizeof(buffer) - 1) < 0)
+		{
+			return false;
+		}
+
+		msg = std::string(buffer);
+
+		return true;
+	}
+
+	bool Console::Write(const std::string& msg)
+	{
+		if (!IsValid())
+		{
+			return false;
+		}
+
+		if (write(m_PipeFd[0], msg.c_str(), msg.size()) < 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
 } /* OREd */

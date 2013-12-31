@@ -16,30 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Daemon.hpp"
-#include "Manager.hpp"
 #include "Log.hpp"
 
-#include <stdlib.h>
-
-static char* const args[] = { "java", "-jar", "craftbukkit.jar", NULL };
-
-std::string JavaPath = "/usr/bin/java";
-
-using namespace OREd;
-
-int main()
+namespace OREd
 {
-	if (!Daemonize("/servers/ORE/"))
+	namespace Log
 	{
-		exit(EXIT_FAILURE);
+		std::ofstream STREAM;
 	}
 
-	Manager manager(4242);
+	bool Log::Init(const std::string& path)
+	{
+		STREAM.open(path.c_str());
 
-	manager.Start();
-
-	Log::STREAM << "Exiting..." << std::endl;
-
-	exit(EXIT_SUCCESS);
-}
+		return STREAM.is_open();
+	}
+} /* OREd */

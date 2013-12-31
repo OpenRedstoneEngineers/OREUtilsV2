@@ -54,6 +54,11 @@ namespace OREd
 		 */
 		void RegisterHandler(const std::string& cmd, CmdHandler handler);
 
+		/**
+		 * \brief Broadcast a command.
+		 */
+		void BroadcastCommand(const std::string& host, const ArgsList& args);
+
 	protected:
 		virtual bool OnConnect(Client* cli);
 

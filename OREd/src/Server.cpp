@@ -70,6 +70,11 @@ namespace OREd
 
 	Server::~Server()
 	{
+		for (ClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
+		{
+			delete *it;
+		}
+
 		if (IsValid())
 		{
 			close(m_Handle);
@@ -105,7 +110,7 @@ namespace OREd
 
 			for (ClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
 			{
-				FD_SET(it->m_Handle, &fds);
+				FD_SET((*it)->m_Handle, &fds);
 			}
 
 			if (select(sizeof(fds) * 8, &fds, NULL, NULL, &timeout) < 0)
@@ -126,22 +131,28 @@ namespace OREd
 					break;
 				}
 
-				Client cli(cliSockFd);
+				Client* cli = new Client(cliSockFd);
 
-				if (OnConnect(&cli))
+				if (OnConnect(cli))
 				{
 					m_Clients.push_back(cli);
+				}
+				else
+				{
+					delete cli;
 				}
 			}
 
 			for (ClientList::iterator it = m_Clients.begin(); it != m_Clients.end();)
 			{
-				if (FD_ISSET(it->m_Handle, &fds))
+				if (FD_ISSET((*it)->m_Handle, &fds))
 				{
 					std::string msg;
 
-					if (!it->Recv(msg))
+					if (!(*it)->Recv(msg))
 					{
+						delete *it;
+
 						ClientList::iterator temp = it;
 
 						++it;
@@ -151,7 +162,7 @@ namespace OREd
 						continue;
 					}
 
-					OnMessage(&*it, msg);
+					OnMessage(*it, msg);
 				}
 
 				++it;
@@ -162,5 +173,13 @@ namespace OREd
 	void Server::Stop()
 	{
 		m_Running = false;
+	}
+
+	void Server::BroadcastMessage(const std::string& msg)
+	{
+		for (ClientList::iterator it = m_Clients.begin(); it != m_Clients.end(); ++it)
+		{
+			(*it)->Send(msg);
+		}
 	}
 } /* OREd */

@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -O3 -Wall
 
-OBJS = main.o daemon.o Console.o Server.o Client.o ProtoServer.o
+OBJS = main.o Daemon.o Console.o Server.o Client.o ProtoServer.o Manager.o Log.o
 
 build: $(OBJS) 
 	$(CC) -o OREd $(OBJS)
@@ -9,8 +9,8 @@ build: $(OBJS)
 clean:
 	rm -f OREd $(OBJS)
 
-daemon.o: src/daemon.c src/daemon.h
-	$(CC) $(CFLAGS) -c src/daemon.c
+Daemon.o: src/Daemon.cpp src/Daemon.hpp
+	$(CC) $(CFLAGS) -c src/Daemon.cpp
 
 Console.o: src/Console.cpp src/Console.hpp
 	$(CC) $(CFLAGS) -c src/Console.cpp
@@ -23,6 +23,12 @@ Client.o: src/Client.cpp src/Client.hpp
 
 ProtoServer.o: src/ProtoServer.cpp src/ProtoServer.hpp
 	$(CC) $(CFLAGS) -c src/ProtoServer.cpp
+
+Manager.o: src/Manager.cpp src/Manager.hpp
+	$(CC) $(CFLAGS) -c src/Manager.cpp
+
+Log.o: src/Log.cpp src/Log.hpp
+	$(CC) $(CFLAGS) -c src/Log.cpp
 
 main.o: src/main.cpp
 	$(CC) $(CFLAGS) -c src/main.cpp

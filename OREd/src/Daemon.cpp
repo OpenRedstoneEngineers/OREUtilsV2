@@ -16,7 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "daemon.h"
+#include "Daemon.hpp"
+
+#include "Log.hpp"
+
+#include <iostream>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -30,58 +34,55 @@
 #include <string.h>
 #include <assert.h>
 
-int daemonize(void)
+namespace OREd
 {
-	pid_t pid = fork();
-
-	if (pid < 0)
+	bool Daemonize(const std::string& wdir)
 	{
-		printf("Fork unsuccesful.\n");
+		pid_t pid = fork();
 
-		exit(EXIT_FAILURE);
+		if (pid < 0)
+		{
+			std::cout << "Fork unsuccesful." << std::endl;
+
+			return false;
+		}
+
+		if (pid > 0)
+		{
+			std::cout << "Fork succesful. [PID: " << pid << "]" << std::endl;
+
+			exit(EXIT_SUCCESS);
+		}
+
+		umask(0);
+
+		if (!Log::Init("OREd.log"))
+		{
+			std::cout << "Could not open log file." << std::endl;
+
+			exit(EXIT_FAILURE);
+		}
+
+		pid_t sid = setsid();
+
+		if (sid < 0)
+		{
+			Log::STREAM << "Could not create a new session" << std::endl;
+
+			exit(EXIT_FAILURE);
+		}
+
+		if (chdir(wdir.c_str()) < 0)
+		{
+			Log::STREAM << "Could not change working directory to " << wdir << std::endl;
+
+			exit(EXIT_FAILURE);
+		}
+
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+
+		return true;
 	}
-
-	if (pid > 0)
-	{
-		printf("Fork succesful. [PID: %i]\n", pid);
-
-		exit(EXIT_SUCCESS);
-	}
-
-	umask(0);
-
-	fLog = fopen(LOG_PATH, "w");
-
-	if (fLog == NULL)
-	{
-		printf("Could not open log file %s\n", LOG_PATH);
-
-		exit(EXIT_FAILURE);
-	}
-
-	pid_t sid = setsid();
-
-	if (sid < 0)
-	{
-		fprintf(fLog, "Could not create a new session.\n");
-
-		fclose(fLog);
-
-		exit(EXIT_FAILURE);
-	}
-
-	/*if (chdir(WORKING_DIRECTORY) < 0)
-	{
-		fprintf(fLog, "Could not change working directory to %s.\n", WORKING_DIRECTORY);
-
-		fclose(fLog);
-
-		exit(EXIT_FAILURE);
-	}*/
-
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
-
-	return 0;
-}
+} /* OREd */
