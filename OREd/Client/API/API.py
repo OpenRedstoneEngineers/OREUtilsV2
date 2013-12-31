@@ -3,8 +3,6 @@
 from Console import Console as console
 from Logger import Logger as logger
 
-
 class Base(object):
 	Console = console()
 	Logger  = logger()
-

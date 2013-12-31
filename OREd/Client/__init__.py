@@ -9,8 +9,8 @@ import sys
 
 class EventManager:
 	def __init__(self):
-		self.Logger = API.Logger
-		self.ScriptManager = Scripting.Hooks(logger=self.Logger)#Put things in here to be API in scripts
+		self.API = API.Base
+		self.ScriptManager = Scripting.Hooks(API=self.API)#Put things in here to be API in scripts
 
 	def OnCommand(self, name, args):
 		if not self.ScriptManager.Exec(name, args):
