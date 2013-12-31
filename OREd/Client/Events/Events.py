@@ -8,8 +8,12 @@ class Event(object):
 
 #An event pertaining to a player
 class PlayerEvent(Event):
-	pass
+	def __init__(self, player, description=None):
+		self.player = player
+		self.string = description
 
+	def GetPlayer(self):
+		pass
 #A player joined the game
 class JoinEvent(PlayerEvent):	
 	pass

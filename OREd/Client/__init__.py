@@ -1,6 +1,6 @@
 import Scripting
 import Events
-import API
+from API import API
 
 #Create an iterable of the names of Exceptions
 EventNames = [X for X in dir(Events) if not X[0] == "_"]
@@ -27,3 +27,5 @@ class EventManager:
         
 if __name__ == "__main__":
 	e = EventManager()
+	API.Base.Console.Init('Blah')
+	API.Base.Logger.Init('Log.txt')
