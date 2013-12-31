@@ -8,10 +8,6 @@ class ServerException(Event):
 class PluginException(ServerException):
 	pass
 
-#An error produced by our plugin @@@
-class PythonException(PluginException):
-	pass
-
 #An error produced by a plugin while enabling @@@
 class EnableException(PluginException):
 	pass
@@ -20,36 +16,28 @@ class EnableException(PluginException):
 class DisableException(PluginException):
 	pass
 
-#An error produced by our plugin while enabling @@@
-class PythonEnableException(PythonException, EnableException):
-	pass
-
-#An error produced by our plugin while disabling @@@
-class PythonDisableException(PythonException, DisableException):
-	pass
-
 #The server has become inoperable
-class ServerCriticalException(ServerException):
+class CriticalException(ServerException):
 	pass
 
 #The server is no longer responding @@@
-class ServerTimeoutException(ServerCriticalException):
+class TimeoutException(CriticalException):
 	pass
 
 #The server has eaten all the RAM
-class ServerRAMException(ServerCriticalException):
+class RAMException(CriticalException):
 	pass
 
 #The server has eaten all RAM and Java is stupid @@@
-class ServerUnhandledRAMException(ServerRAMException):
+class UnhandledRAMException(RAMException):
 	pass
 
 #The server has eaten all RAM and Java has killed itself @@@
-class ServerHandledRAMException(ServerRAMException):
+class HandledRAMException(RAMException):
 	pass
 
 #The server is eating all CPU @@@
-class ServerCPUException(ServerCriticalException):
+class CPUException(CriticalException):
 	pass
 
 
