@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "console.h"
+#include "Console.hpp"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,69 +32,66 @@
 #include <string.h>
 #include <assert.h>
 
-child_proc* console_init(const char* filename, char* const argv[])
+namespace OREd
 {
-	assert(filename != NULL);
-
-	child_proc* proc = malloc(sizeof(child_proc));
-
-	if (proc == NULL)
+	Console::Console(const std::string& path, char* const argv[]) : m_Handle(-1)
 	{
-		return NULL;
-	}
-
-	if (pipe(proc->pipeFd) < 0)
-	{
-		free(proc);
-
-		return NULL;
-	}
-
-	proc->pid = fork();
-
-	if (proc->pid < 0)
-	{
-		free(proc);
-
-		return NULL;
-	}
-
-	if (proc->pid == 0)
-	{
-		dup2(proc->pipeFd[0], STDIN_FILENO);
-		dup2(proc->pipeFd[1], STDOUT_FILENO);
-		dup2(proc->pipeFd[1], STDERR_FILENO);
-
-		if (execv(filename, argv) < 0)
+		if (pipe(m_PipeFd) < 0)
 		{
+			return;
+		}
+
+		pid_t id = fork();
+
+		if (id < 0)
+		{
+			return;
+		}
+
+		if (id == 0)
+		{
+			dup2(m_PipeFd[0], STDIN_FILENO);
+			dup2(m_PipeFd[1], STDOUT_FILENO);
+			dup2(m_PipeFd[1], STDERR_FILENO);
+
+			if (execv(path.c_str(), argv) < 0)
+			{
+				exit(EXIT_FAILURE);
+			}
+
 			exit(EXIT_FAILURE);
 		}
 
-		exit(EXIT_SUCCESS);
+		m_Handle = id;
 	}
 
-	return proc;
-}
-
-void console_terminate(child_proc* proc)
-{
-	assert(proc != NULL);
-
-	kill(proc->pid, SIGTERM);
-
-	free(proc);
-}
-
-int console_is_running(child_proc* proc)
-{
-	assert(proc != NULL);
-
-	int status;
-
-	if (waitpid(proc->pid, &status, WNOHANG) < 0)
+	Console::~Console()
 	{
-		return -1;
+		if (IsValid())
+		{
+			kill(m_Handle, SIGTERM);
+		}
 	}
 
-	return !(WIFEXITED(status) || WIFSIGNALED(status));
-}
+	bool Console::IsValid() const
+	{
+		return m_Handle >= 0;
+	}
+
+	bool Console::IsRunning() const
+	{
+		if (!IsValid())
+		{
+			return false;
+		}
+
+		int status;
+
+		if (waitpid(m_Handle, &status, WNOHANG) < 0)
+		{
+			return -1;
+		}
+
+		return !(WIFEXITED(status) || WIFSIGNALED(status));
+	}
+} /* OREd */

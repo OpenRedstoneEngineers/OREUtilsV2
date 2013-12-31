@@ -18,17 +18,16 @@
 
 #include "daemon.h"
 
-#include "console.h"
-
-#include "server.h"
-
-#include "client.h"
+#include "Console.hpp"
+#include "ProtoServer.hpp"
 
 #include <stdlib.h>
 
-// Test
+static char* const args[] = { "java", "-jar", "craftbukkit.jar", NULL };
 
-static char* const args[] = { "java", "-jar craftbukkit.jar", NULL };
+std::string JavaPath = "/usr/bin/java";
+
+using namespace OREd;
 
 int main()
 {
@@ -37,11 +36,11 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	server* serv = server_init(4242);
+	ProtoServer server(4242);
 
-	child_proc* server = console_init("/usr/bin/java", args);
+	Console console(JavaPath, (char* const*) args);
 
-	if (server == NULL)
+	if (!console.IsRunning())
 	{
 		fprintf(fLog, "Could not start craftbukkit.\n");
 
@@ -50,11 +49,9 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	server_serve(serv);
+	// server.Start();
 
-	console_terminate(server);
-
-	server_terminate(serv);
+	// server.Stop();
 
 	fprintf(fLog, "Exiting.\n");
 

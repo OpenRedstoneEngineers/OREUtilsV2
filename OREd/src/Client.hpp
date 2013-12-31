@@ -16,48 +16,50 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ORED_CONSOLE_
-#define _ORED_CONSOLE_
+#ifndef _ORED_CLIENT_
+#define _ORED_CLIENT_
 
-#include <sys/types.h>
+#include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * \brief Represents a child process.
- */
-typedef struct child_proc_
+namespace OREd
 {
-	/* Process ID */
-	pid_t pid;
+	/**
+	 * \brief Represents a remote TCP connection.
+	 */
+	class Client
+	{
+	public:
+		Client(const std::string& host, const std::string& service);
 
-	/* File descriptors. */
-	int pipeFd[2];
-} child_proc;
+		Client(const std::string& address, const int port);
 
-/**
- * \brief Create a new child process.
- *
- * On failure, a NULL pointer will be returned.
- */
-child_proc* console_init(const char* filename, char* const argv[]);
+		Client(int handle) : m_Handle(handle) {}
 
-/**
- * \brief Terminate the specified child process.
- *
- * WARNING: The pointer will be invalidated.
- */
-void console_terminate(child_proc* proc);
+		Client() : m_Handle(-1) {}
 
-/**
- * \return whether the child process is running.
- */
-int console_is_running(child_proc* proc);
+		~Client();
 
-#ifdef __cplusplus
-}
-#endif
+		/**
+		 * \return whether the socket is valid.
+		 */
+		bool IsValid() const;
+
+		/**
+		 * \return the last message from the packet queue. (Blocking)
+		 */
+		bool Recv(std::string& msg);
+
+		/**
+		 * \brief Send the specified message.
+		 */
+		bool Send(const std::string& msg);
+
+	protected:
+		/** Socket handle */
+		int m_Handle;
+
+		friend class Server;
+	};
+} /* OREd */
 
 #endif

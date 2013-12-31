@@ -70,14 +70,14 @@ int daemonize(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (chdir(WORKING_DIRECTORY) < 0)
+	/*if (chdir(WORKING_DIRECTORY) < 0)
 	{
 		fprintf(fLog, "Could not change working directory to %s.\n", WORKING_DIRECTORY);
 
 		fclose(fLog);
 
 		exit(EXIT_FAILURE);
-	}
+	}*/
 
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);

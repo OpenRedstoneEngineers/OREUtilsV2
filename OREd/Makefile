@@ -1,7 +1,7 @@
-CC = cc
+CC = g++
 CFLAGS = -O3 -Wall
 
-OBJS = main.o daemon.o console.o server.o client.o proto_server.o
+OBJS = main.o daemon.o Console.o Server.o Client.o ProtoServer.o
 
 build: $(OBJS) 
 	$(CC) -o OREd $(OBJS)
@@ -12,18 +12,18 @@ clean:
 daemon.o: src/daemon.c src/daemon.h
 	$(CC) $(CFLAGS) -c src/daemon.c
 
-console.o: src/console.c src/console.h
-	$(CC) $(CFLAGS) -c src/console.c
+Console.o: src/Console.cpp src/Console.hpp
+	$(CC) $(CFLAGS) -c src/Console.cpp
 
-server.o: src/server.c src/server.h
-	$(CC) $(CFLAGS) -c src/server.c
+Server.o: src/Server.cpp src/Server.hpp
+	$(CC) $(CFLAGS) -c src/Server.cpp
 
-client.o: src/client.c src/client.h
-	$(CC) $(CFLAGS) -c src/client.c
+Client.o: src/Client.cpp src/Client.hpp
+	$(CC) $(CFLAGS) -c src/Client.cpp
 
-proto_server.o: src/proto_server.c src/proto_server.h
-	$(CC) $(CFLAGS) -c src/proto_server.c
+ProtoServer.o: src/ProtoServer.cpp src/ProtoServer.hpp
+	$(CC) $(CFLAGS) -c src/ProtoServer.cpp
 
-main.o: src/main.c
-	$(CC) $(CFLAGS) -c src/main.c
+main.o: src/main.cpp
+	$(CC) $(CFLAGS) -c src/main.cpp
 
