@@ -29,6 +29,3 @@ class Logger:
 		self("[CRITICAL]"+text)
 		self.ForeColour(5,5,5)
 
-X = Logger("Log.txt")
-X.Severe("No cookies\n")
-X.Critical("No melon\n")

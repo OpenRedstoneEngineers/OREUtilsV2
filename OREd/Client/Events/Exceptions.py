@@ -1,4 +1,4 @@
-from Events import Event
+from Events.Events import Event
 
 #Something has gone wrong.
 class ServerException(Event):

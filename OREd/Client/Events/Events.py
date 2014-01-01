@@ -1,6 +1,6 @@
 #Base class for an event
 class Event(object):
-	def __init__(self, description):
+	def __init__(self, server, description=''):
 		self.string = description
 
 	def __repr__(self):
@@ -8,7 +8,7 @@ class Event(object):
 
 #An event pertaining to a player
 class PlayerEvent(Event):
-	def __init__(self, player, description):
+	def __init__(self, server, player, description=''):
 		self.player = player
 		self.string = description
 

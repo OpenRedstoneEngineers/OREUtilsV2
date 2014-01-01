@@ -1,6 +1,6 @@
 import Scripting
 import Events
-from API import API
+import API
 
 #Create an iterable of the names of Exceptions
 EventNames = [X for X in dir(Events) if not X[0] == "_"]
@@ -14,12 +14,12 @@ class EventManager:
 
 	def OnCommand(self, name, args):
 		if not self.ScriptManager.Exec(name, args):
-		print('Unknown command: '+name)
+			print('Unknown command: '+name)
 
-	def OnEvent(self, name, args):
+	def OnEvent(self, name, kwargs):
 		found = Events.__dict__.get(name)
 		if found:
-			instance = found(args)
+			instance = found(**kwargs)
 			self.ScriptManager.Event(instance)
             
 		else:

@@ -1,4 +1,4 @@
-from Connection import Connection
+from API.Connection import Connection
 
 class Console(Connection):
 	def Command(self, message):

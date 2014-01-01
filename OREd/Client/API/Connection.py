@@ -1,3 +1,3 @@
 class Connection(object):
-	def Init(host):
+	def Init(self, host):
 		pass
