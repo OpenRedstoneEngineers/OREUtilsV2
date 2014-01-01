@@ -22,24 +22,47 @@ namespace OREd
 {
 	bool Manager::OnCommand(Client* cli, const ArgsList& args)
 	{
-		HandlerMap::iterator it = m_Handlers.find(args[1]);
+		Console* console = GetConsoleByTarget(args[0]);
+
+		if (console == NULL)
+		{
+			return false;
+		}
+
+		HandlerMap::iterator it = m_CmdHandlers.find(args[1]);
 
 		if (it == m_Handlers.end())
 		{
 			return false; // Unknown command
 		}
 
-		return (it->second)(cli, args);
+		return (it->second)(cli, console, args);
 	}
 
 	bool Manager::OnEvent(Client* cli, const ArgsList& args)
 	{
+		// TODO: Parse event		
+
 		return true;
 	}
 
 	bool Manager::OnQuery(Client* cli, const ArgsList& args)
 	{
-		return true;
+		Console* console = GetConsoleByTarget(args[0]);
+
+		if (console == NULL)
+		{
+			return false;
+		}
+
+		HandlerMap::iterator it = m_QueryHandlers.find(args[1]);
+
+		if (it == m_Handlers.end())
+		{
+			return false; // Unknown query
+		}
+
+		return (it->second)(cli, console, args);
 	}
 
 	void Manager::InitConsole(const std::string& name, Console* console)
@@ -63,6 +86,25 @@ namespace OREd
 		else
 		{
 			return it->second;
+		}
+	}
+
+	Console* Manager::GetConsoleByTarget(const std::string& target)
+	{
+		size_t pos = target.find(".");
+
+		if (pos != std::string::npos)
+		{
+			std::string host = target.substr(0, pos);
+
+			if (host != m_Host)
+			{
+				return NULL;
+			}
+
+			std::string name = target.substr(pos + 1, std::string::npos);
+
+			return GetConsole(name);
 		}
 	}
 } /* OREd */

@@ -82,6 +82,11 @@ namespace OREd
 		 */
 		std::string GetPublicKey() const;
 
+		/**
+		 * \return whether the client has admin permissions.
+		 */
+		bool IsAdmin() const;
+
 	protected:
 		/** Socket handle */
 		int m_Handle;
@@ -104,6 +109,11 @@ namespace OREd
 	inline std::string Client::GetPublicKey() const
 	{
 		return m_PubKey;
+	}
+
+	inline bool Client::IsAdmin() const
+	{
+		return (m_Type == TYPE_ADMIN) || (m_Type == TYPE_SERVER);
 	}
 } /* OREd */
 

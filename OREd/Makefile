@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -O3 -Wall
 
-OBJS = main.o Daemon.o Console.o Server.o Client.o ProtoServer.o Manager.o Log.o Auth.o RSAKey.o
+OBJS = main.o Daemon.o Console.o Server.o Client.o ProtoServer.o Manager.o Log.o Auth.o RSAKey.o Handler.o
 
 build: $(OBJS) 
 	$(CC) -o OREd $(OBJS)
@@ -35,6 +35,9 @@ Auth.o: src/Auth.cpp src/Auth.hpp
 
 RSAKey.o: src/RSAKey.cpp src/RSAKey.hpp
 	$(CC) $(CFLAGS) -c src/RSAKey.cpp
+
+Handler.o: src/Handler.cpp src/Handler.hpp
+	$(CC) $(CFLAGS) -c src/Handler.cpp
 
 main.o: src/main.cpp
 	$(CC) $(CFLAGS) -c src/main.cpp
