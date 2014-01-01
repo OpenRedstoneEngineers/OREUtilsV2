@@ -54,7 +54,7 @@ namespace OREd
 			{
 				exit(EXIT_FAILURE);
 			}
-
+			
 			exit(EXIT_FAILURE);
 		}
 

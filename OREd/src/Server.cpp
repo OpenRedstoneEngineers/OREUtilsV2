@@ -90,6 +90,11 @@ namespace OREd
 			return;
 		}
 
+		if (listen(m_Handle, BACKLOG) < 0)
+		{
+			return;
+		}
+
 		m_Running = true;
 
 		struct timeval timeout;
@@ -125,6 +130,8 @@ namespace OREd
 
 				if (cliSockFd < 0)
 				{
+					m_Running = false;
+
 					break;
 				}
 

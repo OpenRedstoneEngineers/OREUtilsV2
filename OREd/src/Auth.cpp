@@ -22,20 +22,46 @@ namespace OREd
 {
 	bool Authenticator::AuthServerIn(Client* remote)
 	{
-		// TODO: Listen for public key
+		std::string key;		
 
-		remote->m_Type = Client::TYPE_LISTENER;
+		if (!remote->Recv(key))
+		{
+			remote->m_Type = Client::TYPE_LISTENER;
+
+			return false;
+		}
+
+		bool found = false;
+
+		for (KeyList::iterator it = m_KnownKeys.begin(); it != m_KnownKeys.end(); ++it)
+		{
+			if (*it == key)
+			{
+				remote->m_PubKey = key;
+
+				found = true;
+			}
+		}
+
+		if (found)
+		{
+			// TODO: Handshake
+
+			remote->m_Type = Client::TYPE_SERVER;
+		}
 
 		return false;
 	}
 
 	bool Authenticator::AuthServerOut(Client* remote)
 	{
-		// TODO: Send public key
+		remote->Send(m_Key.GetPublicKey());		
 
-		remote->m_Type = Client::TYPE_LISTENER;
+		// TODO: Handshake
 
-		return false;
+		remote->m_Type = Client::TYPE_SERVER;
+
+		return true;
 	}
 
 	std::string Authenticator::EncryptMessage(Client* remote, const std::string& msg)

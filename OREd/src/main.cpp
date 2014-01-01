@@ -35,7 +35,9 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	Manager manager(4242);
+	Manager manager(4242, "skaro");
+
+	Console build(JavaPath, args);
 
 	manager.Start();
 

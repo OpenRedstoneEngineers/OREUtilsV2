@@ -24,6 +24,7 @@
 #include "RSAKey.hpp"
 
 #include <string>
+#include <vector>
 
 namespace OREd
 {
@@ -32,6 +33,9 @@ namespace OREd
 	 */
 	class Authenticator
 	{
+	public:
+		typedef std::vector<std::string> KeyList;
+
 	public:
 		Authenticator() {}
 
@@ -59,6 +63,8 @@ namespace OREd
 
 	protected:
 		RSAKey m_Key;
+
+		KeyList m_KnownKeys;
 	};
 } /* OREd */
 

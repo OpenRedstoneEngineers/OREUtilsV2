@@ -27,7 +27,7 @@ namespace OREd
 			return false;
 		}
 
-		std::string cmd = "kick " + args[2];
+		std::string cmd = "kick " + args[2] + "\n";
 
 		target->Write(cmd);
 
@@ -41,7 +41,7 @@ namespace OREd
 			return false;
 		}
 
-		std::string cmd = "stop";
+		std::string cmd = "stop\n";
 
 		target->Write(cmd);
 

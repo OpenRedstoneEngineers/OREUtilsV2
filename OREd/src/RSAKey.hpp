@@ -34,19 +34,19 @@ namespace OREd
 		/**
 		 * \brief Generate a new RSA key pair.
 		 */
-		void Generate();
+		void Generate(int bits);
 
 		void SetPublicKey(const std::string& key);
 
 		void SetPrivateKey(const std::string& key);
 
 		/**
-		 * \return the associated public key.
+		 * \return the associated public key in plain-text format.
 		 */
 		std::string GetPublicKey() const;
 
 		/**
-		 * \return the associated private key.
+		 * \return the associated private key in plain-text format.
 		 */
 		std::string GetPrivateKey() const;
 
@@ -61,27 +61,36 @@ namespace OREd
 		std::string Decrypt(const std::string& msg) const;
 
 	protected:
+		/** Plain-text public key */
 		std::string m_Public;
 
+		/** Plain-text private key */
 		std::string m_Private;
+
+		/** OpenSSL Handle */
+		//RSA* m_RSA;
 	};
 
-	void RSAKey::SetPublicKey(const std::string& key)
+	inline void RSAKey::SetPublicKey(const std::string& key)
 	{
 		m_Public = key;
+
+		// TODO: Update m_RSA
 	}
 
-	void RSAKey::SetPrivateKey(const std::string& key)
+	inline void RSAKey::SetPrivateKey(const std::string& key)
 	{
 		m_Private = key;
+
+		// TODO: Update m_RSA
 	}
 
-	std::string RSAKey::GetPublicKey() const
+	inline std::string RSAKey::GetPublicKey() const
 	{
 		return m_Public;
 	}
 
-	std::string RSAKey::GetPrivateKey() const
+	inline std::string RSAKey::GetPrivateKey() const
 	{
 		return m_Private;
 	}

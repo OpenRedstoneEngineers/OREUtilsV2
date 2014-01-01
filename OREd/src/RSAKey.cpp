@@ -22,7 +22,7 @@
 
 namespace OREd
 {
-	void RSAKey::Generate()
+	void RSAKey::Generate(int bits)
 	{
 		// TODO
 	}

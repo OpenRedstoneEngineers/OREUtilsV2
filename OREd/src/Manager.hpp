@@ -72,8 +72,6 @@ namespace OREd
 	class Manager : public ProtoServer
 	{
 	public:
-
-	public:
 		typedef bool (*CmdHandler)(Client* cli, ConsolePtr& target, const ArgsList& args);
 
 		typedef std::map<const std::string, ConsolePtr*> ConsoleMap;
