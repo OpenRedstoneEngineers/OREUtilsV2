@@ -20,9 +20,32 @@
 
 namespace OREd
 {
+	ConsolePtr::ConsolePtr(const std::string& path, char* const* argv) : m_Path(path), m_Argv(argv)
+	{
+		m_Ptr = new Console(m_Path, m_Argv);
+	}
+
+	void ConsolePtr::Stop()
+	{
+		if (m_Ptr)
+		{
+			delete m_Ptr;
+
+			m_Ptr = NULL;
+		}
+	}
+
+	void ConsolePtr::Start()
+	{
+		if (m_Ptr == NULL)
+		{
+			m_Ptr = new Console(m_Path, m_Argv);
+		}
+	}
+
 	bool Manager::OnCommand(Client* cli, const ArgsList& args)
 	{
-		Console* console = GetConsoleByTarget(args[0]);
+		ConsolePtr* console = GetConsoleByTarget(args[0]);
 
 		if (console == NULL)
 		{
@@ -31,12 +54,12 @@ namespace OREd
 
 		HandlerMap::iterator it = m_CmdHandlers.find(args[1]);
 
-		if (it == m_Handlers.end())
+		if (it == m_CmdHandlers.end())
 		{
 			return false; // Unknown command
 		}
 
-		return (it->second)(cli, console, args);
+		return (it->second)(cli, *console, args);
 	}
 
 	bool Manager::OnEvent(Client* cli, const ArgsList& args)
@@ -48,7 +71,7 @@ namespace OREd
 
 	bool Manager::OnQuery(Client* cli, const ArgsList& args)
 	{
-		Console* console = GetConsoleByTarget(args[0]);
+		ConsolePtr* console = GetConsoleByTarget(args[0]);
 
 		if (console == NULL)
 		{
@@ -57,17 +80,17 @@ namespace OREd
 
 		HandlerMap::iterator it = m_QueryHandlers.find(args[1]);
 
-		if (it == m_Handlers.end())
+		if (it == m_QueryHandlers.end())
 		{
 			return false; // Unknown query
 		}
 
-		return (it->second)(cli, console, args);
+		return (it->second)(cli, *console, args);
 	}
 
-	void Manager::InitConsole(const std::string& name, Console* console)
+	void Manager::InitConsole(const std::string& name, ConsolePtr* console)
 	{
-		if (!console->IsValid())
+		if (!(*console)->IsValid())
 		{
 			return;
 		}
@@ -75,7 +98,7 @@ namespace OREd
 		m_Consoles[name] = console;
 	}
 
-	Console* Manager::GetConsole(const std::string& name)
+	ConsolePtr* Manager::GetConsole(const std::string& name)
 	{
 		ConsoleMap::iterator it = m_Consoles.find(name);
 
@@ -89,7 +112,7 @@ namespace OREd
 		}
 	}
 
-	Console* Manager::GetConsoleByTarget(const std::string& target)
+	ConsolePtr* Manager::GetConsoleByTarget(const std::string& target)
 	{
 		size_t pos = target.find(".");
 
@@ -106,5 +129,7 @@ namespace OREd
 
 			return GetConsole(name);
 		}
+
+		return NULL;
 	}
 } /* OREd */

@@ -29,14 +29,54 @@
 namespace OREd
 {
 	/**
+	 * \brief Encapsulates a console pointer.
+	 */
+	class ConsolePtr
+	{
+	public:
+		ConsolePtr() : m_Ptr(NULL) {}
+
+		ConsolePtr(Console* ptr) : m_Ptr(ptr) {}
+
+		ConsolePtr(const std::string& path, char* const* argv);
+
+		/**
+		 * \brief Stop the child process.
+		 */
+		void Stop();
+
+		/**
+		 * \brief (Re)start the child process.
+		 */
+		void Start();
+
+		/**
+		 * \return the internal pointer.
+		 */
+		Console* GetPtr();
+
+		inline Console& operator*() const { return *m_Ptr; }
+		inline Console* operator->() const { return m_Ptr; }
+
+	protected:
+		Console* m_Ptr;
+
+		std::string m_Path;
+
+		char* const* m_Argv;
+	};
+
+	/**
 	 * \brief Manages the server consoles.
 	 */
 	class Manager : public ProtoServer
 	{
 	public:
-		typedef bool (*CmdHandler)(Client* cli, Console* target, const ArgsList& args);
 
-		typedef std::map<const std::string, Console*> ConsoleMap;
+	public:
+		typedef bool (*CmdHandler)(Client* cli, ConsolePtr& target, const ArgsList& args);
+
+		typedef std::map<const std::string, ConsolePtr*> ConsoleMap;
 
 		typedef std::map<const std::string, CmdHandler> HandlerMap;
 
@@ -46,12 +86,12 @@ namespace OREd
 		/**
 		 * \brief Init a console instance.
 		 */
-		void InitConsole(const std::string& name, Console* console);
+		void InitConsole(const std::string& name, ConsolePtr* console);
 
 		/**
 		 * \return the console with the specified name.
 		 */
-		Console* GetConsole(const std::string& name);
+		ConsolePtr* GetConsole(const std::string& name);
 
 		/**
 		 * \return the associated hostname.
@@ -59,7 +99,7 @@ namespace OREd
 		std::string GetHostname() const;
 
 	protected:
-		Console* GetConsoleByTarget(const std::string& target);
+		ConsolePtr* GetConsoleByTarget(const std::string& target);
 
 	protected:
 		virtual bool OnCommand(Client* cli, const ArgsList& args);
@@ -82,7 +122,12 @@ namespace OREd
 		std::string m_Host;
 	};
 
-	std::string Manager::GetHostname() const
+	inline Console* ConsolePtr::GetPtr()
+	{
+		return m_Ptr;
+	}
+
+	inline std::string Manager::GetHostname() const
 	{
 		return m_Host;
 	}

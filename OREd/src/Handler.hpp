@@ -26,22 +26,22 @@ namespace OREd
 	/**
 	 * \brief Kick the specified player.
 	 */
-	bool HandleCmdKick(Client* cli, Console* target, const Manager::ArgsList& args);
+	bool HandleCmdKick(Client* cli, ConsolePtr& target, const Manager::ArgsList& args);
 
 	/**
 	 * \brief Stop the specified server.
 	 */
-	bool HandleCmdStop(Client* cli, Console* target, const Manager::ArgsList& args);
+	bool HandleCmdStop(Client* cli, ConsolePtr& target, const Manager::ArgsList& args);
 
 	/**
 	 * \brief (Re)start the specified server.
 	 */
-	bool HandleCmdStart(Client* cli, Console* target, const Manager::ArgsList& args);
+	bool HandleCmdStart(Client* cli, ConsolePtr& target, const Manager::ArgsList& args);
 
 	/**
 	 * \brief Kill the specified server.
 	 */
-	bool HandleCmdKill(Client* cli, Console* target, const Manager::ArgsList& args);
+	bool HandleCmdKill(Client* cli, ConsolePtr& target, const Manager::ArgsList& args);
 } /* OREd */
 
 #endif

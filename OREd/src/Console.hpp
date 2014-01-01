@@ -55,6 +55,11 @@ namespace OREd
 		 */
 		bool Write(const std::string& msg);
 
+		/**
+		 * \brief Kill the process.
+		 */
+		void Kill();
+
 	protected:
 		/** Process handle */
 		pid_t m_Handle;

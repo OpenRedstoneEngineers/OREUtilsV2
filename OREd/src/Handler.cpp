@@ -20,7 +20,7 @@
 
 namespace OREd
 {
-	bool HandleCmdKick(Client* cli, Console* target, const Manager::ArgsList& args)
+	bool HandleCmdKick(Client* cli, ConsolePtr& target, const Manager::ArgsList& args)
 	{
 		if (args.size() < 3 || !cli->IsAdmin())
 		{
@@ -34,7 +34,7 @@ namespace OREd
 		return true;
 	}
 
-	bool HandleCmdStop(Client* cli, Console* target, const Manager::ArgsList& args)
+	bool HandleCmdStop(Client* cli, ConsolePtr& target, const Manager::ArgsList& args)
 	{
 		if (!cli->IsAdmin())
 		{
@@ -45,29 +45,31 @@ namespace OREd
 
 		target->Write(cmd);
 
+		target.Stop();
+
 		return true;
 	}
 
-	bool HandleCmdStart(Client* cli, Console* target, const Manager::ArgsList& args)
+	bool HandleCmdStart(Client* cli, ConsolePtr& target, const Manager::ArgsList& args)
 	{
 		if (!cli->IsAdmin())
 		{
 			return false;
 		}
 
-		// TODO: Restart the server
+		target.Start();
 
 		return true;
 	}
 
-	bool HandleCmdKill(Client* cli, Console* target, const Manager::ArgsList& args)
+	bool HandleCmdKill(Client* cli, ConsolePtr& target, const Manager::ArgsList& args)
 	{
 		if (!cli->IsAdmin())
 		{
 			return false;
 		}
 
-		// TODO: Forcefully kill the server
+		target.Stop();
 
 		return true;
 	}

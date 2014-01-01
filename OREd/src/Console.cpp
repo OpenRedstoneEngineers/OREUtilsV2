@@ -63,10 +63,7 @@ namespace OREd
 
 	Console::~Console()
 	{
-		if (IsValid())
-		{
-			kill(m_Handle, SIGTERM);
-		}
+		Kill();
 	}
 
 	bool Console::IsValid() const
@@ -125,5 +122,13 @@ namespace OREd
 		}
 
 		return true;
+	}
+
+	void Console::Kill()
+	{
+		if (IsValid())
+		{
+			kill(m_Handle, SIGTERM);
+		}
 	}
 } /* OREd */
