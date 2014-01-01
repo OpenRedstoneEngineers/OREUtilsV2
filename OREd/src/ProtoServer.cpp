@@ -22,11 +22,17 @@
 
 namespace OREd
 {
+	ProtoServer::~ProtoServer()
+	{
+		for (ServerConnMap::iterator it = m_Conns.begin(); it != m_Conns.end(); ++it)
+		{
+			delete it->second;
+		}
+	}
+
 	bool ProtoServer::OnConnect(Client* cli)
 	{
-		// TODO: Authenticate (Server)
-
-		return true;
+		return m_Auth.AuthServerIn(cli);
 	}
 
 	void ProtoServer::OnMessage(Client* cli, const std::string& msg)
@@ -49,36 +55,34 @@ namespace OREd
 			return;
 		}
 
-		const std::string& hostname = args[0];
+		const std::string& type = args[1];
 
-		// Propagate hostname
-
-		HandlerMap::iterator it = m_Handlers.find(args[1]);
-
-		if (it == m_Handlers.end())
+		if (type == "EVENT")
 		{
-			return; // Unknown command
+			OnEvent(cli, args);
 		}
-
-		if (!(it->second)(cli, args))
+		else if (type == "QUERY")
 		{
-			return; // Syntax error
+			OnQuery(cli, args);
 		}
-	}
-
-	void ProtoServer::ConnectToServer(const std::string& name, const Client cli)
-	{
-		if (cli.IsValid())
+		else
 		{
-			// TODO: Authenticate (Client)
-
-			m_Conns[name] = cli;
+			OnCommand(cli, args);
 		}
 	}
 
-	void ProtoServer::RegisterHandler(const std::string& cmd, CmdHandler handler)
+	void ProtoServer::ConnectToServer(const std::string& name, Client* cli)
 	{
-		m_Handlers[cmd] = handler;
+		if (cli->IsValid())
+		{
+			if (m_Auth.AuthServerOut(cli))
+			{
+				if (cli->GetType() == Client::TYPE_SERVER)
+				{
+					m_Conns[name] = cli;
+				}
+			}
+		}
 	}
 
 	void ProtoServer::BroadcastCommand(const std::string& host, const ArgsList& args)

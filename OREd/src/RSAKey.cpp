@@ -16,53 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Manager.hpp"
+#include "RSAKey.hpp"
+
+#include <fstream>
 
 namespace OREd
 {
-	bool Manager::OnCommand(Client* cli, const ArgsList& args)
+	void RSAKey::Generate()
 	{
-		HandlerMap::iterator it = m_Handlers.find(args[1]);
-
-		if (it == m_Handlers.end())
-		{
-			return false; // Unknown command
-		}
-
-		return (it->second)(cli, args);
+		// TODO
 	}
 
-	bool Manager::OnEvent(Client* cli, const ArgsList& args)
+	std::string RSAKey::Encrypt(const std::string& msg) const
 	{
-		return true;
+		// TODO
+
+		return msg;
 	}
 
-	bool Manager::OnQuery(Client* cli, const ArgsList& args)
+	std::string RSAKey::Decrypt(const std::string& msg) const
 	{
-		return true;
-	}
+		// TODO
 
-	void Manager::InitConsole(const std::string& name, Console* console)
-	{
-		if (!console->IsValid())
-		{
-			return;
-		}
-
-		m_Consoles[name] = console;
-	}
-
-	Console* Manager::GetConsole(const std::string& name)
-	{
-		ConsoleMap::iterator it = m_Consoles.find(name);
-
-		if (it == m_Consoles.end())
-		{
-			return NULL;
-		}
-		else
-		{
-			return it->second;
-		}
+		return msg;
 	}
 } /* OREd */

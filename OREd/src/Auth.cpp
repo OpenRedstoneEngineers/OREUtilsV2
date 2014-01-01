@@ -16,53 +16,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Manager.hpp"
+#include "Auth.hpp"
 
 namespace OREd
 {
-	bool Manager::OnCommand(Client* cli, const ArgsList& args)
+	bool Authenticator::AuthServerIn(Client* remote)
 	{
-		HandlerMap::iterator it = m_Handlers.find(args[1]);
+		// TODO: Listen for public key
 
-		if (it == m_Handlers.end())
-		{
-			return false; // Unknown command
-		}
+		remote->m_Type = Client::TYPE_LISTENER;
 
-		return (it->second)(cli, args);
+		return false;
 	}
 
-	bool Manager::OnEvent(Client* cli, const ArgsList& args)
+	bool Authenticator::AuthServerOut(Client* remote)
 	{
-		return true;
+		// TODO: Send public key
+
+		remote->m_Type = Client::TYPE_LISTENER;
+
+		return false;
 	}
 
-	bool Manager::OnQuery(Client* cli, const ArgsList& args)
+	std::string Authenticator::EncryptMessage(Client* remote, const std::string& msg)
 	{
-		return true;
+		return m_Key.Encrypt(msg);
 	}
 
-	void Manager::InitConsole(const std::string& name, Console* console)
+	std::string Authenticator::DecryptMessage(Client* remote, const std::string& msg)
 	{
-		if (!console->IsValid())
-		{
-			return;
-		}
-
-		m_Consoles[name] = console;
-	}
-
-	Console* Manager::GetConsole(const std::string& name)
-	{
-		ConsoleMap::iterator it = m_Consoles.find(name);
-
-		if (it == m_Consoles.end())
-		{
-			return NULL;
-		}
-		else
-		{
-			return it->second;
-		}
+		return m_Key.Decrypt(msg);
 	}
 } /* OREd */

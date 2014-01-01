@@ -29,6 +29,24 @@ namespace OREd
 	class Client
 	{
 	public:
+		enum Type
+		{
+			TYPE_UNKNOWN = 0,
+
+			/** Listens to events */
+			TYPE_LISTENER,
+
+			/** Can send queries */
+			TYPE_USER,
+
+			/** Can execute commands */
+			TYPE_ADMIN,
+
+			/** Remote server */
+			TYPE_SERVER
+		};
+
+	public:
 		Client(const std::string& host, const std::string& service);
 
 		Client(const std::string& address, const int port);
@@ -54,12 +72,39 @@ namespace OREd
 		 */
 		bool Send(const std::string& msg);
 
+		/**
+		 * \return the type of the client.
+		 */
+		Type GetType() const;
+
+		/**
+		 * \return the associated public key.
+		 */
+		std::string GetPublicKey() const;
+
 	protected:
 		/** Socket handle */
 		int m_Handle;
 
+		/** Client type */
+		Type m_Type;
+
+		/** Public key */
+		std::string m_PubKey;
+
 		friend class Server;
+		friend class Authenticator;
 	};
+
+	inline Client::Type Client::GetType() const
+	{
+		return m_Type;
+	}
+
+	inline std::string Client::GetPublicKey() const
+	{
+		return m_PubKey;
+	}
 } /* OREd */
 
 #endif

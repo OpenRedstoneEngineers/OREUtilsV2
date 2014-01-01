@@ -19,6 +19,8 @@
 #ifndef _ORED_PROTO_SERVER_
 #define _ORED_PROTO_SERVER_
 
+#include "Auth.hpp"
+
 #include "Server.hpp"
 
 #include <string>
@@ -35,24 +37,17 @@ namespace OREd
 	public:
 		typedef std::vector<std::string> ArgsList;
 
-		typedef bool (*CmdHandler)(Client* cli, const ArgsList& args);
-
-		typedef std::map<const std::string, Client> ServerConnMap;
-
-		typedef std::map<const std::string, CmdHandler> HandlerMap;
+		typedef std::map<const std::string, Client*> ServerConnMap;
 
 	public:
 		ProtoServer(const int port) : Server(port) {}
 
+		~ProtoServer();
+
 		/**
 		 * \brief Connect to a remote server.
 		 */
-		void ConnectToServer(const std::string& name, const Client cli);
-
-		/**
-		 * \brief Register a command handler.
-		 */
-		void RegisterHandler(const std::string& cmd, CmdHandler handler);
+		void ConnectToServer(const std::string& name, Client* cli);
 
 		/**
 		 * \brief Broadcast a command.
@@ -65,11 +60,27 @@ namespace OREd
 		virtual void OnMessage(Client* cli, const std::string& msg);
 
 	protected:
+		/**
+		 * \brief Called when a command is broadcasted.
+		 */
+		virtual bool OnCommand(Client* cli, const ArgsList& args) = 0;
+
+		/**
+		 * \brief Called when an event is broadcasted.
+		 */
+		virtual bool OnEvent(Client* cli, const ArgsList& args) = 0;
+
+		/**
+		 * \brief Called when a query is broadcasted.
+		 */
+		virtual bool OnQuery(Client* cli, const ArgsList& args) = 0;
+
+	protected:
 		/** Outgoing server connections */
 		ServerConnMap m_Conns;
 
-		/** Command handlers */
-		HandlerMap m_Handlers;
+		/** Associated authenticator */
+		Authenticator m_Auth;
 	};
 } /* OREd */
 

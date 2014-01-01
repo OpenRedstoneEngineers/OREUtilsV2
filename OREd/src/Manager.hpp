@@ -34,15 +34,14 @@ namespace OREd
 	class Manager : public ProtoServer
 	{
 	public:
+		typedef bool (*CmdHandler)(Client* cli, const ArgsList& args);
+
 		typedef std::map<const std::string, Console*> ConsoleMap;
 
-	public:
-		static bool HandleQuery(Client* cli, const ArgsList& args);
-
-		static bool HandleEvent(Client* cli, const ArgsList& args);
+		typedef std::map<const std::string, CmdHandler> HandlerMap;
 
 	public:
-		Manager(const int port);
+		Manager(const int port) : ProtoServer(port) {}
 
 		/**
 		 * \brief Init a console instance.
@@ -55,8 +54,18 @@ namespace OREd
 		Console* GetConsole(const std::string& name);
 
 	protected:
+		virtual bool OnCommand(Client* cli, const ArgsList& args);
+
+		virtual bool OnEvent(Client* cli, const ArgsList& args);
+
+		virtual bool OnQuery(Client* cli, const ArgsList& args);
+
+	protected:
 		/** Associated consoles */
 		ConsoleMap m_Consoles;
+
+		/** Command handlers */
+		HandlerMap m_Handlers;
 	};
 } /* OREd */
 
