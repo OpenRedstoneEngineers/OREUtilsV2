@@ -1,47 +1,61 @@
 #Base class for an event
 class Event(object):
-	def __init__(self, server, description=''):
-		self.string = description
+	def __init__(self, description=''):
+		self.desc = description
 
 	def __repr__(self):
-		return "Event: "+self.string
+		return "Event: "+self.desc
 
 #An event pertaining to a player
 class PlayerEvent(Event):
-	def __init__(self, server, player, description=''):
+	desc = ''
+	def __init__(self, player):
 		self.player = player
-		self.string = description
-
+	
 	def GetPlayer(self):
 		pass
+
+	def __repr__(self):
+		return self.player+" "+self.desc
 
 #An event relating to the server
 class ServerEvent(Event):
 	pass
+
 #A player joined the game
-class Join(PlayerEvent):	
-	pass
+class Join(PlayerEvent):
+	desc = "joined the game"
 
 #A player is no longer in the game
 class Leave(PlayerEvent):
-	pass
+	desc = "is no longer in the game"
 
 #A player left of their own free will
 class Quit(Leave):
-	pass
+	desc = "left the game"
 
 #A player was kicked
 class Kick(Quit):
-	pass
+	desc = "was kicked from the game"
 
 #A player said something
 class Talk(PlayerEvent):
-	pass
+	def __init__(self, player, message):
+		self.desc   = ": "+message
+		self.player = player
 
 #Server started
 class Stop(ServerEvent):
-	pass
+	def __init__(self, reason):
+		self.desc = reason
+
+	def __repr__(self):
+		return "The server stopped : "+self.desc
 
 #Server stopped
 class Start(ServerEvent):
-	pass
+	def __init__(self, reason):
+		self.desc = reason
+
+	def __repr__(self):
+		return "The server has started : "+self.desc

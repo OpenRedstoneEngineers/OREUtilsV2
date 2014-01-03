@@ -22,13 +22,12 @@ class Functions:
 
 #A class for containing all hooks of exceptions and commands
 class Hooks:
-    	#Fuck complying with python guidelines
 	def __init__(self, **API):
 		self.commands = {}
 		self.events = {}
-		API["command"] = self.command
-		API["event"]   = self.event		
-        
+		API["command"] = self.WrapCommand
+		API["event"]   = self.WrapEvent		
+        	
 		for path in os.listdir(os.getcwd()+"/Scripting/Scripts"):
 			fullPath = "Scripting/Scripts/"+path
 			exec(compile(open(fullPath).read(), fullPath, "exec"), API)
@@ -45,11 +44,11 @@ class Hooks:
 			return instance
 
 	#Return a Functions instance relating to a command
-	def command(self, name):
+	def WrapCommand(self, name):
 		return self.GetFunctions(name, self.commands)
 
 	#Return a Functions instance relating to an exception
-	def event(self, event):
+	def WrapEvent(self, event):
 		if event[0] != "_" and event in Events.__dict__:
 			Event = Events.__dict__[event] 
 			return self.GetFunctions(Event, self.events) 

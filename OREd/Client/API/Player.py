@@ -12,3 +12,6 @@ class Player(Base):
 
 	def Ban(self, message=''):
 		self.Console.Raw('ban %s %s'%(self.name, message))
+
+	def GetRank(self):
+		pass
