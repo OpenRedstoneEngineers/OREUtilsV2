@@ -34,10 +34,17 @@ class EventManager:
 	def Core(self, Console):
 		for packet in Console.Loop():
 			args = packet.split()
-			if args[1] == 'EVENT':
+
+			self.API.LoadAPI(args[0])
+
+			commandType = args[1]
+
+			if   commandType == 'EVENT':
 				kwargs = {x[0]:x[1] for x in (z.split('=') for z in args[3:])} 
 				self.OnEvent(args[2], kwargs)
 
+			elif commandType == 'CMD':
+				self.OnCommand(args[2], args[3:])
         
 if __name__ == "__main__":
 
@@ -49,5 +56,5 @@ if __name__ == "__main__":
 	for Logger in API.Base.Loggers:
 		Logger.Init('Log.txt')
 
-	EventManager().OnEvent('Join', {'player':'xeo'})
+	EventManager().Core()
 	

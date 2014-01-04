@@ -15,7 +15,7 @@ class Functions:
         
 		for script in self.functions:
 			try:
-				script(*args)
+				script(args)
 
 			except Exception as E:
 				return E
@@ -58,7 +58,7 @@ class Hooks:
 	def Event(self, event):
 		for eventType, scripts  in self.events.items():
 			if isinstance(event, eventType):
-				scripts.Exec((event,))
+				scripts.Exec(event))
 
 	#Execute the scripts relating to a command
 	def Exec(self, name, args):
