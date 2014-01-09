@@ -1,0 +1,57 @@
+Node.py:
+  class Node:
+    node.iteritems()
+      an iterator object iterating across (key,value) pairs
+    
+    node.itervalues()
+      an iterator object iterating across values
+    
+    node.iterkeys()
+      an iterator object iterating across keys
+    
+    for X in node:
+      iterate across all keys
+      
+    X in node
+      get if a key is in a node
+      
+    node[X] = X
+      set a value at a key
+      
+    node[X]
+      get a value at a key
+      
+    del node[X]
+      delete a value at a key
+      
+    len(node)
+      get the amount of keys in the node
+      
+    node.Get(X)
+      get key from node, or from children, whose keys can be
+      accessed via dots. e.g. node.Get('child.child.key')
+      
+    node.Set(X, Value)
+      set key in node, or in children, which can be
+      accessed via dots. e.g. node.Set('child.child.key', 'foo')
+      
+    node.Ensure(X, Value)
+      checks if a key is in a node, if it is not, it is set to a
+      default value (used for loading/fixing configs)
+      
+    node.copy()
+      get a non-linked copy of the node
+      
+    node.Dict()
+      convert the node into a dict of values (including children)
+      
+    node + node
+      combine the keys of two nodes, the latter overwrites conflicts
+      
+NodeManager.py
+  class NodeManmager(data, backend)
+  
+  class NodeFile(filename, backend=JSONBackend, read=True)
+      
+  
+    
