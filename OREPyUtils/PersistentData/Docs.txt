@@ -49,9 +49,38 @@ Node.py:
       combine the keys of two nodes, the latter overwrites conflicts
       
 NodeManager.py
-  class NodeManmager(data, backend)
+  class NodeManmager(data=None, backend=JSONBackend):
+    data is information to pass to backend, to get the data for the
+    node. Depending on the backend it is generally a string or dict.
+    
+    str(nodeManmager)
+      get the string representataion of the contents of the node
+      
+    nodeManager.Dict()
+      get the dict representataion of the contents of the node, calls
+      nodeManager.node.Dict
+      
+    nodeManager.node
+      get the root node contained in this manager
   
   class NodeFile(filename, backend=JSONBackend, read=True)
+    filename is the path to the file to either read and pass to backend,
+    or to create.
+    
+    str(nodeFile)
+      get the string representataion of the contents of the node
       
+    nodeManager.Dict()
+      get the dict representataion of the contents of the node, calls
+      nodeFile.node.Dict
+      
+    nodeFile.node
+      get the root node contained in this manager
+      
+    nodeFile.Dump()
+      update the file referenced by this manager to the contents of the
+      node
+
+
   
     
