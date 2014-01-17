@@ -164,15 +164,10 @@ def GenCommands(fileIn = None,fileOut = None, *extra):
 	fileTo.close()
 	return 'Operation sucessful'
 
-if __name__ == "__main__":
-	print GenCommands('/servers/test/plugins/OREUtilsV2.py.dir/Data/Commands.txt','ResultCode.py')
-
-	exit()
-
 @hook.command('gencommands')
 def onCommandGen(sender,args):
 	if sender.hasPermission('ore.gencommand'):
-		sender.sendMessage(GenCommands('Commands.txt','plugins/OREUtilsV2.py.dir/OREPyUtils/ResultCode.py'))
+		sender.sendMessage(GenCommands('plugins/OREUtilsV2.py.dir/Data/Commands.txt','plugins/OREUtilsV2.py.dir/OREPyUtils/ResultCode.py'))
 	else:
 		sender.sendMessage('No permission')
 

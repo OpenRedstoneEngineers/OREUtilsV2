@@ -5,16 +5,17 @@ from Helper import Sudo
 import org.bukkit.Bukkit.dispatchCommand as dispatchCommand 
 import org.bukkit.Bukkit.getPlayerExact	 as getPlayerExact
 
-# Permission nodes: 
+'''
+Permission nodes:
 
-# Color Whitelist
-colours = '123456789abcdef'
+ore.nameformat.others
+'''
 
-# Format Whitelist
-fonts = 'lnor'
+# Whitelist
+Colours = '123456789abcdef'
+Fonts = 'lnor'
 
-# Presets
-preset = {
+Presets = {
 	'rainbow'   : '4c6e23915d',
 	'ice'       : 'f7b3b7f',
 	'greyscale' : '87f',
@@ -24,51 +25,53 @@ preset = {
 	'fire'      : 'e646e'
 }
 
-def Distribute(list1,list2):
+def Distribute(list1, list2):
 	len1   = len(list1)
-	change = len1/float(len(list2))
+	change = len1 / float(len(list2))
 	
 	while len1 > 0:
 		len1 -= change
-		list1.insert(int(len1),list2.pop())
+
+		list1.insert(int(len1), list2.pop())
 
 	return ''.join(list1)
 
-@hook.command("nameformat", description="Colourify your name")
-def onCommandNameFormat(target, args):
-	if args:
-		if target.hasPermission('ore.nameformat.others'):
-			player = getPlayerExact(args[0])
-	
-			if player != None:
-				target = player
+@hook.command("nameformat", description="Colourify your name", usage="Usage: /nameformat [name] <format...>")
+def onCommandNameFormat(sender, args):
+	if not args:
+		return False
 
-				del args[0]
+	target = sender
 
-		formats = []
+	if target.hasPermission('ore.nameformat.others'):
+		player = getPlayerExact(args[0])
 
-		for format in ' '.join(args):
-			if format in colours:
-				formats.append('&' + format)
+		if player != None:
+			target = player
 
-			elif format in fonts:
-				formats[-1] += '&' + format
+			del args[0]
 
-			elif format == ' ' and formats[-1]:
-				formats.append('')
+	formats = []
 
-			else:
-				sender.sendMessage('invalid colour code ('+format+')')
+	for format in ' '.join(args):
+		if format in Colours:
+			formats.append('&' + format)
 
-				return False
+		elif format in Fonts:
+			formats[-1] += '&' + format
 
-		name = target.getName()
+		elif format == ' ' and formats[-1]:
+			formats.append('')
 
-		if formats:
-			Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
+		else:
+			sender.sendMessage('Invalid colour code (' + format + ')')
+			return False
 
-			return True
-	
-	sender.sendMessage('/nameformat [name] <colours...>')
-	
+	name = target.getName()
+
+	if formats:
+		Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
+
+		return True
+
 	return False

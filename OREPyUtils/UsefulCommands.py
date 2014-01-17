@@ -88,6 +88,13 @@ def OnCommandExecBook(sender, args):
 
 	program = '\n'.join(pages)
 
+	for i in xrange(len(args)):
+		program = program.replace('#a' + str(i), args[i])
+
+	program = program.replace("#a", ' '.join(args))
+	program = program.replace("#m", sender.getName())
+	program = program.replace("#p", "ping &b")
+
 	cmds = program.split('\n')
 
 	if len(cmds) > 3 and not sender.hasPermission("ore.execbook.admin"):
@@ -104,106 +111,6 @@ def OnCommandExecBook(sender, args):
 
 	return True
 
-@hook.command('e')
-def onCommandBookGet(sender, args):
-	item = sender.getItemInHand()
-
-	if item.getTypeId() not in (386, 387):
-		sender.sendMessage(Color("c") + 'You must have a book')
-		return False
-
-	metadata = item.getItemMeta()
-	s = ''	  
-
-	for i in metadata.getPages():
-		s = s+'\n'+i
-
-	n = 0
-
-	while 1:
-		a = '#a'+str(n)
-
-		if len(args) <= n:
-			break
-
-		s = s.replace(a, args[n])
-		n += 1
-
-	n = 0
-
-	while 1:
-		a = '#r'+str(n)
-
-		if len(args) <= n:
-			break
-
-		s = s.replace(a, ' '.join(args[n:]))
-		n += 1
-
-	n = 0
-
-	while 1:
-		a = '#n'+str(n)
-
-		if len(args) <= n:
-			break
-
-		name = getPlayer(args[n])
-
-		if name != None:
-			s = s.replace(a, name.getName())
-
-		n += 1
-
-	s = s.replace('#a', ' '.join(args))
-	s = s.replace('#p', 'ping &b')
-	s = s.replace('#m', sender.getName())
-	s = s.split('\n')[1:]
-	n = 0
-
-	if len(args) > 0 and '@'+args[0] in s:
-		n = s.index('@'+args[0])+1
-		no = 0
-
-		while True:
-			if n == len(s):
-				break
-
-			if no == 3 and not sender.hasPermission('xeoperms.give'):
-				break
-			
-			command = s[n]
-			if command[0:2] == '#b':
-				broadcastMessage(Color("e") + s[n][2:] + Color("6") + ' ('+ sender.getName() + ')')
-			elif command.split()[0] != 'e':
-				dispatchCommand(sender, command)
- 
-			if not n+1 == len(s) and s[n+1][0] == '@':
-				break
- 
-			n += 1
-			no += 1
-		sender.sendMessage('Command(s) run!')
-		return True
-
-	for i in s:
-		if n == 3 and not sender.hasPermission('xeoperms.give'):
-			break
-		if len(i) == 0:
-			break
-		if i[0] == '@':
-			break
-
-		if i[0:2] == '#b':
-			broadcastMessage(Color("e") + i[2:] + Color("6") + ' ('+sender.getName()+')')
-		elif i.split()[0] != 'e':
-			dispatchCommand(sender, i)
-		n += 1
-
-	sender.sendMessage(Color("a") + 'Command(s) run!')
-
-	return True
-
 @hook.command('schems', usage="Usage: /schems <list|load|save> name")
 def OnCommandSchems(sender, args):
 	Name = sender.getName()
@@ -217,7 +124,7 @@ def OnCommandSchems(sender, args):
 		try:
 			UserSchems = os.listdir('/var/www/schems/files/' + Name)
 		except:
-			sender.sendMessage("No schematics!")
+			sender.sendMessage("Could not read the schematic directory.")
 			return True
 
 		sender.sendMessage('List of your schematics:')

@@ -1,4 +1,4 @@
-from Helper import Sudo, Color
+from Helper import Sudo, Color, Colorify
 
 from org.bukkit import Bukkit
 
@@ -23,7 +23,6 @@ def OnCommandFixLag(sender, args):
 	sender.sendMessage(Color("5") + "T3h lagz, they be gone!")
 
 	return True
-
 
 @hook.command("fast")
 def OnCommandFast(sender, args):
@@ -94,6 +93,6 @@ def onCommandRaw(sender, args):
 		sender.sendMessage("No permission!")
 		return True
 	
-	Bukkit.broadcastMessage(' '.join(args).replace('&', u'\u00A7'))
+	Bukkit.broadcastMessage(Colorify(' '.join(args)))
 
 	return True

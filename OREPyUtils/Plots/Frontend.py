@@ -127,7 +127,7 @@ def onCommandPallow(sender, args):
 			manager.AddAllowed(name, '*')
 			sender.sendMessage('All players, unless specifed by /pban, can build on your plot(s)')
 		else:
-			manager.addallowed(name, args[1])
+			manager.AddAllowed(name, args[1])
 			sender.sendMessage(args[1]+' can build on your plot(s)')
 
 	return True

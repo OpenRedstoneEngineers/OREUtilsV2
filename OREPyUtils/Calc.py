@@ -227,3 +227,4 @@ def OnCommandCalc(sender, args):
 	sender.sendMessage(expr + " -> " + str(result))
 
 	return True
+
