@@ -3,6 +3,8 @@ import math
 import tokenize
 import StringIO
 
+from Helper import SendError
+
 class SymbolBase:
 	NAME = None
 
@@ -220,8 +222,9 @@ def OnCommandCalc(sender, args):
 
 	try:
 		result = parser.Parse(expr)
+
 	except SyntaxError, E:
-		sender.sendMessage("Syntax error: " + str(E))
+		SendError(sender, "Syntax error: " + str(E))
 		return True
 
 	sender.sendMessage(expr + " -> " + str(result))

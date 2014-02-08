@@ -4,6 +4,8 @@ Permission nodes:
 ore.bus
 """
 
+from Helper import SendInfo, SendError
+
 class LastPoint:
 	def __init__(loc, power):
 		self.loc = loc
@@ -70,27 +72,27 @@ class Bus:
 @hook.command("bstart")
 def OnCommandBusStart(sender, args):
 	if not sender.hasPermission("ore.bus"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	loc = sender.getLocation()
 
 	LastPos[sender.getName()] = loc
 
-	sender.sendMessage("Bus start: %d %d %d" % (loc.getX(), loc.getY(), loc.getZ()))
+	SendInfo(sender, "Bus start: %d %d %d" % (loc.getX(), loc.getY(), loc.getZ()))
 
 	return True
 
 @hook.command("bpoint")
 def OnCommandBusWaypoint(sender, args):
 	if not sender.hasPermission("ore.bus"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	first = LastPos.get(sender.getName())
 
 	if first == None:
-		sender.sendMessage("No starting point selected!")
+		SendError(sender, "No starting point selected!")
 		return True
 
 	second = sender.getLocation()
@@ -98,10 +100,10 @@ def OnCommandBusWaypoint(sender, args):
 	LastPos[sender.getName()] = second
 
 	if first.getWorld() != second.getWorld():
-		sender.sendMessage("World mismatch!")
+		SendError(sender, "World mismatch!")
 		
 	else:
-		sender.sendMessage("Waypoint: %d %d %d" % (second.getX(), second.getY(), second.getZ()))
+		SendInfo(sender, "Waypoint: %d %d %d" % (second.getX(), second.getY(), second.getZ()))
 
 		b = Bus(first.getBlockX(), first.getBlockY(), first.getBlockZ(), second.getBlockX(), second.getBlockY(), second.getBlockZ(), first.getWorld())
 

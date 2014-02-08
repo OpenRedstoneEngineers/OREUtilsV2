@@ -2,7 +2,7 @@ from __future__ import with_statement
 
 import random
 
-from Helper import color 
+from Helper import Color, SendInfo, SendError 
 
 import org.bukkit.Bukkit.broadcastMessage as broadcastMessage
 
@@ -21,18 +21,18 @@ def LoadDerps(filename):
 		Derps = [X.replace('\n', '') for X in f.xreadlines()]
 
 def BroadcastDerp(sender, message):
-	broadcastMessage(color("2") + " * " + color("f") + sender.getName() + color("l") + " DERP! " + color("d") + message)
+	broadcastMessage(Color("2") + " * " + Color("f") + sender.getName() + Color("l") + " DERP! " + Color("d") + message)
 
 @hook.command("derp", description="Let your derp shine!")
 def OnCommandDerp(sender, args):
 	if len(args) > 0 and args[0].isdigit():
-		index = int(args[0])
+		Index = int(args[0])
 
-		if index >= len(Derps) or index < 0:
-			sender.sendMessage("Index out of range")
+		if Index >= len(Derps) or Index < 0:
+			SendError(sender, "Index out of range")
 			return True
 
-		BroadcastDerp(sender, Derps[index])
+		BroadcastDerp(sender, Derps[Index])
 
 		return True
 
@@ -40,7 +40,7 @@ def OnCommandDerp(sender, args):
 		if args[0] == "reload":
 			LoadDerps("Data/Derps.txt")
 
-			sender.sendMessage(color("e") + "Derps reloaded")
+			SendInfo(sender, "Derps reloaded")
 
 			return True
 
@@ -50,7 +50,7 @@ def OnCommandDerp(sender, args):
 
 @hook.command("Derps", description="List available Derps")
 def OnCommandDerps(sender, args):
-	for counter, derp in enumerate(Derps):
-		sender.sendMessage(color("1") + str(counter) + color("f") + ": " + color("a") + derp)
+	for Counter, Derp in enumerate(Derps):
+		sender.sendMessage(Color("1") + str(Counter) + Color("f") + ": " + Color("a") + Derp)
 
 	return True

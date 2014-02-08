@@ -1,4 +1,4 @@
-from Helper import Sudo, Color, Colorify
+from Helper import Sudo, Color, Colorify, SendInfo, SendError
 
 from org.bukkit import Bukkit
 
@@ -20,7 +20,7 @@ def OnCommandFixLag(sender, args):
 
 	Bukkit.dispatchCommand(sender, "butcher -f")
 
-	sender.sendMessage(Color("5") + "T3h lagz, they be gone!")
+	SendInfo(sender, "T3h lagz, they be gone!")
 
 	return True
 
@@ -33,7 +33,7 @@ def OnCommandFast(sender, args):
 	sender.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 5000, 50, True))
 	sender.addPotionEffect(PotionEffect(PotionEffectType.JUMP, 5000, 8, True))
 
-	sender.sendMessage("SUPER SPEED!")
+	SendInfo(sender, "SUPER SPEED!")
 
 	return True
 
@@ -47,7 +47,7 @@ def onCommandQuick(sender, args):
 	sender.addPotionEffect(PotionEffect(PotionEffectType.NIGHT_VISION, 50000, 2, True))
 	sender.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 50000, 2, True))
 
-	sender.sendMessage("Super powers!")
+	SendInfo(sender, "Super powers!")
 
 	return True
 
@@ -61,7 +61,7 @@ def OnCommmandFixMe(sender, args):
 @hook.command("join", description="Make someone join the server!", usage="/<command> <player> [location]")
 def onCommandJoin(sender, args):
 	if not sender.hasPermission("ore.fun.join"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	if len(args) < 1:
@@ -77,7 +77,7 @@ def onCommandJoin(sender, args):
 @hook.command("leave", description="Make someone leave the server!", usage="/<command> <player>")
 def onCommandLeave(sender, args):
 	if not sender.hasPermission("ore.fun.join"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	if not len(args):
@@ -90,7 +90,7 @@ def onCommandLeave(sender, args):
 @hook.command("raw")
 def onCommandRaw(sender, args):
 	if not sender.hasPermission("ore.raw"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 	
 	Bukkit.broadcastMessage(Colorify(' '.join(args)))

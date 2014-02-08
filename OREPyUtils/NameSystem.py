@@ -1,6 +1,6 @@
 from __future__ import division 
 
-from Helper import Sudo 
+from Helper import Sudo, SendError
 
 import org.bukkit.Bukkit.dispatchCommand as dispatchCommand 
 import org.bukkit.Bukkit.getPlayerExact	 as getPlayerExact
@@ -70,7 +70,7 @@ def onCommandNameFormat(sender, args):
 			formats.append('')
 
 		else:
-			sender.sendMessage('Invalid colour code (' + format + ')')
+			SendError(sender, 'Invalid colour code (' + format + ')')
 			return False
 
 	name = target.getName()

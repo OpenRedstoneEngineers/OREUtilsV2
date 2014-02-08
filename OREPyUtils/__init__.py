@@ -133,10 +133,8 @@ def OnCommandFail(sender, args):
 @hook.enable
 def OnEnable():
 	Load('Plots')
-
-	Load('IRCBot', conf=CONFIG)
-	
-#	Load('Inventory')
+	Load('IRCBot', conf=CONFIG)	
+	Load('Inventory')
 
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',
@@ -149,5 +147,5 @@ def OnEnable():
 @hook.disable
 def OnDisable():
 	Unload('Plots')
-
 	Unload('IRCBot')
+	Unload('Inventory')

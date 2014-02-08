@@ -6,7 +6,7 @@ from org.bukkit.Bukkit import dispatchCommand
 from org.bukkit.Bukkit import getPlayer
 from org.bukkit.Bukkit import broadcastMessage
 
-from Helper import Color, Colorify, Info
+from Helper import Color, Colorify, Info, SendInfo, SendError
 
 help = {}
 keys = []
@@ -37,7 +37,7 @@ def OnCommandDecode(sender,args):
 			Final.append(chr(int(String[Ind:Ind + 2], 16)))
 
 		except:
-			sender.sendMessage('Invalid Char!')
+			SendError(sender, 'Invalid Char!')
 			return True
 
 	sender.sendMessage(''.join(Final))
@@ -56,27 +56,27 @@ def OnCommandRename(sender, args):
 	meta = item.getItemMeta()
 
 	if meta == None:
-		sender.sendMessage("No item in hand")
+		SendError(sender, "No item in hand")
 		return True
 
 	meta.setDisplayName(argstring)
 
 	item.setItemMeta(meta)
 
-	sender.sendMessage("Renamed item!")
+	SendInfo(sender, "Renamed item!")
 
 	return True
 
 @hook.command("execbook")
 def OnCommandExecBook(sender, args):
 	if not sender.hasPermission("ore.execbook"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return
 
 	item = sender.getItemInHand()
 
 	if item.getTypeId() not in (386, 387):
-		sender.sendMessage(Color("c") + 'You must have a book')
+		SendError(sender, 'You must have a book')
 		return True
 
 	meta = item.getItemMeta()
@@ -98,7 +98,7 @@ def OnCommandExecBook(sender, args):
 	cmds = program.split('\n')
 
 	if len(cmds) > 3 and not sender.hasPermission("ore.execbook.admin"):
-		sender.sendMessage("Cannot execute more than three commands")
+		SendError(sender, "Cannot execute more than three commands")
 		return True
 
 	for cmd in cmds:
@@ -107,7 +107,7 @@ def OnCommandExecBook(sender, args):
 
 		dispatchCommand(sender, cmd)
 
-	sender.sendMessage("Exectued %d commands!" % len(cmds))
+	SendInfo(sender, "Exectued %d commands!" % len(cmds))
 
 	return True
 
@@ -124,7 +124,7 @@ def OnCommandSchems(sender, args):
 		try:
 			UserSchems = os.listdir('/var/www/schems/files/' + Name)
 		except:
-			sender.sendMessage("Could not read the schematic directory.")
+			SendError(sender, "Could not read the schematic directory.")
 			return True
 
 		sender.sendMessage('List of your schematics:')

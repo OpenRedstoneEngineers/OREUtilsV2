@@ -1,6 +1,6 @@
 from org.bukkit.Bukkit import broadcastMessage
 
-from Helper import Color
+from Helper import Color, SendInfo, SendError
 
 TNT = True
 
@@ -8,7 +8,7 @@ TNT = True
 @hook.command("tnt", description = "TNT is fun.")
 def OnCommandTNT(sender, args):
 	if not sender.hasPermission('ore.tnt'):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	global TNT
@@ -42,7 +42,8 @@ def OnPlayerClick(event):
 	if player.hasPermission("".join(('ore.ban.', str(event.getItem().getTypeId())))):
 		if not player.hasPermission("ore.ban.override"):
 			event.setCancelled(True)
-			player.sendMessage(Color("4") + "You are not allowed to use this item.")
+
+			SendInfo(player, "You are not allowed to use this item.")
 
 	return True
 
@@ -52,7 +53,8 @@ def OnPlayerJoinEvent(event):
 	sender = event.getPlayer()
 
 	sender.setPlayerTime(6000, 0)
-	sender.sendMessage("Your time was set to day.")
+
+	SendInfo(sender, "Your time was set to day.")
 
 	return True
 
@@ -62,7 +64,7 @@ Lamps = False
 @hook.command("lamps", description="Toggle lamps")
 def OnCommandLamps(sender,args):
 	if not sender.hasPermission('ore.lamp'):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	global Lamps

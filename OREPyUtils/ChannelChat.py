@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from Helper import color
+from Helper import Color, SendInfo, SendError
 
 class ChannelMode:
 	PUBLIC	 = 0
@@ -115,7 +115,8 @@ class ChannelManager:
 		for chan in self.Channels.itervalues():
 			chan.Leave(player)
 
-		del self.ActiveChannel[player.getName()]
+		if player.getName() in self.ActiveChannel:
+			del self.ActiveChannel[player.getName()]
 
 Chans = ChannelManager()
 
@@ -129,38 +130,38 @@ def OnCommandCChat(sender, args):
 
 	if cmd == "join":
 		if Chans.Join(sender, chan):
-			sender.sendMessage("Welcome to channel " + color("9") + chan)
+			SendInfo(sender, "Welcome to channel " + Color("9") + chan)
 		else:
-			sender.sendMessage(color("c") + "You are already in that channel")
+			SendError(sender, "You are already in that channel")
 
 		return True
 
 	elif cmd == "leave":
 		if Chans.Leave(sender, chan):
-			sender.sendMessage("You have left the channel")
+			SendInfo(sender, "You have left the channel")
 		else:
-			sender.sendMessage("You are not in that channel")
+			SendError(sender, "You are not in that channel")
 
 		return True
 
 	elif cmd == "info":
 		if chan not in Chans.Channels:
-			sender.sendMessage("No such channel")
+			SendError(sender, "No such channel")
 			return True
 
 		msg = ', '.join([x.getName() for x in Chans.Channels[chan].players])
 
-		sender.sendMessage("Players in channel " + chan + ": " + msg) 
+		SendInfo(sender, "Players in channel " + chan + ": " + msg) 
 
 		return True
 
 	elif cmd == "switch":
 		if chan not in Chans.Channels:
-			sender.sendMessage("No such channel")
+			SendError(sender, "No such channel")
 			return True
 
 		if sender not in Chans.Channels[chan].players:
-			sender.sendMessage("You are not in that channel")
+			SendError(sender, "You are not in that channel")
 			return True
 
 		Chans.ActiveChannel[sender.getName()] = chan
@@ -172,7 +173,7 @@ def OnCommandCChat(sender, args):
 @hook.command("ccadmin", usage="/<command> <list|playerinfo|kick>")
 def OnCommandCCAdmin(sender, args):
 	if not sender.hasPermission("ore.cchat.admin"):
-		sender.sendMessage("No permission")
+		SendError(sender, "No permission")
 		return True
 
 	if len(args) == 0:
@@ -190,7 +191,7 @@ def OnCommandCCAdmin(sender, args):
 
 	elif cmd == "playerinfo":
 		if len(args) != 2:
-			sender.sendMessage("Usage: /ccadmin playerinfo <player>")
+			SendError(sender, "Usage: /ccadmin playerinfo <player>")
 			return True
 
 		sender.sendMessage("Player " + args[1] + ":")
@@ -204,20 +205,20 @@ def OnCommandCCAdmin(sender, args):
 
 	elif cmd == "kick":
 		if len(args) != 3:
-			sender.sendMessage("Usage: /ccadmin kick <player> <channel>")
+			SendError(sender, "Usage: /ccadmin kick <player> <channel>")
 			return True
 
 		chan = Chans.Channels.get(args[2])
 
 		if chan == None:
-			sender.sendMessage("No such channel")
+			SendError(sender, "No such channel")
 			return True
 
 		for player in chan.players:
 			if player.getName() == args[1]:
-				player.sendMessage("You have been kicked from channel " + args[2])
+				SendInfo(player, "You have been kicked from channel " + args[2])
 
-				sender.sendMessage("Kicked player " + args[1] + " from channel " + args[2])
+				SendInfo(sender, "Kicked player " + args[1] + " from channel " + args[2])
 
 				chan.Leave(player)
 
@@ -232,7 +233,7 @@ def OnCommandCC(sender, args):
 	chan = Chans.ActiveChannel.get(sender.getName())
 
 	if chan == None or chan == "":
-		sender.sendMessage("You are not in a channel")
+		SendError(sender, "You are not in a channel")
 		return True
 
 	Chans.ChanMsg(sender, chan, msg)

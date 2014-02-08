@@ -1,6 +1,6 @@
 from __future__ import division
 
-from Helper import Sudo, color
+from Helper import Sudo, Color, SendInfo, SendError
 
 import random
 
@@ -37,16 +37,16 @@ vowels = 'aeiou'
 @hook.command("foodfight", description="A polite mealtime activity")
 def onCommandFoodfight(sender,args):
 	if len(args) == 0:
-		sender.sendMessage(color("c") + "You must specify who you are to throw food at.")
-		return False
+		SendError(sender, "You must specify who you are to throw food at.")
+		return True
 
 	Item = random.choice(Food.items())
 		
 	receiver = Bukkit.getPlayer(args[0])
 
 	if receiver == None:
-		sender.sendMessage(color("c") + 'No such player.')
-		return False
+		SendError(sender, 'No such player.')
+		return True
 
 	Sudo("give " + args[0] + ' ' + Item[1] + " 1")
 
@@ -55,11 +55,11 @@ def onCommandFoodfight(sender,args):
 	Name  = sender.getName()
 	RName = receiver.getName()
 
-	Bukkit.broadcastMessage(color("5") + Name + color("e") + " threw "+ Singular + color("6") + Item[0] + color("c") + " at " + color("5") + RName)
+	Bukkit.broadcastMessage(Color("5") + Name + Color("e") + " threw "+ Singular + Color("6") + Item[0] + Color("c") + " at " + Color("5") + RName)
 
 	if random.randint(1,5) == 1:
 		receiver.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 40, 1, True))
-		Bukkit.broadcastMessage(color("5") + "Headshot!")
+		Bukkit.broadcastMessage(Color("5") + "Headshot!")
 
 	return True
 
@@ -67,14 +67,14 @@ def onCommandFoodfight(sender,args):
 @hook.command("slap", description="Slappings!")
 def onCommandFoodfight(sender,args):
 	if len(args) == 0:
-		sender.sendMessage(color("c") + "/slap [Player] [Thing]")
-		return False
+		SendError(sender, "Usage: /slap [Player] [Thing]")
+		return True
 
 	receiver = Bukkit.getPlayer(args[0])
 
 	if receiver == None:
-		sender.sendMessage(color("c") + 'No such player.')
-		return False
+		SendError(sender, 'No such player.')
+		return True
 
 	if len(args) > 1:
 		item = ' '.join(args[1:])
@@ -116,7 +116,7 @@ def onCommandFoodfight(sender,args):
 	else:
 		amount = ''
 
-	Bukkit.broadcastMessage(color("5") + sender.getName() + color("c") + " slapped " + color("5") + receiverName + color("c") + " about a bit with " + amount + color("6") + item)
+	Bukkit.broadcastMessage(Color("5") + sender.getName() + Color("c") + " slapped " + Color("5") + receiverName + Color("c") + " about a bit with " + amount + Color("6") + item)
 
 	if random.randint(0,1):
 		receiver.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 160, 3, True))
@@ -131,54 +131,61 @@ def onCommandFoodfight(sender,args):
 @hook.command("random", description = "Produce a random number.")
 def onCommandRandom(sender,args):
 	Len = len(args)
+
 	if not Len:
 		sender.sendMessage(str(random.random()))
+
 	elif Len == 1:
 		if Integer.match(args[0]):
 			sender.sendMessage(str(random.randint(0,int(args[0]))))
 		else:
-			sender.sendMessage('That\'s no integer')
+			SendError(sender, 'Expected integer')
+
 	elif Len == 2:
 		if Integer.match(args[0]) and Integer.match(args[1]):
 			sender.sendMessage(str(random.randint(int(args[0]),int(args[1])))) 
 		else:	
-			sender.sendMessage('That\'s no integer')
+			SendError(sender, 'Expected integer')
 	else:
-		sender.sendMessage('/random [A] [B]')
+		SendError(sender, 'Usage: /random [A] [B]')
+
 	return True
 
 #effect
 @hook.command("eff", description="Get a custom potion effect!")
 def onCommandItemname(sender,args):
 	if len(args) == 0:
-		sender.sendMessage(color("c") + "You must have an argument -" + color("6") + " /eff [effect] [power] [duration]" + color("c") + " you can also use 'rem' and 'list' as effects, for special functions")
-		return False
+		SendError(sender, "You must have an argument -" + Color("6") + " /eff [effect] [power] [duration]" + Color("c") + " you can also use 'rem' and 'list' as effects, for special functions")
+		return True
 	
 	if args[0] == "rem":
 		if len(args) < 2:
 			for effect in sender.getActivePotionEffects():
 				sender.removePotionEffect(effect.getType())
+
 			return True
+
 		elif int(args[1]) < sender.getActivePotionEffects():
 			effect = sender.getActivePotionEffects()[int(args[1])]
 			sender.removePotionEffect(effect.getType())
+
 			return True
-	if args[0] == "list" and len(args) > 0:
-		
+
+	if args[0] == "list" and len(args) > 0:		
 		if len(args) < 2:
 			Bukkit.dispatchCommand(sender,"e")
-		
 		else:
-			Bukkit.dispatchCommand(sender,"e "+args[1])
+			Bukkit.dispatchCommand(sender,"e " + args[1])
+
 		return True
 	
 	if len(args) < 3:
-		sender.sendMessage(color("c") + "You must have the correct amount of arguments -" + color("6") + " /eff [effect] [power] [duration]")
-		return False
+		SendError(sender, "You must have the correct amount of arguments -" + Color("6") + " /eff [effect] [power] [duration]")
+		return True
 	
 	for i in range(1,2):
 		if args[i].isdigit() == False:
-			sender.sendMessage(color("c") + "Your power and duration must be integers -" + color("6") + " /eff [effect] [power] [duration]")
+			sender.sendMessage(Color("c") + "Your power and duration must be integers -" + Color("6") + " /eff [effect] [power] [duration]")
 			return False
 
 	args[0] = args[0].upper()
@@ -187,9 +194,11 @@ def onCommandItemname(sender,args):
 
 	if len(args) == 4:
 		receiver = Bukkit.getPlayer(args[3])
+
 		if receiver == None:
-			sender.sendMessage(color("c") + "Invalid player")
-			return False
+			SendError("Invalid player")
+			return True
+
 	else:
 		receiver = sender
 
@@ -200,12 +209,11 @@ def onCommandItemname(sender,args):
 #choice
 @hook.command("choose",description="For those hard important decisions that you can't leave to chance")
 def onCommandChoose(sender, args):
-
 	if not args:
-		sender.sendMessage(color("c") + 'You must have some things to choose between')
-		return False
+		SendError(sender, 'You must have some things to choose between')
+		return True
 
-	sender.sendMessage(color("5") + color("l") + 'You roll your magic dice!')
+	sender.sendMessage(Color("5") + Color("l") + 'You roll your magic dice!')
 	sender.sendMessage(random.choice(args))
 
 	return True

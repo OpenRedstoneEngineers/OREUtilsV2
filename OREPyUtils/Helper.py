@@ -14,13 +14,23 @@ def color(colors):
 def Colorify(text):
 	return re.sub("&(?=[?\da-fk-or])", u"\u00A7", text)
 
+'''
+Execute a command with root permissions
+'''
+def Sudo(Command):
+	Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Command)
 
-# Execute a command with root permissions
-def Sudo(command):
-	Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
+def Info(Message):
+	Bukkit.getServer().getLogger().log(Level.INFO, Message)
 
-def Info(message):
-	Bukkit.getServer().getLogger().log(Level.INFO, message)
+def Severe(Message):
+	Bukkit.getServer().getLogger().log(Level.SEVERE, Message)
 
-def Severe(message):
-	Bukkit.getServer().getLogger().log(Level.SEVERE, message)
+def SendInfo(Player, Message):
+	Player.sendMessage(Color("e") + "[INFO] " + Message)
+
+def SendWarning(Player, Message):
+	Player.sendMessage(Color("6") + "[WARNING] " + Message)
+
+def SendError(Player, Message):
+	Player.sendMessage(Color("c") + "[ERROR] " + Message)

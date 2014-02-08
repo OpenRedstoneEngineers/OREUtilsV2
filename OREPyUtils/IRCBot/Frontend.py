@@ -11,6 +11,8 @@ from org.bukkit import ChatColor
 
 from .. import Helper
 
+SendInfo, SendWarning, SendError = Helper.SendInfo, Helper.SendWarning, Helper.SendError # Hack
+
 class AliasInfo:
 	def __init__(self, name, isServer, srvcolor):
 		self.Name = name
@@ -61,7 +63,7 @@ class OREBot(IRCBot.IRCBot):
 		Bukkit.broadcastMessage(str(ChatColor.YELLOW) + name + " left IRC")
 
 	def OnPrivMsg(self, name, message):
-		Helper.Info("Private IRC message from %s: %s" % (name, message))
+		Info("Private IRC message from %s: %s" % (name, message))
 
 	def OnChanMsg(self, name, message):
 		if name in self.Muted:
@@ -98,17 +100,17 @@ def Terminate():
 @hook.command("ircadmin")
 def OnCommandIRCAdmin(sender, args):
 	if not sender.hasPermission("ore.irc.admin"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	if len(args) == 0:
-		sender.sendMessage("--- IRC Admin ---")
-		sender.sendMessage("status     - Connection status")
-		sender.sendMessage("disconnect - Disconnect from remote server")
-		sender.sendMessage("reconnect  - Reconnect to remote server")
-		sender.sendMessage("raw        - Send a raw command")
-		sender.sendMessage("mute       - Mute a particular player")
-		sender.sendMessage("unmute     - Guess. I dare you.")
+		SendInfo(sender, "--- IRC Admin ---")
+		SendInfo(sender, "status     - Connection status")
+		SendInfo(sender, "disconnect - Disconnect from remote server")
+		SendInfo(sender, "reconnect  - Reconnect to remote server")
+		SendInfo(sender, "raw        - Send a raw command")
+		SendInfo(sender, "mute       - Mute a particular player")
+		SendInfo(sender, "unmute     - Guess. I dare you.")
 
 		return True
 
@@ -116,17 +118,17 @@ def OnCommandIRCAdmin(sender, args):
 
 	if cmd == "status":
 		if Bot.running == True:
-			sender.sendMessage("Connected to %s:%i" % (OREBot.HOST, OREBot.PORT))
+			SendInfo(sender, "Connected to %s:%i" % (OREBot.HOST, OREBot.PORT))
 		else:
-			sender.sendMessage("No active connection")
+			SendWarning(sender, "No active connection")
 
 	elif cmd == "disconnect":
 		if Bot.running == True:
 			Bot.Quit()
 
-			sender.sendMessage("Disconnected from %s:%i" % (OREBot.HOST, OREBot.PORT))
+			SendInfo(sender, "Disconnected from %s:%i" % (OREBot.HOST, OREBot.PORT))
 		else:
-			sender.sendMessage("No active connection")
+			SendWarning(sender, "No active connection")
 
 	elif cmd == "reconnect":
 		if Bot.running == True:
@@ -134,32 +136,35 @@ def OnCommandIRCAdmin(sender, args):
 
 		Bot.__init__()
 
-		sender.sendMessage("Connected to %s:%i" % (OREBot.HOST, OREBot.PORT))
+		SendInfo(sender, "Connected to %s:%i" % (OREBot.HOST, OREBot.PORT))
 
 	elif cmd == "raw":
 		if Bot.running == True:
 			Bot.Send(' '.join(args[1:]) + "\r\n")
 		else:
-			sender.sendMessage("No active connection")
+			SendWarning(sender, "No active connection")
 
 	elif cmd == "mute":
 		if len(args) < 2:
-			sender.sendMessage("Muted players:")
+			SendInfo(sender, "Muted players:")
 
 			for name in OREBot.Muted:
-				sender.sendMessage("-" + name)
+				SendInfo(sender, "-" + name)
 		else:
 			OREBot.Muted.append(args[1])
 
 	elif cmd == "unmute":
 		if len(args) < 2:
-			sender.sendMessage("Muted players:")
+			SendInfo(sender, "Muted players:")
 
 			for name in OREBot.Muted:
-				sender.sendMessage("-" + name)
+				SendInfo(sender, "-" + name)
 		else:
 			if args[1] in OREBot.Muted:
 				OREBot.Muted.remove(args[1])
+
+	else:
+		SendError(sender, "Invalid action")
 		
 	return True
 

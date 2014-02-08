@@ -3,6 +3,8 @@ import Map
 
 from .. import Helper
 
+Info, SendInfo, SendError = Helper.Info, Helper.SendInfo, Helper.SendError # Hack
+
 from collections import defaultdict
 
 from org.bukkit.Bukkit import getWorlds
@@ -102,7 +104,7 @@ def InitManager(world):
 
 	Managers[world.getName()] = manager
 
-	Helper.Info("Initialized plot manager %s" % world.getName())
+	Info("Initialized plot manager %s" % world.getName())
 
 def InitManagers():
 	for world in getWorlds():
@@ -119,16 +121,16 @@ def onCommandPallow(sender, args):
 	name = sender.getName()
 	
 	if name not in manager.players:
-		sender.sendMessage('You do not own any plots')
+		SendError(sender, 'You do not own any plots')
 		return False
 
 	else:
 		if not args:
 			manager.AddAllowed(name, '*')
-			sender.sendMessage('All players, unless specifed by /pban, can build on your plot(s)')
+			SendInfo(sender, 'All players, unless specifed by /pban, can build on your plot(s)')
 		else:
 			manager.AddAllowed(name, args[1])
-			sender.sendMessage(args[1]+' can build on your plot(s)')
+			SendInfo(sender, args[1]+' can build on your plot(s)')
 
 	return True
 
@@ -139,16 +141,16 @@ def onCommandPunallow(sender, args):
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('You do not own any plots')
+		SendError(sender, 'You do not own any plots')
 		return True
 
 	else:
 		if not args:
 			manager.RemAllowed(name, '*')
-			sender.sendMessage('Players cannot build on your plot unless otherwise specified')
+			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
 		else:
 			manager.RemAllowed(name, args[1])
-			sender.sendMessage(args[1]+' cannot build on your plot unless otherwise specified')
+			SendInfo(sender, args[1]+' cannot build on your plot unless otherwise specified')
 
 	return True
 
@@ -159,7 +161,7 @@ def onCommandPWho(sender, args):
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('You do not own any plots')
+		SendError(sender, 'You do not own any plots')
 		return True
 
 	allowed = []
@@ -174,15 +176,15 @@ def onCommandPWho(sender, args):
 	allowed.sort()
 	banned.sort()
 
-	sender.sendMessage('Allowed players:')
+	SendInfo(sender, 'Allowed players:')
 
 	for allow in allowed:
-		 sender.sendMessage(' ' + allow)
+		 SendInfo(sender, ' ' + allow)
 
-	sender.sendMessage('Banned players:')
+	SendInfo(sender, 'Banned players:')
 
 	for ban in banned:
-		sender.sendMessage(' ' + ban)
+		SendInfo(sender, ' ' + ban)
 
 	return True
 	
@@ -193,7 +195,7 @@ def onCommandPallow(sender, args):
 	name = sender.getName()
 
 	if name not in manager.players:
-		sender.sendMessage('You do not own any plots')
+		SendError(sender, 'You do not own any plots')
 		return True
 
 	else:
@@ -201,8 +203,8 @@ def onCommandPallow(sender, args):
 			return False
 
 		else:
-			manager.addallowed(name, '- '+args[1])
-			sender.sendMessage(args[1] + ' can not build on your plot(s)')
+			manager.AddAllowed(name, '- '+args[1])
+			SendInfo(sender, args[1] + ' can not build on your plot(s)')
 
 	return True
 
@@ -227,10 +229,10 @@ def onCommandPInfo(sender, args):
 		y = pos[1]
 
 	if not manager.IsInRange(x, y):
-		sender.sendMessage("Out of range.")
+		SendError(sender, "Out of range.")
 		return True
 
-	sender.sendMessage(manager.Info(x, y))
+	SendInfo(sender, manager.Info(x, y))
 
 	return True
 
@@ -243,7 +245,7 @@ def onCommandPInfo(sender, args):
 @hook.command("preserve", usage="Usage: /preserve [x] [y]")
 def onCommandPreserve(sender, args):
 	if not sender.hasPermission("ore.plot.reserve"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 	
 	manager = GetManager_ByPlayer(sender)
@@ -255,7 +257,7 @@ def onCommandPreserve(sender, args):
 		z = int(args[1])
 		
 		if not manager.IsInRange(x,z):
-			sender.sendMessage("Out of range")
+			SendError(sender, "Out of range")
 			return True		
 
 		if len(args) > 2:
@@ -270,10 +272,10 @@ def onCommandPreserve(sender, args):
 		manager.Reserve(x,y,sender.getName(),reason)
 	
 	except Manager.PlotError, E:
-		sender.sendMessage(str(E))
+		SendError(sender, str(E))
 		return True
 	
-	sender.sendMessage("Plot reserved.")
+	SendInfo(sender, "Plot reserved.")
 
 	manager.MarkReserved(x, y)
 	
@@ -295,7 +297,7 @@ def onCommandPmap(sender, args):
 		y = int(args[1])
 
 		if not manager.IsInRange(x, y):
-			sender.sendMessage("Out of range.")
+			SendError(sender, "Out of range.")
 			return True
 
 	except:
@@ -303,7 +305,7 @@ def onCommandPmap(sender, args):
 			pos = GetCoords_Owner(args[0], manager)
 
 			if pos == None:
-				sender.sendMessage("No such plot.")
+				SendError(sender, "No such plot.")
 				return True
 			
 			x = pos[0]
@@ -315,7 +317,7 @@ def onCommandPmap(sender, args):
 				index = int(args[1])
 				
 				if index not in range(len(poses)):
-					sender.sendMessage("No such plot.")
+					SendError(sender, "No such plot.")
 					return True
 
 				x, y = poses[index]
@@ -327,7 +329,7 @@ def onCommandPmap(sender, args):
 			y = pos[1]
 
 			if not manager.IsInRange(x, y):
-				sender.sendMessage("Out of range.")
+				SendError(sender, "Out of range.")
 				return True
 
 	pos = manager.PlotToMapCoords(x, y)
@@ -358,7 +360,7 @@ def onCommandPwarp(sender, args):
 		y = int(args[1])
 
 		if not manager.IsInRange(x, y):
-			sender.sendMessage("Out of range.")
+			SendError(sender, "Out of range.")
 			return True
 
 	except:
@@ -366,7 +368,7 @@ def onCommandPwarp(sender, args):
 			pos = GetCoords_Owner(args[0], manager)
 
 			if pos == None:
-				sender.sendMessage("No such plot.")
+				SendError(sender, "No such plot.")
 				return True
 
 			x = pos[0]
@@ -378,7 +380,7 @@ def onCommandPwarp(sender, args):
 			index = int(args[1])
 	
 			if index not in range(len(poses)):
-				sender.sendMessage("No such plot.")
+				SendError(sender, "No such plot.")
 				return True
 
 			x, y = poses[index]
@@ -390,7 +392,7 @@ def onCommandPwarp(sender, args):
 			y = pos[1]
 
 			if not manager.IsInRange(x, y):
-				sender.sendMessage("Out of range.")
+				SendError(sender, "Out of range.")
 				return True
 
 	pos = manager.GetPlotCentre(x, y)
@@ -415,7 +417,7 @@ def onCommandPclaimAs(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.claimas"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return False
 
 	if len(args) < 1:
@@ -428,7 +430,7 @@ def onCommandPclaimAs(sender, args):
 		name = str(args[2])
 
 		if not manager.IsInRange(x, y):
-			sender.sendMessage("Out of range.")
+			SendError(sender, "Out of range.")
 			return True
 
 	except:
@@ -443,10 +445,10 @@ def onCommandPclaimAs(sender, args):
 		manager.Claim(x, y, name)
 
 	except Manager.PlotError, E:
-		sender.sendMessage(str(E))
+		SendError(sender, str(E))
 		return True
 		
-	sender.sendMessage("Plot claimed.")
+	SendInfo(sender, "Plot claimed.")
 	manager.MarkClaimed(x, y)
 	
 	return True
@@ -466,7 +468,7 @@ def onCommandPclaim(sender, args):
 		y = int(args[1])
 
 		if not manager.IsInRange(x, y):
-			sender.sendMessage("Out of range.")
+			SendError(sender, "Out of range.")
 			return True
 
 	except:
@@ -479,10 +481,10 @@ def onCommandPclaim(sender, args):
 		manager.Claim(x, y, sender.getName())
 
 	except Manager.PlotError, E:
-		sender.sendMessage(str(E))
+		SendError(sender, str(E))
 		return True
 
-	sender.sendMessage("Plot claimed.")
+	SendInfo(sender, "Plot claimed.")
 	manager.MarkClaimed(x, y)
 
 	return True
@@ -502,7 +504,7 @@ def onCommandPunclaim(sender, args):
 		y = int(args[1])
 
 		if not manager.IsInRange(x, y):
-			sender.sendMessage("Out of range.")
+			SendError(sender, "Out of range.")
 			return True
 
 	except:
@@ -515,10 +517,10 @@ def onCommandPunclaim(sender, args):
 		manager.Unclaim(x, y, sender.getName())
 
 	except Manager.PlotError, E:
-		sender.sendMessage(str(E))
+		SendError(sender, str(E))
 		return True
 
-	sender.sendMessage("Plot unclaimed.")
+	SendInfo(sender, "Plot unclaimed.")
 	manager.MarkUnclaimed(x, y)
 
 	return True
@@ -535,18 +537,17 @@ def onCommandPgenerate(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.generate"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	try:
 		manager.size.radius = int(args[0])
 	except:
-		pass
+		SendError(sender, "Please use an integer radius")
 
 	manager.Generate()
 
-
-	sender.sendMessage("Generated " + str(manager.GetNumPlots()) + " plots")
+	SendInfo(sender, "Generated " + str(manager.GetNumPlots()) + " plots")
 
 	return True
 
@@ -560,7 +561,7 @@ def onCommandPgive(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	if len(args) < 1:
@@ -570,7 +571,7 @@ def onCommandPgive(sender, args):
 
 	info.remPlots += 1
 
-	sender.sendMessage("User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
 	return True
 
@@ -584,7 +585,7 @@ def onCommandPtake(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
-		sender.sendMessage("No permission!")
+		SendError(sender, "No permission!")
 		return True
 
 	if len(args) < 1:
@@ -594,7 +595,7 @@ def onCommandPtake(sender, args):
 
 	info.remPlots -= 1
 
-	sender.sendMessage("User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
 	return True
 
@@ -614,18 +615,18 @@ def onCommandPsearch(sender, args):
 	reasonMatch = []
 
 
-	sender.sendMessage("Matches for owner:")
+	SendInfo(sender, "Matches for owner:")
 
 	for pos, plot in manager.plots.node.iteritems():
 		if "owner"  in plot and find in plot.owner:
-			sender.sendMessage(plot.Info())
+			SendInfo(sender, plot.Info())
 		if "reason" in plot and find in plot.reason:
 			reasonMatch.append(plot.Info())
 
-	sender.sendMessage("Matches for reason:")
+	SendInfo(sender, "Matches for reason:")
 
 	for reason in reasonMatch:
-		sender.sendMessage(reason)
+		SendInfo(sender, reason)
 
 	return True
 
@@ -639,7 +640,7 @@ def onCommandPusers(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not manager.plays:
-		sender.sendMessage("No users!")
+		SendError(sender, "No users!")
 
 	else:
 		names = []
@@ -647,6 +648,6 @@ def onCommandPusers(sender, args):
 		for name in manager.players.iterkeys():
 			names.append(name)
 
-		sender.sendMessage(', '.join(names))
+		SendInfo(sender, ', '.join(names))
 
 	return True
