@@ -15,7 +15,7 @@ def Plot2_CoordStr(X, Y):
 
 def LoadData1(Path):
 	try:
-		File = open(Path, "r")
+		File = open(Path, "rb")
 
 		return pickle.load(File)
 
@@ -38,7 +38,7 @@ def ConvertData(Plots, Players):
 		if Plot[0] == False:
 			Status = PlotStatus2.FREE
 	
-			OutData["Plots"][PlotTag]["Status"] = Status
+			OutData["Plots"][PlotTag]["status"] = Status
 
 		else:
 			Status = PlotStatus2.CLAIMED
@@ -47,9 +47,9 @@ def ConvertData(Plots, Players):
 			Index = Plot[1]
 			Date  = Plot[2]
 
-			OutData["Plots"][PlotTag]["Status"] = Status
-			OutData["Plots"][PlotTag]["Owner"]  = Owner
-			OutData["Plots"][PlotTag]["Date"]   = Date
+			OutData["Plots"][PlotTag]["status"] = Status
+			OutData["Plots"][PlotTag]["owner"]  = Owner
+			OutData["Plots"][PlotTag]["date"]   = Date
 
 	OutData["Players"] = {}
 
@@ -61,7 +61,19 @@ def ConvertData(Plots, Players):
 
 		OutData["Players"][Name] = {}
 
-		OutData["Players"][Name]["RemPlots"] = RemPlots
+		OutData["Players"][Name]["remPlots"] = RemPlots
+
+	OutData["Size"] = {}
+
+	OutData["Size"]["radius"] = 20
+	OutData["Size"]["x"]      = 256
+	OutData["Size"]["z"]      = 256
+
+	OutData["Size"]["pos"] = {}
+
+	OutData["Size"]["pos"]["x"] = 0
+	OutData["Size"]["pos"]["y"] = 0
+	OutData["Size"]["pos"]["z"] = 0
 
 	return OutData
 
@@ -82,7 +94,7 @@ def SaveNode2(File, Node, Embed=0):
 
 def SaveData2(Path, Data):
 	try:
-		File = open(Path, "w")
+		File = open(Path, "wb")
 
 		SaveNode2(File, Data)
 
@@ -99,10 +111,10 @@ else:
 if len(sys.argv) > 2:
 	InPlayerPath = sys.argv[2]
 else:
-	InPlayerPath = "Players.json"
+	InPlayerPath = "Players.xeodata"
 
 if len(sys.argv) > 3:
-	OutPath = sys.argv[2]
+	OutPath = sys.argv[3]
 else:
 	OutPath = "PlotData.json"
 
@@ -118,8 +130,10 @@ if PlayerData == None:
 	print "Could not read file %s" % InPlayerPath
 	exit(-1)
 
+OutData = {}
+
 try:
-	OutData = ConvertData(PlotData, PlayerData)
+	OutData["ORE"] = ConvertData(PlotData, PlayerData)
 except:
 	print "Corrupted data"
 	exit(-1)

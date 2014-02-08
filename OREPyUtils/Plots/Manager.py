@@ -19,8 +19,8 @@ class PlotBox:
 
 	def __getitem__(self, tuple):
 		name = "Plot_%s_%s" % tuple
-		if name in self.node:
 
+		if name in self.node:
 			return self.node[name]
 			
 		else:
