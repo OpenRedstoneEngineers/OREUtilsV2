@@ -8,7 +8,7 @@ Permission nodes:
 ore.inv
 """
 
-def LoadPreset(path):
+def OnEnable(path="InventoryPresets.json"):
 	global PresetFile, Presets
 	
 	PresetFile = PersistentData.NodeFile(path)

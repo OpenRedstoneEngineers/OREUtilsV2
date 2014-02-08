@@ -51,9 +51,15 @@ def onCommandNameFormat(sender, args):
 
 			del args[0]
 
+	for argi, arg in enumerate(args):	
+		preset = Presets.get(arg)
+
+		if preset:
+			args[argi] = preset
+
 	formats = []
 
-	for format in ' '.join(args):
+	for format in ''.join(args):
 		if format in Colours:
 			formats.append('&' + format)
 

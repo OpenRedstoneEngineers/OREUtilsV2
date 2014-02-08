@@ -136,6 +136,7 @@ def OnEnable():
 
 	Load('IRCBot', conf=CONFIG)
 	
+	Load('Inventory')
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',
 		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
