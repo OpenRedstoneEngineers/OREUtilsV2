@@ -37,7 +37,7 @@ def Distribute(list1, list2):
 	return ''.join(list1)
 
 @hook.command("nameformat", description="Colourify your name", usage="Usage: /nameformat [name] <format...>")
-def onCommandNameFormat(sender, args):
+def OnCommandNameFormat(sender, args):
 	if not args:
 		return False
 
@@ -71,13 +71,11 @@ def onCommandNameFormat(sender, args):
 
 		else:
 			SendError(sender, 'Invalid colour code (' + format + ')')
-			return False
+			return True
 
 	name = target.getName()
 
 	if formats:
 		Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
 
-		return True
-
-	return False
+	return True

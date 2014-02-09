@@ -1,18 +1,24 @@
 import org.bukkit.Bukkit as Bukkit
 
+from org.bukkit.inventory import ItemStack
+
 import re
 
 from java.util.logging import Level
 
-# Deprecated
-def Color(colors):
-	return ''.join([u'\u00A7' + color for color in colors])
-def color(colors):
-	return Color(colors)
+'''
+Constructs a colorcode string from the specified color sequence.
+
+NOTE: Deprecated.
+'''
+def Color(Colors):
+	return ''.join([u'\u00A7' + Color for Color in Colors])
 	
-# lets you use &-coded strings
-def Colorify(text):
-	return re.sub("&(?=[?\da-fk-or])", u"\u00A7", text)
+'''
+Transforms a &-encoded string to a colored one.
+'''
+def Colorify(Text):
+	return re.sub("&(?=[?\da-fk-or])", u"\u00A7", Text)
 
 '''
 Execute a command with root permissions
@@ -34,3 +40,9 @@ def SendWarning(Player, Message):
 
 def SendError(Player, Message):
 	Player.sendMessage(Color("c") + "[ERROR] " + Message)
+
+'''
+Give an item to the specified player.
+'''
+def GiveItem(Player, Type, Meta=0, Amount=1):
+	Player.getInventory().addItem(ItemStack(Type, Amount, Meta))

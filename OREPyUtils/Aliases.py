@@ -38,7 +38,7 @@ def OnCommandFast(sender, args):
 	return True
 
 @hook.command("quick", description="A version of /fast, made for buliding")
-def onCommandQuick(sender, args):
+def OnCommandQuick(sender, args):
 	for potion in sender.getActivePotionEffects(): 
 		sender.removePotionEffect(potion.getType())
 
@@ -59,7 +59,7 @@ def OnCommmandFixMe(sender, args):
 	return True
 
 @hook.command("join", description="Make someone join the server!", usage="/<command> <player> [location]")
-def onCommandJoin(sender, args):
+def OnCommandJoin(sender, args):
 	if not sender.hasPermission("ore.fun.join"):
 		SendError(sender, "No permission!")
 		return True
@@ -75,7 +75,7 @@ def onCommandJoin(sender, args):
 	return True
 
 @hook.command("leave", description="Make someone leave the server!", usage="/<command> <player>")
-def onCommandLeave(sender, args):
+def OnCommandLeave(sender, args):
 	if not sender.hasPermission("ore.fun.join"):
 		SendError(sender, "No permission!")
 		return True
@@ -88,7 +88,7 @@ def onCommandLeave(sender, args):
 	return True
 
 @hook.command("raw")
-def onCommandRaw(sender, args):
+def OnCommandRaw(sender, args):
 	if not sender.hasPermission("ore.raw"):
 		SendError(sender, "No permission!")
 		return True

@@ -67,12 +67,12 @@ def ConvertData(Plots, Players):
 
 	OutData["Size"]["radius"] = 20
 	OutData["Size"]["x"]      = 256
-	OutData["Size"]["z"]      = 256
+	OutData["Size"]["y"]      = 256
 
 	OutData["Size"]["pos"] = {}
 
 	OutData["Size"]["pos"]["x"] = 0
-	OutData["Size"]["pos"]["y"] = 0
+	OutData["Size"]["pos"]["y"] = 16
 	OutData["Size"]["pos"]["z"] = 0
 
 	return OutData
@@ -86,7 +86,7 @@ def SaveNode2(File, Node, Embed=0):
 		if isinstance(Value, dict):
 			SaveNode2(File, Value, Embed + 1)
 		else:
-			File.write(str(Value))
+			File.write(repr(Value))
 
 		File.write(",\n")
 

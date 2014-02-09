@@ -543,7 +543,7 @@ def onCommandPgenerate(sender, args):
 	try:
 		manager.size.radius = int(args[0])
 	except:
-		SendError(sender, "Please use an integer radius")
+		pass
 
 	manager.Generate()
 

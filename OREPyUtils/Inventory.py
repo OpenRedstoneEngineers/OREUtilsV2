@@ -4,11 +4,31 @@ import PersistentData
 
 from Helper import SendInfo, SendError
 
+from org.bukkit.inventory import ItemStack
+
 """
 Permission nodes:
 
 ore.inv
 """
+
+class ItemSlot(PersistentData.Node):
+	def __init__(self, Type, Data, Amount):
+		self.Type   = Type
+		self.Data   = Data
+		self.Amount = Amount
+
+	def Write(Player, SlotID):
+		Stack = ItemStack(self.Type, self.Amount, self.Data)
+
+		Player.getInventory().setItem(SlotID, Stack)
+
+	def Read(Player, SlotID):
+		Stack = Player.getInventory.getItem(SlotID)
+
+		self.Type   = Stack.getType()
+		self.Data   = Stack.getData()
+		self.Amount = Stack.getAmount()
 
 def OnEnable(path="InventoryPresets.json"):
 	global PresetFile, Presets

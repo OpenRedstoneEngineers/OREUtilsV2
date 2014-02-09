@@ -4,6 +4,9 @@ from Helper import Info, Severe
 
 import PersistentData
 
+from ast import literal_eval as Eval
+import traceback
+
 Failiures = {}
 
 DATA_PATH = "plugins/OREUtilsV2.py.dir/Data/"
@@ -23,13 +26,10 @@ class ConfigFile(PersistentData.NodeFile):
 
 CONFIG	= ConfigFile()
 
-Include = CONFIG['Include']
+Include = [key for key,value in CONFIG["Include"].iteritems() if value]
 
-if not isinstance(Include, list):
-	Include = []
-	Severe('[!]No Include list in config!')
-	Failiures['All'] = 'No Include list found in config'
 
+print(Include)
 
 def ImportFiles():
 	for N in Include:
@@ -45,7 +45,7 @@ def ImportFiles():
 			Info('[i]Imported ' + N)
 
 def Load(plugin, **kwargs):
-	if plugin not in Failiures:
+	if plugin not in Failiures and plugin in Include:
 		#try:
 		exec plugin + '.OnEnable(**kwargs)'
 		
@@ -100,11 +100,10 @@ def onCommandProperty(sender, args):
 			try:
 				value = Eval(' '.join(args[1:]))
 			except:
+				traceback.print_exc()
 				sender.sendMessage('Usage: /property [name] [value]')
 			else:
 				CONFIG[args[0]] = value
-
-		CONFIG.Dump()
 
 	return True
 
@@ -115,6 +114,7 @@ def OnCommandFail(sender, args):
 			sender.sendMessage('[!!]Module failed: ' + Failiures[Args[0]])
 		
 		elif args[0] in Include:
+			
 			sender.sendMessage('All is good')
 		
 		else:
@@ -146,6 +146,8 @@ def OnEnable():
 
 @hook.disable
 def OnDisable():
+	CONFIG.Dump()
+
 	Unload('Plots')
 	Unload('IRCBot')
 	Unload('Inventory')

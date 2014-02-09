@@ -172,3 +172,4 @@ def OnCommandOREHelp(sender,args):
 		sender.sendMessage(Color("e") + '====' + Color("c") + str(matches) + Color("6") + 'matches found' + Color("e") + '====')
 
 	return True
+
