@@ -26,18 +26,34 @@ Execute a command with root permissions
 def Sudo(Command):
 	Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Command)
 
+'''
+Log info
+'''
 def Info(Message):
 	Bukkit.getServer().getLogger().log(Level.INFO, Message)
 
+'''
+Log a severe error
+'''
 def Severe(Message):
 	Bukkit.getServer().getLogger().log(Level.SEVERE, Message)
 
+'''
+Send a plain text message to a player
+'''
 def SendInfo(Player, Message):
 	Player.sendMessage(Color("e") + "[INFO] " + Message)
 
+'''
+Send a warning message to a player.
+
+an error message is to be used when a command execution has an issus, but can continue.'''
 def SendWarning(Player, Message):
 	Player.sendMessage(Color("6") + "[WARNING] " + Message)
+'''
+Send an error message to a player.
 
+an error message is to be used when a command execution cannot continue.'''
 def SendError(Player, Message):
 	Player.sendMessage(Color("c") + "[ERROR] " + Message)
 
