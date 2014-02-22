@@ -13,7 +13,7 @@ NOTE: Deprecated.
 '''
 def Color(Colors):
 	return ''.join([u'\u00A7' + Color for Color in Colors])
-	
+
 '''
 Transforms a &-encoded string to a colored one.
 '''
@@ -47,13 +47,16 @@ def SendInfo(Player, Message):
 '''
 Send a warning message to a player.
 
-an error message is to be used when a command execution has an issus, but can continue.'''
+A warning message is to be used when a command execution has an issue, but can continue.
+'''
 def SendWarning(Player, Message):
 	Player.sendMessage(Color("6") + "[WARNING] " + Message)
+
 '''
 Send an error message to a player.
 
-an error message is to be used when a command execution cannot continue.'''
+An error message is to be used when a command execution cannot continue.
+'''
 def SendError(Player, Message):
 	Player.sendMessage(Color("c") + "[ERROR] " + Message)
 

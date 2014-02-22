@@ -26,10 +26,9 @@ class ConfigFile(PersistentData.NodeFile):
 
 CONFIG	= ConfigFile()
 
+CONFIG.node.properties.Ensure("Include", {})
 Include = [key for key,value in CONFIG["Include"].iteritems() if value]
 
-
-print(Include)
 
 def ImportFiles():
 	for N in Include:
@@ -46,6 +45,7 @@ def ImportFiles():
 
 def Load(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
+		print(plugin)
 		#try:
 		exec plugin + '.OnEnable(**kwargs)'
 		
@@ -55,7 +55,7 @@ def Load(plugin, **kwargs):
 		#	Failiures[plugin] = str(E)
 
 def Unload(plugin, **kwargs):
-	if plugin not in Failiures:
+	if plugin not in Failiures and plugin in Include:
 		try:
 			exec plugin + '.OnDisable(**kwargs)'
 
@@ -75,8 +75,6 @@ def CheckIsString(property, plugin):
 
 		return False
 
-def ConvertPath(path):
-	return path.replace('[path]', DATA_PATH)
 
 ImportFiles()
 
@@ -135,6 +133,8 @@ def OnEnable():
 	Load('Plots')
 	Load('IRCBot', conf=CONFIG)	
 	Load('Inventory')
+	Load('EventHooks', conf=CONFIG)
+	Load('Derps', conf=CONFIG)
 
 	CheckIsString('DerpPath', 'Derps')
 	TryExec('Derps',

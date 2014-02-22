@@ -14,8 +14,18 @@ ore.derp.reload
 
 Derps = []
 
-def LoadDerps(filename):
+def OnEnable(conf=None):
+	global Config
+	Config = conf.node.properties
+
+def LoadDerps():
 	global Derps
+
+	Config.Ensure("DerpPath", "")
+	Config.Ensure("MainPath", "")
+	filename = Config.DerpPath.replace("[path]", Config.MainPath)
+
+	print(filename)
 
 	with open(filename) as f:
 		Derps = [X.replace('\n', '') for X in f.xreadlines()]
@@ -38,7 +48,7 @@ def OnCommandDerp(sender, args):
 
 	if len(args) > 0 and not args[0].isdigit() and sender.hasPermission('ore.derp.reload'):
 		if args[0] == "reload":
-			LoadDerps("Data/Derps.txt")
+			LoadDerps()
 
 			SendInfo(sender, "Derps reloaded")
 
@@ -48,7 +58,7 @@ def OnCommandDerp(sender, args):
 
 	return True
 
-@hook.command("Derps", description="List available Derps")
+@hook.command("derps", description="List available Derps")
 def OnCommandDerps(sender, args):
 	for Counter, Derp in enumerate(Derps):
 		sender.sendMessage(Color("1") + str(Counter) + Color("f") + ": " + Color("a") + Derp)

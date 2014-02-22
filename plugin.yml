@@ -1,4 +1,4 @@
-name: OREUtils
+name: OREUtilsV2
 main: plugin.py
 in: plugin.py
 version: 1.0

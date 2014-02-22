@@ -2,34 +2,32 @@ from org.bukkit.Bukkit import broadcastMessage
 
 from Helper import Color, SendInfo, SendError
 
-TNT = True
+def OnEnable(conf=None):
+	global val
+	
+	val = conf.node.properties
 
-# TNT command
-@hook.command("tnt", description = "TNT is fun.")
-def OnCommandTNT(sender, args):
-	if not sender.hasPermission('ore.tnt'):
-		SendError(sender, "No permission!")
-		return True
-
-	global TNT
-
-	TNT = not TNT
-
-	broadcastMessage('TNT has been %sabled'%('re-en','dis')[TNT])
-		
-	return True
+	val.Ensure("TNT", False)
+	val.Ensure("Lamps", True)
 
 # TNT
 @hook.event("entity.ExplosionPrimeEvent", "high")
-def OnExplosionPrimeEvent(e):
+def OnExplosionPrimeEvent(event):
 	if TNT:
-		e.setCancelled(True)
+		event.setCancelled(True)
 
 # TNT Carts
 @hook.event("entity.EntityExplodeEvent", "high")
-def OnEntityExplodeEvent(e):
-	if TNT:
-		e.setCancelled(True)
+def OnEntityExplodeEvent(event):
+	if val.TNT:
+		event.setCancelled(True)
+
+# Lamps
+@hook.event("block.BlockPhysicsEvent", "High")
+def onBlockChanged(event):
+	if val.Lamps:
+		if event.getBlock().getTypeId() in [123, 124]:
+			event.setCancelled(True)
 
 # Banned items
 @hook.event("player.PlayerInteractEvent", "Monitor")
@@ -39,7 +37,9 @@ def OnPlayerClick(event):
 
 	player = event.getPlayer()
 
-	if player.hasPermission("".join(('ore.ban.', str(event.getItem().getTypeId())))):
+	ItemPermission = "ore.ban." + str(event.getItem().getTypeId())
+
+	if player.hasPermission(ItemPermission):
 		if not player.hasPermission("ore.ban.override"):
 			event.setCancelled(True)
 
@@ -57,27 +57,3 @@ def OnPlayerJoinEvent(event):
 	SendInfo(sender, "Your time was set to day.")
 
 	return True
-
-# Lamps command
-Lamps = False
-
-@hook.command("lamps", description="Toggle lamps")
-def OnCommandLamps(sender,args):
-	if not sender.hasPermission('ore.lamp'):
-		SendError(sender, "No permission!")
-		return True
-
-	global Lamps
-
-	Lamps = not Lamps
-
-	broadcastMessage('Lamps have been %sabled' % ('re-en', 'dis')[Lamps])
-
-	return True
-
-# Lamps
-@hook.event("block.BlockPhysicsEvent", "High")
-def onBlockChanged(event):
-	if Lamps:
-		if event.getBlock().getTypeId() in [123, 124]:
-			event.setCancelled(True)

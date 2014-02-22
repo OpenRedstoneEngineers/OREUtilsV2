@@ -60,6 +60,10 @@ class PlayerBox:
 
 			return new
 
+	def __iter__(self):
+		for name in self.playerNode:
+			yield name
+
 """
 @brief Base class for plot exceptions
 """
@@ -159,7 +163,7 @@ class Plot(PersistentData.Node):
 
 		if self.status == PlotStatus.CLAIMED:
 			if "reason" in self:
-				desc += "\nOwner: " + self.owner + "\nClaimed at: " + self.date + "\nDescription: "
+				desc += "\nOwner: " + self.owner + "\nClaimed at: " + self.date + "\nDescription: " + self.reason
 			else:
 				desc += "\nOwner: " + self.owner + "\nClaimed at: " + self.date
 		
@@ -180,7 +184,8 @@ class PlotManager:
 	"""
 	def AddAllowed(self, allower, allowed):
 		self.players[allower].Ensure('allowed', [])
-		self.players[allower].allowed.append(allowed)
+		if allowed not in self.players[allower].allowed:
+			self.players[allower].allowed.append(allowed)
 	
 	"""
 	@brief no longer allow allowed to build on allower's plots

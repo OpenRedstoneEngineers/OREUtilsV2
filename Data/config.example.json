@@ -1,5 +1,6 @@
 {
 'properties' :     {
+    'MainPath' : '/plugins/OREUtilsV2/Data/',
     'DerpPath' : '[path]Derps.txt',
     'HelpPath' : '[path]Help.txt',
     'Include' : {

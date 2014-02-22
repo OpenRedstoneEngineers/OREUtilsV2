@@ -39,16 +39,25 @@ class NodeManager:
 
 class NodeFile(NodeManager):
 	def __init__(self, filename, backend=JSONBackend, read=True):
+		self.filename = filename
+
 		if Exists(filename) and read:
 			data = open(filename).read()
 		else:
 			data = None
 
-		self.filename = filename
-
 		NodeManager.__init__(self, data, backend)
 
 	def Dump(self):
-		open(self.filename, 'w').write(str(self))
+		data = str(self)
+		file = open(self.filename+".blah", 'w')
+		file.write(data)
+		file.close()
+	
+		file = open(self.filename+".blah", "r")
+		if file.read() == data:
+			final = open(self.filename, "w")
+			final.write(data)
+			final.close()
 
-		print str(self)
+		file.close()

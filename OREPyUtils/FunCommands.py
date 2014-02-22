@@ -177,11 +177,11 @@ def OnCommandItemname(sender,args):
 
 			return True
 
-	if args[0] == "list" and len(args) > 0:		
+	if args[0] == "list":		
 		if len(args) < 2:
-			Bukkit.dispatchCommand(sender,"e")
+			Bukkit.dispatchCommand(sender, "e")
 		else:
-			Bukkit.dispatchCommand(sender,"e " + args[1])
+			Bukkit.dispatchCommand(sender, "e " + args[1])
 
 		return True
 	
@@ -195,8 +195,8 @@ def OnCommandItemname(sender,args):
 			return False
 
 	args[0] = args[0].upper()
-	args[0] = args[0].replace(" ","")
-	args[0] = args[0].replace(".","")
+	args[0] = args[0].replace(" ", "")
+	args[0] = args[0].replace(".", "")
 
 	if len(args) == 4:
 		receiver = Bukkit.getPlayer(args[3])
@@ -208,8 +208,12 @@ def OnCommandItemname(sender,args):
 	else:
 		receiver = sender
 
-	receiver.addPotionEffect(PotionEffect(eval("PotionEffectType."+args[0]+int(args[2])+(int(args[1])-1))))
-	
+	EffectStr = "PotionEffectType." + args[0]
+
+	try:
+		receiver.addPotionEffect(PotionEffect(eval(EffectStr), int(args[2]), int(args[1] - 1)))
+	except: sender.sendMessage("Invalid effect")	
+
 	return True
 	
 #choice
