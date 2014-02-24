@@ -1,38 +1,23 @@
-CC = g++
-CFLAGS = -O3 -Wall
+CC = gcc
+CFLAGS = -Wall -g
+LIBS= -pthread
+OBJS = bin/main.o bin/packet.o bin/routing.o
 
-OBJS = main.o Console.o Server.o Client.o ProtoServer.o Manager.o Auth.o RSAKey.o Handler.o
-
-build: $(OBJS) 
-	$(CC) -o OREd $(OBJS)
+build: bin/ $(OBJS) 
+	$(CC) $(OBJS) $(LIBS) -o OREd
 
 clean:
 	rm -f OREd $(OBJS)
 
-Console.o: src/Console.cpp src/Console.hpp
-	$(CC) $(CFLAGS) -c src/Console.cpp
+bin/:
+	mkdir bin
+	@echo "Making directory bin/."
 
-Server.o: src/Server.cpp src/Server.hpp
-	$(CC) $(CFLAGS) -c src/Server.cpp
+bin/main.o: src/main.c src/daemon.h src/routing.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
 
-Client.o: src/Client.cpp src/Client.hpp
-	$(CC) $(CFLAGS) -c src/Client.cpp
+bin/packet.o: src/packet.c src/packet.h src/routing.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
 
-ProtoServer.o: src/ProtoServer.cpp src/ProtoServer.hpp
-	$(CC) $(CFLAGS) -c src/ProtoServer.cpp
-
-Manager.o: src/Manager.cpp src/Manager.hpp
-	$(CC) $(CFLAGS) -c src/Manager.cpp
-
-Auth.o: src/Auth.cpp src/Auth.hpp
-	$(CC) $(CFLAGS) -c src/Auth.cpp
-
-RSAKey.o: src/RSAKey.cpp src/RSAKey.hpp
-	$(CC) $(CFLAGS) -c src/RSAKey.cpp
-
-Handler.o: src/Handler.cpp src/Handler.hpp
-	$(CC) $(CFLAGS) -c src/Handler.cpp
-
-main.o: src/main.cpp
-	$(CC) $(CFLAGS) -c src/main.cpp
-
+bin/routing.o: src/routing.c src/routing.h src/daemon.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@

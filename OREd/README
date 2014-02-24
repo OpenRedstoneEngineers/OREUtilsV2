@@ -12,8 +12,8 @@ sessions connect to each other over a SSL connecction. Currently, all
 ORE interfacing programs are clients to this network. They communicate
 with their local OREd via a unix socket. All messages are passed to
 either all clients, all clients of a category, or a specific
-client. Currently, there are three types of client.
-There are:
+client.
+Potential clients:
 
 >The clients that are built into OREd, allowing the network to control
      its routing nodes. (Start/stop/move servers.)
@@ -21,8 +21,8 @@ There are:
      servers provide most of the interfacing in the system.
 >Utility clients. Generally, does not receive commands, only sends and
      receives feedback.
+>Web clients: Web services for querying ORE's network status.
 
-OREd provides the following abilities beyond the network:
->MySQL configuration
->Bukkit server launching/stopping
-
+OREd's second component is a per-host OREd and service management client.
+This client deals with tasks such as starting and stopping servers,
+reconfiguring plugins and config files, and more.

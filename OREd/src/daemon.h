@@ -7,7 +7,6 @@
  *     2014-01-03 | Created file, added log | redstonewarrior
  * Description: This file contains process information and the log file fd.
  * Plans:
- *     -Possibly move to log.h and add helper methods?
  *
  * Further copyright information:
  *     Copyright (C) 2013 OpenRedstone
@@ -35,4 +34,31 @@
 /* Log file's fd. Implemented in main.c as of 2014-01-03. */
 extern int ore_logfd;
 
-#endif // __ORED_DAEMON_H
+/************************/
+/* Configuration Values */
+
+/* These are all static after daemonization.
+ * Do strdup(), if not NULL main free()s at
+ * kill.
+ */
+/* Various paths */
+extern char *ore_config;        /* '@' if stdin config.                 */
+extern char *ore_log;           /* NULL if not daemonized (debug mode.) */
+extern char *ore_java;          /* JVM executable.                      */
+extern char *ore_jar_flag;      /* Java jar flag.                       */
+extern char *ore_bukkit;        /* Bukkit jar path.                     */
+extern char *ore_plugins;       /* Bukkit plugin directory.             */
+
+/* OREd has multiple debugging modes, representing different levels
+ * of scrutiny. 0 is release mode, it will not output anything but
+ * errors and high level messages to the log file. (If you want nothing,
+ * redirect to /dev/null.) Level 1 shows detailed notes on everything but
+ * per-packet routing. (Save routing errors.) Also prints config on startup.
+ * Level 2 shows all available information on the system, including
+ * packet info spam.
+ */
+extern int   ore_debug;          /* 0 if normal, debug level if nonzero. */
+#endif /* __ORED_DAEMON_H */
+
+
+
