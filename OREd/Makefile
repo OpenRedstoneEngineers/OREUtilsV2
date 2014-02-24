@@ -1,44 +1,23 @@
-CC = g++
-CFLAGS = -O3 -Wall
+CC = gcc
+CFLAGS = -Wall -g
+LIBS= -pthread
+OBJS = bin/main.o bin/packet.o bin/routing.o
 
-OBJS = main.o Daemon.o Console.o Server.o Client.o ProtoServer.o Manager.o Log.o Auth.o RSAKey.o Handler.o
+build: bin/ $(OBJS) 
+	$(CC) $(OBJS) $(LIBS) -o OREd
 
-build: $(OBJS) 
-	$(CC) -o OREd $(OBJS)
-        
 clean:
 	rm -f OREd $(OBJS)
 
-Daemon.o: src/Daemon.cpp src/Daemon.hpp
-	$(CC) $(CFLAGS) -c src/Daemon.cpp
+bin/:
+	mkdir bin
+	@echo "Making directory bin/."
 
-Console.o: src/Console.cpp src/Console.hpp
-	$(CC) $(CFLAGS) -c src/Console.cpp
+bin/main.o: src/main.c src/daemon.h src/routing.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
 
-Server.o: src/Server.cpp src/Server.hpp
-	$(CC) $(CFLAGS) -c src/Server.cpp
+bin/packet.o: src/packet.c src/packet.h src/routing.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
 
-Client.o: src/Client.cpp src/Client.hpp
-	$(CC) $(CFLAGS) -c src/Client.cpp
-
-ProtoServer.o: src/ProtoServer.cpp src/ProtoServer.hpp
-	$(CC) $(CFLAGS) -c src/ProtoServer.cpp
-
-Manager.o: src/Manager.cpp src/Manager.hpp
-	$(CC) $(CFLAGS) -c src/Manager.cpp
-
-Log.o: src/Log.cpp src/Log.hpp
-	$(CC) $(CFLAGS) -c src/Log.cpp
-
-Auth.o: src/Auth.cpp src/Auth.hpp
-	$(CC) $(CFLAGS) -c src/Auth.cpp
-
-RSAKey.o: src/RSAKey.cpp src/RSAKey.hpp
-	$(CC) $(CFLAGS) -c src/RSAKey.cpp
-
-Handler.o: src/Handler.cpp src/Handler.hpp
-	$(CC) $(CFLAGS) -c src/Handler.cpp
-
-main.o: src/main.cpp
-	$(CC) $(CFLAGS) -c src/main.cpp
-
+bin/routing.o: src/routing.c src/routing.h src/daemon.h
+	$(CC) $(CFLAGS) -c $< $(LIBS) -o $@
