@@ -59,5 +59,8 @@ class NodeFile(NodeManager):
 			final = open(self.filename, "w")
 			final.write(data)
 			final.close()
+			file.close()
+			return True
 
 		file.close()
+		return False
