@@ -7,14 +7,16 @@ ore.bus
 from Helper import SendInfo, SendError
 
 class LastPoint:
-	def __init__(loc, power):
-		self.loc = loc
+	def __init__(self, loc, power=0):
+		self.loc   = loc
 		self.power = power
 
 LastPos = {}
 
 class Bus:
-	def __init__(self, x0, y0, z0, x1, y1, z1, world):
+	def __init__(self, x0, y0, z0, x1, y1, z1, world, power=0):
+		self.power = power
+
 		dx = (1 if x0 < x1 else -1)
 		dy = (1 if y0 < y1 else -1)
 		dz = (1 if z0 < z1 else -1)
@@ -22,8 +24,6 @@ class Bus:
 		self.x, self.y, self.z = x0, y0, z0
 
 		self.world = world
-
-		self.power = 0
 
 		while self.y != y1:
 			self.Draw()
@@ -77,7 +77,7 @@ def OnCommandBusStart(sender, args):
 
 	loc = sender.getLocation()
 
-	LastPos[sender.getName()] = loc
+	LastPos[sender.getName()] = LastPoint(loc)
 
 	SendInfo(sender, "Bus start: %d %d %d" % (loc.getX(), loc.getY(), loc.getZ()))
 
@@ -97,14 +97,16 @@ def OnCommandBusWaypoint(sender, args):
 
 	second = sender.getLocation()
 
-	LastPos[sender.getName()] = second
-
-	if first.getWorld() != second.getWorld():
+	if first.loc.getWorld() != second.getWorld():
 		SendError(sender, "World mismatch!")
 		
 	else:
 		SendInfo(sender, "Waypoint: %d %d %d" % (second.getX(), second.getY(), second.getZ()))
 
-		b = Bus(first.getBlockX(), first.getBlockY(), first.getBlockZ(), second.getBlockX(), second.getBlockY(), second.getBlockZ(), first.getWorld())
+		b = Bus(first.loc.getBlockX(), first.loc.getBlockY(), first.loc.getBlockZ(), \
+		           second.getBlockX(),    second.getBlockY(),    second.getBlockZ(), \
+		        first.loc.getWorld(), first.power)
+
+		LastPos[sender.getName()] = LastPoint(second, b.power)
 
 	return True

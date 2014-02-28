@@ -123,42 +123,39 @@ def SaveData():
 def GetPlot(sender, args, manager):
 	if args:
 
-		poses = GetAllCoords_Owner(args[0], manager)
 
-		if len(args) == 2:
-			try:
-				pos = [int(x) for x in args]
+		try:
+			pos = int(args[0]), int(args[1])
 
-				if manager.IsInRange(*pos):
-					return pos
+			if manager.IsInRange(*pos):
+				del args[:2]
+				return pos
+		except:pass
 
-			except:pass
+		try:
 			index = int(args[1])
 
-		else:
+		except:
 			index = 0
 
-		if index < len(poses):
-			return poses[index]
-
 		find = args[0].lower()
-
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
 			if "owner"  in plot and find in plot.owner.lower():
 				if not index:
+					del args[:2]
 					return pos
 				index -= 1
 			if "reason" in plot and find in plot.reason.lower():
 				if not index:
+					del args[:2]
 					return pos
 				index -= 1
-	else:
-		pos = GetCoords_Player_AbsOrMap(sender, manager)
+	pos = GetCoords_Player_AbsOrMap(sender, manager)
 
-		if manager.IsInRange(*pos):
-			return pos
+	if manager.IsInRange(*pos):
+		return pos
 		
 	SendError(sender, "Unknown plot.")
 	return False
