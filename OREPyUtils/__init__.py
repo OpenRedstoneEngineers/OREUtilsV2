@@ -52,14 +52,13 @@ def ImportFiles():
 """
 def Load(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
-		print(plugin)
-		#try:
-		exec plugin + '.OnEnable(**kwargs)'
+		try:
+			exec plugin + '.OnEnable(**kwargs)'
 		
-		#except Exception, E:
-		#	Severe('[!]Error with ' + plugin + ' '+str(E))
+		except Exception, E:
+			Severe('[!]Error with ' + plugin + ' '+str(E))
 
-		#	Failiures[plugin] = str(E)
+			Failiures[plugin] = str(E)
 
 """
 @brief Unload the specified module.
@@ -72,25 +71,11 @@ def Unload(plugin, **kwargs):
 		except Exception, E:
 			Severe('[!]Error with ' + plugin + ' ' + str(E))
 
-"""
-@brief Check whether the specified config property is a string or not.
-"""		
-def CheckIsString(property, plugin): # Obsolete
-	if isinstance(CONFIG[property], str):
-		return True
-
-	else:
-		Severe('[!]No ' + property + ' in config')
-
-		Failiures[plugin] = 'No ' + property + ' in config'
-
-		return False
-
 # Load the modules
 ImportFiles()
 
 @hook.command('property', description='Plugin properties')
-def onCommandProperty(sender, args):
+def OnCommandProperty(sender, args):
 	if not sender.hasPermission("ore.config"):
 		sender.sendMessage("No permission!")
 		return True

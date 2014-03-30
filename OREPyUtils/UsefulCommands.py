@@ -1,6 +1,7 @@
 from __future__ import division
 
 import os
+from ast import literal_eval as Eval
 
 from org.bukkit.Bukkit import dispatchCommand
 from org.bukkit.Bukkit import getPlayer
@@ -22,9 +23,10 @@ def OnEnable(conf=None):
 	filename = Config.HelpPath.replace("[path]", Config.MainPath)
 
 	try:
+		help = Eval(open(filename).read())
+
 		keys = help.keys()
 		keys.sort()
-		help = open(filename).read()
 
 	except:
 		Info("[!]Could not find help file")
@@ -149,34 +151,40 @@ def OnCommandPass(sender, args):
 	return True
 
 @hook.command('orehelp')
-def OnCommandOREHelp(sender,args):
+def OnCommandOREHelp(sender, args):
 	if len(args) == 0:
 		matches = len(keys)
 
 		for i in keys:
 			sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
-
-	elif args[0] in keys:
-		matches = 1
-
-		sender.sendMessage(Color("a") + '/' + Color("2") + args[0] + Color("a") + help[args[0]]['long'])
-	else:		
-		matches = 0 
-
-	for i in keys:
-		if i.find(args[0]) == 0:
-			matches += 1
-			sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
-
-	for i in keys:
-		if i.find(args[0]) > 0:
-			matches += 1
-			sender.sendMessage(Color("f") + '/' + ChatColor.GRAY + Color("f") + help[i]['short'])
-
-	if matches == 0:
-		sender.sendMessage(Color("c") + '====' + Color("4") + 'No matches found' + Color("c") + '====')
 	else:
-		sender.sendMessage(Color("e") + '====' + Color("c") + str(matches) + Color("6") + 'matches found' + Color("e") + '====')
+		# Full match
+		if args[0] in keys:
+			matches = 1
+
+			sender.sendMessage(Color("a") + '/' + Color("2") + args[0] + Color("a") + help[args[0]]['long'])
+
+		# Partial match
+		else:		
+			matches = 0 
+
+			# Starting with
+			for i in keys:
+				if i.find(args[0]) == 0:
+					matches += 1
+					sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
+
+			# Containing
+			for i in keys:
+				if i.find(args[0]) > 0:
+					matches += 1
+					sender.sendMessage(Color("e") + '/' + Color("6") + i + Color("e") + help[i]['short'])
+
+	# Print number of matches
+	if matches == 0:
+		sender.sendMessage(Color("c") + '==== ' + Color("4") + 'No matches found' + Color("c") + ' ====')
+	else:
+		sender.sendMessage(Color("e") + '==== ' + Color("c") + str(matches) + Color("6") + ' matches found' + Color("e") + ' ====')
 
 	return True
 
