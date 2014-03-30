@@ -11,13 +11,20 @@ from Helper import Color, Colorify, Info, SendInfo, SendError
 help = {}
 keys = []
 
-def OnEnable(**kwargs):
+def OnEnable(conf=None):
 	global help, keys
+
+	Config = conf.node.properties
+
+	Config.Ensure("HelpPath", "")
+	Config.Ensure("MainPath", "")
+
+	filename = Config.HelpPath.replace("[path]", Config.MainPath)
 
 	try:
 		keys = help.keys()
 		keys.sort()
-		help = open(kwargs['path']).read()
+		help = open(filename).read()
 
 	except:
 		Info("[!]Could not find help file")

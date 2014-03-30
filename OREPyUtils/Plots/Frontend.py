@@ -20,10 +20,13 @@ ore.plot.claimas
 ore.plot.generate
 """
 
+"""
+WorldName(str) <-> Manager
+"""
 Managers = {}
 
 """
-@brief Get plot coords, either actual, or representative on the map
+@brief Get plot coords, either actual, or representative on the map.
 """
 def GetCoords_AbsOrMap(x, y, manager):
 	if manager.IsOnMap(x, y):
@@ -32,7 +35,7 @@ def GetCoords_AbsOrMap(x, y, manager):
 		return manager.GetPlotCoords(x, y)
 
 """
-@brief Get the actual plot coords of a player
+@brief Get the actual plot coords of a player.
 """
 def GetCoords_Player(sender, manager):
 	loc = sender.getLocation()
@@ -43,7 +46,7 @@ def GetCoords_Player(sender, manager):
 	return manager.GetPlotCoords(x, y)
 
 """
-@brief Get a player's plot coords, either actual, or representative on the map
+@brief Get a player's plot coords, either actual, or representative on the map.
 """
 def GetCoords_Player_AbsOrMap(sender, manager):
 	loc = sender.getLocation()
@@ -54,7 +57,7 @@ def GetCoords_Player_AbsOrMap(sender, manager):
 	return GetCoords_AbsOrMap(x, y, manager)
 	
 """
-@brief Get the coords of the first plot of a player
+@brief Get the coords of the first plot of a player.
 """
 def GetCoords_Owner(owner, manager):
 	fullName = GetPlayer_Match(owner, manager)
@@ -67,22 +70,27 @@ def GetCoords_Owner(owner, manager):
 			if fullName == plot.owner:
 				return pos
 
+"""
+@brief Retrieve the full name of a player from a partial one.
+"""
 def GetPlayer_Match(player, manager):
 	player = player.lower()
-	players = dict((s.lower(),s) for s in manager.players.playerNode)
+
+	players = dict((s.lower(), s) for s in manager.players.playerNode)
 	
+	# Full match
 	if player in players:
 		return players[player]
-	
-	else:
-		for match in players:
-			if player in match:
-				return players[match]
+
+	# Partial match
+	for match in players:
+		if player in match:
+			return players[match]
 
 	return None
 
 """
-@brief Get the coords of all plots of a player
+@brief Get the coords of all plots of a player.
 """
 def GetAllCoords_Owner(owner, manager): 
 	fullName = GetPlayer_Match(owner, manager)
@@ -98,39 +106,51 @@ def GetAllCoords_Owner(owner, manager):
 
 	return Coords
 
+"""
+@brief Get the plot manager responsible for the world the specified player is in.
+"""
 def GetManager_ByPlayer(sender):
 	return Managers[str(sender.getWorld().getName())]
 
+"""
+@brief Initialize the plot manager of the specified world.
+"""
 def InitManager(world):
 	manager = Map.PlotMap(world)
 
 	manager.LoadOrCreate(world.getName() + "/PlotData.json")
 
+	# Generate in-game plot map
 	manager.Generate()
 
 	Managers[world.getName()] = manager
 
 	Info("Initialized plot manager %s" % world.getName())
 
+"""
+@brief Initialize the plot managers of all loaded worlds.
+"""
 def InitManagers():
 	for world in getWorlds():
 		InitManager(world)
 
+"""
+@brief Serialize the plot data to disk.
+"""
 def SaveData():
 	for world, manager in Managers.iteritems():
 		manager.Save(world + "/PlotData.json")
 
 def GetPlot(sender, args, manager):
 	if args:
-
-
 		try:
 			pos = int(args[0]), int(args[1])
 
 			if manager.IsInRange(*pos):
 				del args[:2]
 				return pos
-		except:pass
+		except:
+			pass
 
 		try:
 			index = int(args[1])
@@ -142,16 +162,19 @@ def GetPlot(sender, args, manager):
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
+
 			if "owner"  in plot and find in plot.owner.lower():
 				if not index:
 					del args[:2]
 					return pos
 				index -= 1
+
 			if "reason" in plot and find in plot.reason.lower():
 				if not index:
 					del args[:2]
 					return pos
 				index -= 1
+
 	pos = GetCoords_Player_AbsOrMap(sender, manager)
 
 	if manager.IsInRange(*pos):
@@ -162,7 +185,7 @@ def GetPlot(sender, args, manager):
 
 
 @hook.command("pallow", usage="Usage: /pallow <name>")
-def onCommandPallow(sender, args):
+def OnCommandPallow(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
@@ -177,12 +200,12 @@ def onCommandPallow(sender, args):
 			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
 		else:
 			manager.AddAllowed(name, args[0])
-			SendInfo(sender, args[0]+' can build on your plot(s)')
+			SendInfo(sender, args[0] + ' can build on your plot(s)')
 
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
-def onCommandPunallow(sender, args):
+def OnCommandPunallow(sender, args):
 	manager = GetManager_ByPlayer(sender) 
 
 	name = sender.getName()
@@ -202,7 +225,7 @@ def onCommandPunallow(sender, args):
 	return True
 
 @hook.command("pwho", usage="Usage: /pwho")
-def onCommandPWho(sender, args):
+def OnCommandPWho(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
 	name = sender.getName()
@@ -218,8 +241,8 @@ def onCommandPWho(sender, args):
 
 	if 'allowed' not in player:
 		SendError(sender, "You do not have any permissions set up")
-	else:
 
+	else:
 		for allow in player.allowed:
 			if allow.startswith('- '):
 				banned.append(allow)
@@ -239,8 +262,7 @@ def onCommandPWho(sender, args):
 	for ban in banned:
 		SendInfo(sender, ' ' + ban)
 
-	return True
-	
+	return True	
 
 """
 @brief /pinfo
@@ -249,7 +271,7 @@ def onCommandPWho(sender, args):
 /pinfo
 """
 @hook.command("pinfo", usage="Usage: /pinfo [x] [y]")
-def onCommandPInfo(sender, args):
+def OnCommandPInfo(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	try:
@@ -277,7 +299,7 @@ def onCommandPInfo(sender, args):
 /preserve
 """
 @hook.command("preserve", usage="Usage: /preserve [x] [y]")
-def onCommandPreserve(sender, args):
+def OnCommandPreserve(sender, args):
 	if not sender.hasPermission("ore.plot.reserve"):
 		SendError(sender, "No permission!")
 		return True
@@ -323,7 +345,7 @@ def onCommandPreserve(sender, args):
 /pmap
 """
 @hook.command("pmap", usage="Usage: /pmap [x] [y] OR /pmap <owner>")
-def onCommandPmap(sender, args):
+def OnCommandPmap(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	x, y = GetPlot(sender, args, manager)
@@ -348,7 +370,7 @@ def onCommandPmap(sender, args):
 /pwarp
 """
 @hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner>")
-def onCommandPwarp(sender, args):
+def OnCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
 	try:
@@ -368,7 +390,6 @@ def onCommandPwarp(sender, args):
 	except:
 		traceback.print_exc()
 
-
 """
 @brief /pclaimas
 
@@ -376,7 +397,7 @@ def onCommandPwarp(sender, args):
 /pclaimas Name
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
-def onCommandPclaimAs(sender, args):
+def OnCommandPclaimAs(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	x, y = GetPlot(sender, args, manager) 
@@ -400,7 +421,7 @@ def onCommandPclaimAs(sender, args):
 /pclaim
 """
 @hook.command("pclaim", usage="Usage: /pclaim [x] [z]")
-def onCommandPclaim(sender, args):
+def OnCommandPclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	x, y = GetPlot(sender, args, manager) 
@@ -428,7 +449,7 @@ def onCommandPclaim(sender, args):
 /punclaim
 """
 @hook.command("punclaim", usage="Usage: /punclaim [x] [z]")
-def onCommandPunclaim(sender, args):
+def OnCommandPunclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	x, y = GetPlot(sender, args, manager) 
@@ -453,7 +474,7 @@ def onCommandPunclaim(sender, args):
 /pgenerate
 """
 @hook.command("pgenerate", usage="Usage: /pgenerate [radius]")
-def onCommandPgenerate(sender, args):
+def OnCommandPgenerate(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.generate"):
@@ -477,7 +498,7 @@ def onCommandPgenerate(sender, args):
 /pgive Name Amount
 """
 @hook.command("pgive", usage="Usage: /pgive <name> <amount>")
-def onCommandPgive(sender, args):
+def OnCommandPgive(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
@@ -501,7 +522,7 @@ def onCommandPgive(sender, args):
 /ptake Name Amount
 """
 @hook.command("ptake", usage="Usage: /ptake <name> <amount>")
-def onCommandPtake(sender, args):
+def OnCommandPtake(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not sender.hasPermission("ore.plot.give"):
@@ -525,22 +546,24 @@ def onCommandPtake(sender, args):
 /psearch Name
 """
 @hook.command("psearch", usage="Usage: /psearch <name>")
-def onCommandPsearch(sender, args):
+def OnCommandPsearch(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if len(args) < 1:
 		return False
 
 	find = ' '.join(args).lower()
-	reasonMatch = []
 
+	reasonMatch = []
 
 	SendInfo(sender, "Matches for owner:")
 
 	for pos, plot in manager.plots.node.iteritems():
-		pos = "%s, %s"%tuple(pos.split("_")[1:])
+		pos = "%s, %s" % tuple(pos.split("_")[1:])
+
 		if "owner"  in plot and find in plot.owner.lower():
 			SendInfo(sender, pos+"\n"+plot.Info())
+
 		if "reason" in plot and find in plot.reason.lower():
 			reasonMatch.append(pos+"\n"+plot.Info())
 
@@ -557,7 +580,7 @@ def onCommandPsearch(sender, args):
 /pusers
 """
 @hook.command("pusers", usage="Usage: /pusers")
-def onCommandPusers(sender, args):
+def OnCommandPusers(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	if not manager.players:

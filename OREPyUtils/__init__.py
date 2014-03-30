@@ -24,25 +24,32 @@ class ConfigFile(PersistentData.NodeFile):
 	def __setitem__(self, name, value):
 		self.node.properties.Set(name, value)
 
+# Configuration file
 CONFIG	= ConfigFile()
 
+# Module names
 CONFIG.node.properties.Ensure("Include", {})
 Include = [key for key,value in CONFIG["Include"].iteritems() if value]
 
-
+"""
+@brief Try to import the specified modules.
+"""
 def ImportFiles():
-	for N in Include:
+	for module in Include:
 		try:
-			exec 'import ' + N
+			exec 'import ' + module
 
 		except Exception, E:
-			Severe('[!]Error importing ' + N)
+			Severe('[!]Error importing ' + module)
 
-			Failiures[N] = str(E)
+			Failiures[module] = str(E)
 	
 		else:
-			Info('[i]Imported ' + N)
+			Info('[i]Imported ' + module)
 
+"""
+@brief Enable the specified module.
+"""
 def Load(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
 		print(plugin)
@@ -54,6 +61,9 @@ def Load(plugin, **kwargs):
 
 		#	Failiures[plugin] = str(E)
 
+"""
+@brief Unload the specified module.
+"""
 def Unload(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
 		try:
@@ -61,10 +71,11 @@ def Unload(plugin, **kwargs):
 
 		except Exception, E:
 			Severe('[!]Error with ' + plugin + ' ' + str(E))
-#temp
-def TryExec(*args):pass
-		
-def CheckIsString(property, plugin):
+
+"""
+@brief Check whether the specified config property is a string or not.
+"""		
+def CheckIsString(property, plugin): # Obsolete
 	if isinstance(CONFIG[property], str):
 		return True
 
@@ -75,7 +86,7 @@ def CheckIsString(property, plugin):
 
 		return False
 
-
+# Load the modules
 ImportFiles()
 
 @hook.command('property', description='Plugin properties')
@@ -111,8 +122,7 @@ def OnCommandFail(sender, args):
 		if args[0] in Failiures:
 			sender.sendMessage('[!!]Module failed: ' + Failiures[Args[0]])
 		
-		elif args[0] in Include:
-			
+		elif args[0] in Include:	
 			sender.sendMessage('All is good')
 		
 		else:
@@ -135,14 +145,7 @@ def OnEnable():
 	Load('Inventory')
 	Load('EventHooks', conf=CONFIG)
 	Load('Derps', conf=CONFIG)
-
-	CheckIsString('DerpPath', 'Derps')
-	TryExec('Derps',
-		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
-
-	CheckIsString('HelpPath', 'UsefulCommands')
-	TryExec('UsefulCommands', 
-		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
+	Load('UsefulCommands', conf=CONFIG)
 
 @hook.disable
 def OnDisable():
