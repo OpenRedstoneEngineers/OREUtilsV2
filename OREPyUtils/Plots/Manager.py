@@ -49,12 +49,12 @@ class PlayerBox:
 	def __init__(self, playerNode):
 		self.playerNode = playerNode
 
-	def __getitem__(self, name):
+	def __getitem__(self, uuid):
 		try:
-			return self.playerNode[name]
+			return self.playerNode[uuid]
 
 		except Exception:
-			new = self.playerNode.New(name)
+			new = self.playerNode.New(uuid)
 
 			new.remPlots = 1
 
@@ -130,27 +130,29 @@ class Plot(PersistentData.Node):
 	"""
 	@brief Claim this plot.
 	"""
-	def Claim(self, ownerName, reason):
+	def Claim(self, ownerUUID, ownern, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.owner)
+			raise OwnerError(self.ownerUUID)
 
 		if reason:
 			self.reason = reason
 
 		self.status = PlotStatus.CLAIMED
-		self.owner  = ownerName
+                self.ownerid = ownerUUID
+                self.owner = ownern
 		self.date   = ctime()
 
 	"""
 	@brief Reserve this plot.
 	"""
-	def Reserve(self, ownerName, reason):
+	def Reserve(self, ownerUUID, ownern, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.owner)
+			raise OwnerError(self.ownerUUID)
 
-		self.owner  = ownerName 
-		self.status = PlotStatus.RESERVED 
+		self.ownerid = ownerUUID
+		self.status = PlotStatus.RESERVED
 		self.date   = ctime()
+		self.owner = ownern
 
 		if reason:
 			self.reason = reason
@@ -199,10 +201,10 @@ class PlotManager:
 	"""
 	@return whether someone can build on a plot
 	"""
-	def CanBuild(self, x, y, name):
+	def CanBuild(self, x, y, uuid):
 		all = self.WhoCanBuild(x, y)
 
-		return name in all or ('*' in all and '! '+name not in all)
+		return uuid in all or ('*' in all and '! '+uuid not in all)
 
 	"""
 	@return whether the specified plot exists
@@ -215,40 +217,41 @@ class PlotManager:
 	@return get a list of everyone who can build on a plot
 	"""
 	def WhoCanBuild(self, x, y):
-		owner = self.plots[(x, y)].owner
+		owner = self.plots[(x, y)].ownerid
 		
 		return [owner] + self.players[owner].allowed
 		
 	"""
 	@brief Claim the specified plot.
 	"""
-	def Claim(self, x, y, name="server",reason=""):
+	def Claim(self, x, y, uuid="server", name="server", reason=""):
 		plot = self.plots[(x, y)]
 
-		owner = self.players[name]
+                owner = self.players[uuid]
+                self.players[uuid].Name = name
 
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
 		owner.remPlots -= 1
 
-		plot.Claim(name, reason)
+		plot.Claim(uuid, name, reason)
 
 	"""
 	@brief Unclaim the specified plot.
 	"""
-	def Unclaim(self, x, y, name):
+	def Unclaim(self, x, y, uuid, name):
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			if plot.owner == name:
+			if plot.ownerid == uuid:
 				del self.plots[(x, y)]
 
-				owner = self.players[name]
+				owner = self.players[uuid]
 				owner.remPlots += 1
 
 			else:
-				raise OwnerError(plot.owner)
+				raise OwnerError(plot.owneruuid)
 		else:
 			raise UnclaimedError()
 
@@ -259,7 +262,7 @@ class PlotManager:
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			owner = self.players[plot.owner]
+			owner = self.players[plot.owneruuid]
 			owner.remplots += 1
 
 		del self.plots[(x,y)]
@@ -267,18 +270,18 @@ class PlotManager:
 	"""
 	@brief Reserve the specified plot.
 	"""
-	def Reserve(self, x, y, name="server", reason=""):
+	def Reserve(self, x, y, uuid="server", name="server", reason=""):
 		plot = self.plots[(x, y)]
 
-		plot.Reserve(name, reason)
+		plot.Reserve(uuid, name, reason)
 
 	"""
 	@return the description of the specified plot.
 	"""
 	def Info(self, x, y):
-		plot = self.plots[(x, y)]
+                plot = self.plots[(x, y)]
 
-		return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info()
+                return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info()
 
 	"""
 	@return the number of plots.
@@ -315,7 +318,7 @@ class PlotManager:
 
 		self.file.node.Ensure("ORE")
 
-		self.file.node.ORE.Ensure("Players")   
+		self.file.node.ORE.Ensure("Players")
 
 		self.plotsNode = self.file.node.ORE.Ensure("Plots")
 

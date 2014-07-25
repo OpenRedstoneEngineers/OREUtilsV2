@@ -159,25 +159,47 @@ def GetPlot(sender, args, manager):
 		
 	SendError(sender, "Unknown plot.")
 	return False
+"""
+@brief returns a user's name from the uuid's of the current online users and the local database
+"""
+def getNameFromUUID(sender, uuid):
+        manager = GetManager_ByPlayer(sender)
+        if uuid in manager.players:
+                return manager.players[uuid].Name
+        
+        raise Exception
+        
+"""
+@brief returns a user's UUID from the names of the current online users and the local database
+"""
+def getUUIDFromName(sender, name):
+        manager = GetManager_ByPlayer(sender)
 
-
+        for u in manager.players:
+                if u.Name == name:
+                        return str(u)
+        raise Exception
+        
 @hook.command("pallow", usage="Usage: /pallow <name>")
 def onCommandPallow(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
-	name = sender.getName()
+	uuid = str(sender.getUniqueId())
 	
-	if name not in manager.players:
+	if uuid not in manager.players:
 		SendError(sender, 'You do not own any plots')
-		return False
+		return True
 
 	else:
 		if not args:
-			manager.AddAllowed(str(name), '*')
+			manager.AddAllowed(uuid, '*')
 			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
 		else:
-			manager.AddAllowed(name, args[0])
-			SendInfo(sender, args[0]+' can build on your plot(s)')
+                        try:
+                                manager.AddAllowed(uuid, getUUIDFromName(args[0]))
+                                SendInfo(sender, args[0]+' can build on your plot(s)')
+                        except Exception as E:
+                                SendError(sender, 'User does not appear in our database!')
 
 	return True
 
@@ -185,19 +207,22 @@ def onCommandPallow(sender, args):
 def onCommandPunallow(sender, args):
 	manager = GetManager_ByPlayer(sender) 
 
-	name = sender.getName()
+	uuid = str(sender.getUniqueId())
 
-	if name not in manager.players:
+	if uuid not in manager.players:
 		SendError(sender, 'You do not own any plots')
 		return True
 
 	else:
 		if not args:
-			manager.RemAllowed(str(name), '*')
+			manager.RemAllowed(uuid, '*')
 			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
 		else:
-			manager.RemAllowed(name, args[0])
-			SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
+                        try:
+                                manager.RemAllowed(uuid, getUUIDFromName(args[0]))
+                                SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
+                        except Exception:
+                                SendError(sender, 'Player does not appear in our database!')
 
 	return True
 
@@ -205,16 +230,16 @@ def onCommandPunallow(sender, args):
 def onCommandPWho(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
-	name = sender.getName()
+	uuid = str(sender.getUniqueId())
 
-	if name not in manager.players:
+	if uuid not in manager.players:
 		SendError(sender, 'You do not own any plots')
 		return True
 
 	allowed = []
 	banned  = []
 
-	player = manager.players[name]
+	player = manager.players[uuid]
 
 	if 'allowed' not in player:
 		SendError(sender, "You do not have any permissions set up")
@@ -261,11 +286,13 @@ def onCommandPInfo(sender, args):
 
 		x = pos[0]
 		y = pos[1]
-
-	if not manager.IsInRange(x, y):
-		SendError(sender, "Out of range.")
-		return True
-
+        try:
+                if not manager.IsInRange(x, y):
+                        SendError(sender, "Out of range.")
+                        return True
+        except Exception, E:
+                SendError(sender, str(E))
+                return True
 	SendInfo(sender, manager.Info(x, y))
 
 	return True
@@ -303,7 +330,10 @@ def onCommandPreserve(sender, args):
 			reason = ' '.join(args)
 
 	try:
-		manager.Reserve(x,y,sender.getName(),reason)
+		manager.Reserve(x,y,sender.getUniqueId(),reason)
+	except Exception:
+                SendError(sender, 'User does not appear in our database!')
+                return True
 	
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
@@ -377,13 +407,19 @@ def onCommandPwarp(sender, args):
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
 def onCommandPclaimAs(sender, args):
-	manager = GetManager_ByPlayer(sender)
+        try:
+                manager = GetManager_ByPlayer(sender)
 
-	x, y = GetPlot(sender, args, manager) 
+                x, y = GetPlot(sender, args, manager)
+        except Exception as E:
+                SendError(sender, str(E))
+                return True
 
 	try:
-		manager.Claim(x, y, name)
-
+		manager.Claim(x, y, getUUIDFromName(sender, name))
+        except Exception:
+                SendError(sender, 'User does not appear in our database!')
+                return True
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
@@ -403,18 +439,21 @@ def onCommandPclaimAs(sender, args):
 def onCommandPclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
-	x, y = GetPlot(sender, args, manager) 
+	x, y = GetPlot(sender, args, manager)
 
 	try:
 
 		if args:
-			manager.Claim(x, y, sender.getName(), ' '.join(args))
+			manager.Claim(x, y, sender.getUniqueId(), sender.getName(), ' '.join(args))
 		else:
-			manager.Claim(x, y, sender.getName())
+			manager.Claim(x, y, sender.getUniqueId(), sender.getName())
 
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
+	except Exception as E:
+                SendError(sender, str(E))
+                return True
 
 	SendInfo(sender, "Plot claimed.")
 	manager.MarkClaimed(x, y)
@@ -434,7 +473,7 @@ def onCommandPunclaim(sender, args):
 	x, y = GetPlot(sender, args, manager) 
 
 	try:
-		manager.Unclaim(x, y, sender.getName())
+		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
 
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
@@ -486,8 +525,11 @@ def onCommandPgive(sender, args):
 
 	if len(args) < 1:
 		return False
-
-	info = manager.players[args[0]]
+        try:
+                info = manager.players[getUUIDFromName(sender, args[0])]
+        except Exception:
+                SendError(sender, 'User does not appear in our database!')
+                return True
 
 	info.remPlots += 1
 
@@ -511,8 +553,12 @@ def onCommandPtake(sender, args):
 	if len(args) < 1:
 		return False
 
-	info = manager.players[args[0]]
-
+        try:
+                info = manager.players[getUUIDFromName(sender, args[0])]
+        except Exception:
+                SendError(sender, 'User does not appear in our database!')
+                return True
+        
 	info.remPlots -= 1
 
 	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
@@ -539,8 +585,12 @@ def onCommandPsearch(sender, args):
 
 	for pos, plot in manager.plots.node.iteritems():
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
-		if "owner"  in plot and find in plot.owner.lower():
-			SendInfo(sender, pos+"\n"+plot.Info())
+		try:
+                        if "owner" in plot and find in plot.owner.lower():
+                                SendInfo(sender, pos+"\n"+plot.Info())
+                except Exception as E:
+                        SendError(sender, str(E))
+                        return True
 		if "reason" in plot and find in plot.reason.lower():
 			reasonMatch.append(pos+"\n"+plot.Info())
 
@@ -566,8 +616,8 @@ def onCommandPusers(sender, args):
 	else:
 		names = []
 
-		for name in manager.players:
-			names.append(name)
+		for uuid in manager.players:
+                        names.append(getNameFromUUID(sender, uuid))
 
 		SendInfo(sender, ', '.join(names))
 
