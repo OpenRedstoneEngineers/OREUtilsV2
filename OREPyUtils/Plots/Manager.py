@@ -232,9 +232,9 @@ class PlotManager:
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
-		owner.remPlots -= 1
-
                 plot.Claim(self.players[str(uuid)].Name, uuid, reason)
+
+                owner.remPlots -= 1
 
 	"""
 	@brief Unclaim the specified plot.
