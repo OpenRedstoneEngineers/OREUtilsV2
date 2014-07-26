@@ -492,26 +492,18 @@ def onCommandPclaim(sender, args):
 """
 @hook.command("punclaim", usage="Usage: /punclaim [x] [z]")
 def onCommandPunclaim(sender, args):
-        try:
-                manager = GetManager_ByPlayer(sender)
-                x, y = GetPlot(sender, args, manager)
-        except Exception as E:
-                SendError(sender, str(E))
-                return True
+        manager = GetManager_ByPlayer(sender)
+        x, y = GetPlot(sender, args, manager)
 
 	try:
 		manager.Unclaim(x, y, sender.getUniqueId())
-
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
-
-        try:
-                SendInfo(sender, "Plot unclaimed.")
-                manager.MarkUnclaimed(x, y)
-	except Exception as E:
-                SendError(sender, str(E))
-
+	
+        SendInfo(sender, "Plot unclaimed.")
+        manager.MarkUnclaimed(x, y)
+                
 	return True
 
 """

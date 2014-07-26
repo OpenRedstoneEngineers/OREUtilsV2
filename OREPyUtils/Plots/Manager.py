@@ -184,19 +184,19 @@ class PlotManager:
 	@brief allow allowed to build on allower's plots 
 	"""
 	def AddAllowed(self, allower, allowed):
-		self.players[allower].Ensure('allowed', [])
-		if allowed not in self.players[allower].allowed:
-			self.players[allower].allowed.append(allowed)
+		self.players[str(allower)].Ensure('allowed', [])
+		if allowed not in self.players[str(allower)].allowed:
+			self.players[str(allower)].allowed.append(allowed)
 	
 	"""
 	@brief no longer allow allowed to build on allower's plots
 	"""
 	def RemAllowed(self, allower, allowed):
-		if 'allowed' in self.players[allower]:
-			if allowed in self.players[allower].allowed:
-				self.players[allower].allowed.remove(allowed)
-			if self.players[allower].allowed:
-				del self.players[allower].allowed
+		if 'allowed' in self.players[str(allower)]:
+			if allowed in self.players[str(allower)].allowed:
+				self.players[str(allower)].allowed.remove(allowed)
+			if self.players[str(allower)].allowed:
+				del self.players[str(allower)].allowed
 	"""
 	@return whether someone can build on a plot
 	"""
@@ -243,14 +243,14 @@ class PlotManager:
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			if plot.ownerid == uuid:
+			if str(plot.ownerid) == str(uuid):
 				del self.plots[(x, y)]
 
-				owner = self.players[uuid]
+				owner = self.players[str(uuid)]
 				owner.remPlots += 1
 
 			else:
-				raise OwnerError(players[plot.owneruuid].Name)
+				raise OwnerError(self.players[str(plot.ownerid)].Name)
 		else:
 			raise UnclaimedError()
 
@@ -261,7 +261,7 @@ class PlotManager:
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
-			owner = self.players[plot.owneruuid]
+			owner = self.players[str(plot.ownerid)]
 			owner.remplots += 1
 
 		del self.plots[(x,y)]
