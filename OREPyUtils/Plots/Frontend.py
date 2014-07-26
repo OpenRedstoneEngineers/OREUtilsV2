@@ -162,6 +162,7 @@ def GetPlot(sender, args, manager):
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
+
 			if "ownerid"  in plot and find in getNameFromUUID(sender, plot.ownerid):
 				if not index:
 					del args[:2]
@@ -444,7 +445,6 @@ def OnCommandPwarp(sender, args):
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
 def onCommandPclaimAs(sender, args):
-<<<<<<< HEAD
         try:
                 manager = GetManager_ByPlayer(sender)
                 x, y = GetPlot(sender, args, manager)
@@ -459,19 +459,6 @@ def onCommandPclaimAs(sender, args):
         except Exception as E:
                 SendError(sender, str(E))
                 return True
-=======
-        manager = GetManager_ByPlayer(sender)
-        x, y = GetPlot(sender, args, manager)
-        name = ''
-
-        if len(args) == 3:
-                name = str(args[2])
-        elif len(args) == 1:
-                name = str(args[0])
-        else:
-                return False
-
->>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 	try:
 		manager.Claim(x, y, getUUIDFromName(sender, name), name)
         except Exception as E:
