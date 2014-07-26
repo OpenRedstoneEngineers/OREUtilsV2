@@ -5,15 +5,17 @@ import xml.etree.ElementTree as ET
 from .. import Helper
 
 class PlotMap(Manager.PlotManager):
-	BLOCK_RESERVED    = (159,10, 0)
-	BLOCK_ON          = (159, 3, 0)
-	BLOCK_OFF         = (159, 0, 0)
-	BLOCK_FRAME_X     = (1,   0, 0)
-	BLOCK_FRAME_Y     = (1,   0, 0)
-	BLOCK_FRAME_CROSS = (1,   0, 0)
-	BLOCK_BASE        = (1,   0, 0)
-
 	def __init__(self, world):
+		self.BLOCK_RESERVED       = Config["PlotMap.TopBlocks.Reserved"]
+		self.BLOCK_ON             = Config["PlotMap.TopBlocks.On"]
+		self.BLOCK_OFF            = Config["PlotMap.TopBlocks.Off"]
+		self.BLOCK_FRAME_X        = Config["PlotMap.TopBlocks.Frame.X"]
+		self.BLOCK_FRAME_Y        = Config["PlotMap.TopBlocks.Frame.Y"]
+		self.BLOCK_FRAME_CROSS    = Config["PlotMap.TopBlocks.Frame.Cross"]
+		self.BLOCK_BASE           = Config["PlotMap.TopBlocks.Base"]
+		self.BLOCK_BELOW_ON       = Config["PlotMap.BottomBlocks.On"]
+		self.BLOCK_BELOW_OFF      = Config["PlotMap.BottomBlocks.Off"]
+		self.BLOCK_BELOW_RESERVED = Config["PlotMap.BottomBlocks.Reserved"]
 		self.world = world
 
 	"""
@@ -62,21 +64,30 @@ class PlotMap(Manager.PlotManager):
 	def MarkPlotFrame(self, x, y):
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_FRAME_Y)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_FRAME_Y)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 2).setTypeIdAndData(*self.BLOCK_FRAME_X)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 2).setTypeIdAndData(*self.BLOCK_FRAME_X)
 
+
+		if x == self.size.radius-1 || y == self.size.radius-1:
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_FRAME_Y)
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_FRAME_Y)
+			self.world.getBlockAt(position[0],     self.size.pos.y, position[1] + 1).setTypeIdAndData(*self.BLOCK_FRAME_X)
+			self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] + 1).setTypeIdAndData(*self.BLOCK_FRAME_X)
+
+		"""
 		if x == self.size.radius-1:
-			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
-			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_Y)
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_FRAME_Y)
+			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_FRAME_Y)
 
 		if y == self.size.radius-1:
-			self.world.getBlockAt(position[0],     self.size.pos.y, position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
-			self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] + 1).setTypeIdAndData(*PlotMap.BLOCK_FRAME_X)
+			self.world.getBlockAt(position[0],     self.size.pos.y, position[1] + 1).setTypeIdAndData(*self.BLOCK_FRAME_X)
+			self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] + 1).setTypeIdAndData(*self.BLOCK_FRAME_X)
+		"""
 
 
-		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 2).setTypeIdAndData(*PlotMap.BLOCK_FRAME_CROSS)
+		self.world.getBlockAt(position[0] - 2, self.size.pos.y, position[1] - 2).setTypeIdAndData(*self.BLOCK_FRAME_CROSS)
 
 	"""
 	@brief Mark the plot at the specified position as reserved.
@@ -87,11 +98,14 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_RESERVED)
-
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_RESERVED)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_RESERVED)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_RESERVED)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_RESERVED)
 	"""
 	@brief Mark the plot at the specified position as claimed.
 	"""
@@ -101,10 +115,14 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_ON)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_ON)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_ON)
 
 	"""
 	@brief Mark the plot at the specified position as unclaimed.
@@ -115,10 +133,14 @@ class PlotMap(Manager.PlotManager):
 
 		position = self.PlotToMapCoords(x, y)
 
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
-		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*PlotMap.BLOCK_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1]    ).setTypeIdAndData(*self.BLOCK_BELOW_OFF)
+		self.world.getBlockAt(position[0],     self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_OFF)
+		self.world.getBlockAt(position[0] - 1, self.size.pos.y - 1, position[1] - 1).setTypeIdAndData(*self.BLOCK_BELOW_OFF)
 
 	"""
 	@brief Generate a plot map with the specified size.
@@ -136,7 +158,7 @@ class PlotMap(Manager.PlotManager):
 						self.MarkClaimed(x, y, frame=True)
 	
 					elif status == Manager.PlotStatus.RESERVED:
-						self.MarkReserved(x, y, frame=True)		
+						self.MarkReserved(x, y, frame=True)
 				else:
 					self.MarkUnclaimed(x, y, frame=True)
 				
