@@ -24,36 +24,45 @@ class ConfigFile(PersistentData.NodeFile):
 	def __setitem__(self, name, value):
 		self.node.properties.Set(name, value)
 
+# Configuration file
 CONFIG	= ConfigFile()
 
+# Module names
 CONFIG.node.properties.Ensure("Include", {})
 Include = [key for key,value in CONFIG["Include"].iteritems() if value]
 
-
+"""
+@brief Try to import the specified modules.
+"""
 def ImportFiles():
-	for N in Include:
+	for module in Include:
 		try:
-			exec 'import ' + N
+			exec 'import ' + module
 
 		except Exception, E:
-			Severe('[!]Error importing ' + N)
+			Severe('[!]Error importing ' + module)
 
-			Failiures[N] = str(E)
+			Failiures[module] = str(E)
 	
 		else:
-			Info('[i]Imported ' + N)
+			Info('[i]Imported ' + module)
 
+"""
+@brief Enable the specified module.
+"""
 def Load(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
-		print(plugin)
-		#try:
-		exec plugin + '.OnEnable(**kwargs)'
+		try:
+			exec plugin + '.OnEnable(**kwargs)'
 		
-		#except Exception, E:
-		#	Severe('[!]Error with ' + plugin + ' '+str(E))
+		except Exception, E:
+			Severe('[!]Error with ' + plugin + ' '+str(E))
 
-		#	Failiures[plugin] = str(E)
+			Failiures[plugin] = str(E)
 
+"""
+@brief Unload the specified module.
+"""
 def Unload(plugin, **kwargs):
 	if plugin not in Failiures and plugin in Include:
 		try:
@@ -61,25 +70,12 @@ def Unload(plugin, **kwargs):
 
 		except Exception, E:
 			Severe('[!]Error with ' + plugin + ' ' + str(E))
-#temp
-def TryExec(*args):pass
-		
-def CheckIsString(property, plugin):
-	if isinstance(CONFIG[property], str):
-		return True
 
-	else:
-		Severe('[!]No ' + property + ' in config')
-
-		Failiures[plugin] = 'No ' + property + ' in config'
-
-		return False
-
-
+# Load the modules
 ImportFiles()
 
 @hook.command('property', description='Plugin properties')
-def onCommandProperty(sender, args):
+def OnCommandProperty(sender, args):
 	if not sender.hasPermission("ore.config"):
 		sender.sendMessage("No permission!")
 		return True
@@ -111,8 +107,7 @@ def OnCommandFail(sender, args):
 		if args[0] in Failiures:
 			sender.sendMessage('[!!]Module failed: ' + Failiures[Args[0]])
 		
-		elif args[0] in Include:
-			
+		elif args[0] in Include:	
 			sender.sendMessage('All is good')
 		
 		else:
@@ -130,19 +125,12 @@ def OnCommandFail(sender, args):
 	
 @hook.enable
 def OnEnable():
-	Load('Plots')
+	Load('Plots', conf=CONFIG)
 	Load('IRCBot', conf=CONFIG)	
 	Load('Inventory')
 	Load('EventHooks', conf=CONFIG)
 	Load('Derps', conf=CONFIG)
-
-	CheckIsString('DerpPath', 'Derps')
-	TryExec('Derps',
-		'LoadDerps(ConvertPath(CONFIG["DerpPath"]))')
-
-	CheckIsString('HelpPath', 'UsefulCommands')
-	TryExec('UsefulCommands', 
-		'LoadHelp(ConvertPath(CONFIG["HelpPath"]))')
+	Load('UsefulCommands', conf=CONFIG)
 
 @hook.disable
 def OnDisable():
