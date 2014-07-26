@@ -142,7 +142,7 @@ def GetPlot(sender, args, manager):
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
-			if "owner"  in plot and find in plot.owner.lower():
+			if "ownerid"  in plot and find in getNameFromUUID(plot.ownerid):
 				if not index:
 					del args[:2]
 					return pos
@@ -174,17 +174,34 @@ def getNameFromUUID(sender, uuid):
 """
 def getUUIDFromName(sender, ownname):
         manager = GetManager_ByPlayer(sender)
-        u = str(sender.getUniqueId())
         SendInfo(sender, 'Starting search for %s'%ownname)
 
         for uuid in manager.players:
                 SendInfo(sender, 'Looking at player %s'%str(uuid))
-                if "Name" in manager.players[uuid] and manager.players[uuid].Name == name:
+                if "Name" in manager.players[uuid] and manager.players[uuid].Name == ownname:
                         SendInfo(sender, 'Found!')
                         return str(uuid)
                 elif "Name" not in manager.players[uuid]:
                         manager.players[uuid].Name = None
         raise Exception
+
+"""
+@breif update database
+"""
+@hook.event("player.PlayerJoinEvent", "Normal")
+def OnPlayerJoinEvent(event):
+        try:
+                sender = event.getPlayer()
+                manager = GetManager_ByPlayer(sender)
+                uuid = sender.getUniqueId()
+
+                if uuid in manager.players and manager.players[uuid].Name != sender.getName():
+                        manager.players[uuid].Name = sender.getName()
+        
+                return True
+        except Exception as E:
+                SendError(event.getPlayer(), str(E))
+                return True
         
 @hook.command("pallow", usage="Usage: /pallow <name>")
 def onCommandPallow(sender, args):
@@ -292,13 +309,11 @@ def onCommandPInfo(sender, args):
 
 		x = pos[0]
 		y = pos[1]
-        try:
-                if not manager.IsInRange(x, y):
-                        SendError(sender, "Out of range.")
-                        return True
-        except Exception, E:
-                SendError(sender, str(E))
+		
+        if not manager.IsInRange(x, y):
+                SendError(sender, "Out of range.")
                 return True
+
 	SendInfo(sender, manager.Info(x, y))
 
 	return True
@@ -334,13 +349,8 @@ def onCommandPreserve(sender, args):
 		
 		if args:
 			reason = ' '.join(args)
-
-	try:
-		manager.Reserve(x,y,sender.getUniqueId(),reason)
-	except Exception:
-                SendError(sender, 'User does not appear in our database!')
-                return True
-	
+        try:
+                manager.Reserve(x,y,sender.getUniqueId(),reason)
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
@@ -482,7 +492,7 @@ def onCommandPunclaim(sender, args):
 	x, y = GetPlot(sender, args, manager) 
 
 	try:
-		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
+		manager.Unclaim(x, y, sender.getUniqueId())
 
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
