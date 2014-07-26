@@ -138,7 +138,7 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = args[0].lower()
+		find = ' '.join(args[0]).lower()
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
@@ -172,12 +172,18 @@ def getNameFromUUID(sender, uuid):
 """
 @brief returns a user's UUID from the names of the current online users and the local database
 """
-def getUUIDFromName(sender, name):
+def getUUIDFromName(sender, ownname):
         manager = GetManager_ByPlayer(sender)
+        u = str(sender.getUniqueId())
+        SendInfo(sender, 'Starting search for %s'%ownname)
 
-        for u in manager.players:
-                if u.Name == name:
-                        return str(u)
+        for uuid in manager.players:
+                SendInfo(sender, 'Looking at player %s'%str(uuid))
+                if "Name" in manager.players[uuid] and manager.players[uuid].Name == name:
+                        SendInfo(sender, 'Found!')
+                        return str(uuid)
+                elif "Name" not in manager.players[uuid]:
+                        manager.players[uuid].Name = None
         raise Exception
         
 @hook.command("pallow", usage="Usage: /pallow <name>")
@@ -407,26 +413,29 @@ def onCommandPwarp(sender, args):
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
 def onCommandPclaimAs(sender, args):
-        try:
-                manager = GetManager_ByPlayer(sender)
+        manager = GetManager_ByPlayer(sender)
+        x, y = GetPlot(sender, args, manager)
+        name = ''
 
-                x, y = GetPlot(sender, args, manager)
-        except Exception as E:
-                SendError(sender, str(E))
-                return True
+        if len(args) == 3:
+                name = str(args[2])
+        elif len(args) == 1:
+                name = str(args[0])
+        else:
+                return False
 
 	try:
 		manager.Claim(x, y, getUUIDFromName(sender, name))
-        except Exception:
-                SendError(sender, 'User does not appear in our database!')
+        except Exception as E:
+                SendError(sender, str(E))
                 return True
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
-		
+
 	SendInfo(sender, "Plot claimed.")
 	manager.MarkClaimed(x, y)
-	
+
 	return True
 
 """

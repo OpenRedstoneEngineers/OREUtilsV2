@@ -61,8 +61,9 @@ class PlayerBox:
 			return new
 
 	def __iter__(self):
-		for name in self.playerNode:
-			yield name
+		for uuid in self.playerNode:
+			yield uuid
+
 
 """
 @brief Base class for plot exceptions
@@ -132,7 +133,7 @@ class Plot(PersistentData.Node):
 	"""
 	def Claim(self, ownerUUID, ownern, reason):
 		if not self.IsClaimable():
-			raise OwnerError(self.ownerUUID)
+			raise OwnerError(self.owner)
 
 		if reason:
 			self.reason = reason
@@ -228,7 +229,7 @@ class PlotManager:
 		plot = self.plots[(x, y)]
 
                 owner = self.players[uuid]
-                self.players[uuid].Name = name
+                owner.Name = name
 
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
