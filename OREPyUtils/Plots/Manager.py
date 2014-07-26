@@ -131,9 +131,9 @@ class Plot(PersistentData.Node):
 	"""
 	@brief Claim this plot.
 	"""
-	def Claim(self, ownerUUID, reason):
+	def Claim(self, owner, ownerUUID, reason):
 		if not self.IsClaimable():
-			raise OwnerError(node[self.owner].Name)
+			raise OwnerError(owner)
 
 		if reason:
 			self.reason = reason
@@ -145,9 +145,9 @@ class Plot(PersistentData.Node):
 	"""
 	@brief Reserve this plot.
 	"""
-	def Reserve(self, node, ownerUUID, reason):
+	def Reserve(self, owner, ownerUUID, reason):
 		if not self.IsClaimable():
-			raise OwnerError(node[self.ownerUUID].Name)
+			raise OwnerError(owner)
 
 		self.ownerid = ownerUUID
 		self.status = PlotStatus.RESERVED
@@ -159,20 +159,20 @@ class Plot(PersistentData.Node):
 	"""
 	@return a description of this plot.
 	"""
-	def Info(self, node):
+	def Info(self, owner):
 		desc = "Status: " + PlotStatus.ToStr(self.status)
 
 		if self.status == PlotStatus.CLAIMED:
 			if "reason" in self:
-				desc += "\nOwner: " + node[self.ownerid].Name + "\nClaimed at: " + self.date + "\nDescription: " + self.reason
+				desc += "\nOwner: " + owner + "\nClaimed at: " + self.date + "\nDescription: " + self.reason
 			else:
-				desc += "\nOwner: " + node[self.ownerid].Name  + "\nClaimed at: " + self.date
+				desc += "\nOwner: " + owner  + "\nClaimed at: " + self.date
 		
 		elif self.status == PlotStatus.RESERVED:
 			if "reason" in self:
-				desc += "\nReservee: " + node[self.ownerid].Name + "\nReserved at: " + self.date + "\nReason: " + self.reason
+				desc += "\nReservee: " + owner + "\nReserved at: " + self.date + "\nReason: " + self.reason
 			else:
-				desc += "\nReservee: " + node[self.ownerid].Name + "\nReserved at: " + self.date
+				desc += "\nReservee: " + owner + "\nReserved at: " + self.date
 
 		return desc
 
@@ -218,7 +218,7 @@ class PlotManager:
 	def WhoCanBuild(self, x, y):
 		owner = self.plots[(x, y)].ownerid
 		
-		return [owner] + self.players[owner].allowed
+		return [owner] + self.players[str(owner)].allowed
 		
 	"""
 	@brief Claim the specified plot.
@@ -226,15 +226,15 @@ class PlotManager:
 	def Claim(self, x, y, uuid, name, reason=""):
 		plot = self.plots[(x, y)]
 
-                owner = self.players[uuid]
-                owner.Name = name
+                owner = self.players[str(uuid)]
+                self.players[str(uuid)].Name = name
 
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
 		owner.remPlots -= 1
 
-                plot.Claim(self.players, uuid, reason)
+                plot.Claim(self.players[str(uuid)].Name, uuid, reason)
 
 	"""
 	@brief Unclaim the specified plot.
@@ -269,10 +269,13 @@ class PlotManager:
 	"""
 	@brief Reserve the specified plot.
 	"""
-	def Reserve(self, x, y, uuid="server", reason=""):
+	def Reserve(self, x, y, uuid, name, reason=""):
 		plot = self.plots[(x, y)]
 
-		plot.Reserve(self.players, uuid, reason)
+		owner = self.players[str(uuid)]
+		self.players[str(uuid)].Name = name
+
+		plot.Reserve(self.players[str(uuid)].Name, uuid, reason)
 
 	"""
 	@return the description of the specified plot.
@@ -280,7 +283,10 @@ class PlotManager:
 	def Info(self, x, y):
                 plot = self.plots[(x, y)]
 
-                return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info(self.players)
+                if 'ownerid' in plot:
+                        return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info(self.players[str(plot.ownerid)].Name)
+                else:
+                      return "Plot (" + str(x) + ", " + str(y) + ")\n" + plot.Info(" ")  
 
 	"""
 	@return the number of plots.
