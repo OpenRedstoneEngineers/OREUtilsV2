@@ -248,6 +248,9 @@ def OnCommandPallow(sender, args):
                         except Exception as E:
                                 SendError(sender, 'User does not appear in our database!')
 
+			manager.AddAllowed(name, args[0])
+			SendInfo(sender, args[0] + ' can build on your plot(s)')
+
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
@@ -444,6 +447,7 @@ def OnCommandPwarp(sender, args):
 /pclaimas Name
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
+<<<<<<< HEAD
 def onCommandPclaimAs(sender, args):
         try:
                 manager = GetManager_ByPlayer(sender)
@@ -459,6 +463,19 @@ def onCommandPclaimAs(sender, args):
         except Exception as E:
                 SendError(sender, str(E))
                 return True
+
+def onCommandPclaimAs(sender, args):
+        manager = GetManager_ByPlayer(sender)
+        x, y = GetPlot(sender, args, manager)
+        name = ''
+
+        if len(args) == 3:
+                name = str(args[2])
+        elif len(args) == 1:
+                name = str(args[0])
+        else:
+                return False
+
 	try:
 		manager.Claim(x, y, getUUIDFromName(sender, name), name)
         except Exception as E:
@@ -624,6 +641,7 @@ def OnCommandPsearch(sender, args):
 
 	SendInfo(sender, "Matches for owner:")
 	for pos, plot in manager.plots.node.iteritems():
+
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
                         if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, find)):
