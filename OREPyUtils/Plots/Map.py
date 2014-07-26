@@ -70,7 +70,7 @@ class PlotMap(Manager.PlotManager):
 		self.world.getBlockAt(position[0] - 1, self.size.pos.y, position[1] - 2).setTypeIdAndData(*self.BLOCK_FRAME_X)
 
 
-		if x == self.size.radius-1 || y == self.size.radius-1:
+		if x == self.size.radius-1 or y == self.size.radius-1:
 			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1]    ).setTypeIdAndData(*self.BLOCK_FRAME_Y)
 			self.world.getBlockAt(position[0] + 1, self.size.pos.y, position[1] - 1).setTypeIdAndData(*self.BLOCK_FRAME_Y)
 			self.world.getBlockAt(position[0],     self.size.pos.y, position[1] + 1).setTypeIdAndData(*self.BLOCK_FRAME_X)
