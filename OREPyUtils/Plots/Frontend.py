@@ -220,7 +220,7 @@ def onCommandPallow(sender, args):
 			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
 		else:
                         try:
-                                manager.AddAllowed(uuid, getUUIDFromName(args[0]))
+                                manager.AddAllowed(uuid, getUUIDFromName(sender, str(args[0])))
                                 SendInfo(sender, args[0]+' can build on your plot(s)')
                         except Exception as E:
                                 SendError(sender, 'User does not appear in our database!')
@@ -243,7 +243,7 @@ def onCommandPunallow(sender, args):
 			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
 		else:
                         try:
-                                manager.RemAllowed(uuid, getUUIDFromName(args[0]))
+                                manager.RemAllowed(uuid, getUUIDFromName(sender, str(args[0])))
                                 SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
                         except Exception:
                                 SendError(sender, 'Player does not appear in our database!')
@@ -271,9 +271,9 @@ def onCommandPWho(sender, args):
 
 		for allow in player.allowed:
 			if allow.startswith('- '):
-				banned.append(allow)
+				banned.append(getNameFromUUID(sender, allow))
 			else:
-				allowed.append(allow)
+				allowed.append(getNameFromUUID(sender, allow))
 
 	allowed.sort()
 	banned.sort()
@@ -599,22 +599,21 @@ def onCommandPsearch(sender, args):
 	if len(args) < 1:
 		return False
 
-	find = ' '.join(args).lower()
+        find = str(args[0])
+
 	reasonMatch = []
 
-
 	SendInfo(sender, "Matches for owner:")
-
 	for pos, plot in manager.plots.node.iteritems():
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
-                        if "owner" in plot and find in plot.owner.lower():
-                                SendInfo(sender, pos+"\n"+plot.Info())
+                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, find)):
+                                SendInfo(sender, pos+"\n"+plot.Info(find))
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
 		if "reason" in plot and find in plot.reason.lower():
-			reasonMatch.append(pos+"\n"+plot.Info())
+			reasonMatch.append(pos+"\n"+plot.Info(find))
 
 	SendInfo(sender, "Matches for reason:")
 
