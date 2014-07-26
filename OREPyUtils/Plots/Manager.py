@@ -315,6 +315,10 @@ class PlotManager:
 	def Save(self, path):
 		self.file.Dump()
 
+	def MovePlotMap(self, **attributes):
+		for attr, value in attributes.iteritems():
+			self.size[attr] = value
+
 	"""
 	@return Load the plot data.
 	"""

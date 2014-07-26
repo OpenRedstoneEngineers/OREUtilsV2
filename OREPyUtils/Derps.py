@@ -18,14 +18,15 @@ def OnEnable(conf=None):
 	global Config
 	Config = conf.node.properties
 
+	LoadDerps()
+
 def LoadDerps():
 	global Derps
 
 	Config.Ensure("DerpPath", "")
 	Config.Ensure("MainPath", "")
-	filename = Config.DerpPath.replace("[path]", Config.MainPath)
 
-	print(filename)
+	filename = Config.DerpPath.replace("[path]", Config.MainPath)
 
 	with open(filename) as f:
 		Derps = [X.replace('\n', '') for X in f.xreadlines()]
@@ -35,6 +36,10 @@ def BroadcastDerp(sender, message):
 
 @hook.command("derp", description="Let your derp shine!")
 def OnCommandDerp(sender, args):
+	if len(Derps) == 0:
+		SendError(sender, "No registered derps!")
+		return True
+
 	if len(args) > 0 and args[0].isdigit():
 		Index = int(args[0])
 
@@ -60,6 +65,10 @@ def OnCommandDerp(sender, args):
 
 @hook.command("derps", description="List available Derps")
 def OnCommandDerps(sender, args):
+	if len(Derps) == 0:
+		SendError(sender, "No registered derps!")
+		return True
+
 	for Counter, Derp in enumerate(Derps):
 		sender.sendMessage(Color("1") + str(Counter) + Color("f") + ": " + Color("a") + Derp)
 
