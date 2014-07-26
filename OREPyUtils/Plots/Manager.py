@@ -139,7 +139,7 @@ class Plot(PersistentData.Node):
 			self.reason = reason
 
 		self.status = PlotStatus.CLAIMED
-                self.ownerid = ownerUUID
+                self.ownerid = str(ownerUUID)
 		self.date   = ctime()
 
 	"""
@@ -149,7 +149,7 @@ class Plot(PersistentData.Node):
 		if not self.IsClaimable():
 			raise OwnerError(owner)
 
-		self.ownerid = ownerUUID
+		self.ownerid = str(ownerUUID)
 		self.status = PlotStatus.RESERVED
 		self.date   = ctime()
 
