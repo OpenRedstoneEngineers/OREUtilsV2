@@ -242,15 +242,21 @@ def OnCommandPallow(sender, args):
 			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
 		else:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
                         try:
                                 manager.AddAllowed(uuid, getUUIDFromName(args[0]))
                                 SendInfo(sender, args[0]+' can build on your plot(s)')
                         except Exception as E:
                                 SendError(sender, 'User does not appear in our database!')
+<<<<<<< HEAD
 =======
 			manager.AddAllowed(name, args[0])
 			SendInfo(sender, args[0] + ' can build on your plot(s)')
 >>>>>>> upstream/master
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 
 	return True
 
@@ -449,14 +455,20 @@ def OnCommandPwarp(sender, args):
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 def onCommandPclaimAs(sender, args):
         manager = GetManager_ByPlayer(sender)
         x, y = GetPlot(sender, args, manager)
         name = ''
+<<<<<<< HEAD
 =======
 def OnCommandPclaimAs(sender, args):
 	manager = GetManager_ByPlayer(sender)
 >>>>>>> upstream/master
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 
         if len(args) == 3:
                 name = str(args[2])
@@ -635,6 +647,9 @@ def OnCommandPsearch(sender, args):
 
 	for pos, plot in manager.plots.node.iteritems():
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
                         if "owner" in plot and find in plot.owner.lower():
@@ -642,6 +657,7 @@ def OnCommandPsearch(sender, args):
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
+<<<<<<< HEAD
 =======
 		pos = "%s, %s" % tuple(pos.split("_")[1:])
 
@@ -649,6 +665,8 @@ def OnCommandPsearch(sender, args):
 			SendInfo(sender, pos+"\n"+plot.Info())
 
 >>>>>>> upstream/master
+=======
+>>>>>>> 0b141d544bf94f3b82d691a0c25abf4466597119
 		if "reason" in plot and find in plot.reason.lower():
 			reasonMatch.append(pos+"\n"+plot.Info())
 
