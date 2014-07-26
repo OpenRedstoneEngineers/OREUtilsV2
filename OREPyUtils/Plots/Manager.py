@@ -223,7 +223,7 @@ class PlotManager:
 	"""
 	@brief Claim the specified plot.
 	"""
-	def Claim(self, x, y, uuid="server", name="server", reason=" "):
+	def Claim(self, x, y, uuid, name, reason=""):
 		plot = self.plots[(x, y)]
 
                 owner = self.players[uuid]
@@ -234,7 +234,7 @@ class PlotManager:
 
 		owner.remPlots -= 1
 
-		plot.Claim(self.players, uuid, reason)
+                plot.Claim(self.players, uuid, reason)
 
 	"""
 	@brief Unclaim the specified plot.

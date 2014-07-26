@@ -174,12 +174,9 @@ def getNameFromUUID(sender, uuid):
 """
 def getUUIDFromName(sender, ownname):
         manager = GetManager_ByPlayer(sender)
-        SendInfo(sender, 'Starting search for %s'%ownname)
 
         for uuid in manager.players:
-                SendInfo(sender, 'Looking at player %s'%str(uuid))
                 if "Name" in manager.players[uuid] and manager.players[uuid].Name == ownname:
-                        SendInfo(sender, 'Found!')
                         return str(uuid)
                 elif "Name" not in manager.players[uuid]:
                         manager.players[uuid].Name = None
@@ -194,8 +191,14 @@ def OnPlayerJoinEvent(event):
                 sender = event.getPlayer()
                 manager = GetManager_ByPlayer(sender)
                 uuid = sender.getUniqueId()
+                uuid = str(uuid)
+                if "Name" in manager.players[uuid]:
+                        SendInfo(sender, manager.players[uuid].Name)
 
-                if uuid in manager.players and manager.players[uuid].Name != sender.getName():
+                if uuid in manager.players and "Name" in manager.players[uuid] and manager.players[uuid].Name != sender.getName():
+                        SendInfo(sender, 'Change in name detected! Old name: %s' % manager.players[uuid].Name)
+                        manager.players[uuid].Name = sender.getName()
+                elif uuid in manager.players and "Name" not in manager.players[uuid]:
                         manager.players[uuid].Name = sender.getName()
         
                 return True
@@ -298,18 +301,17 @@ def onCommandPWho(sender, args):
 """
 @hook.command("pinfo", usage="Usage: /pinfo [x] [y]")
 def onCommandPInfo(sender, args):
-	manager = GetManager_ByPlayer(sender)
+        manager = GetManager_ByPlayer(sender)
 
-	try:
-		x = int(args[0])
-		y = int(args[1])
+        try:
+                x = int(args[0])
+                y = int(args[1])
 
-	except:
-		pos = GetCoords_Player_AbsOrMap(sender, manager)
+        except:
+                pos = GetCoords_Player_AbsOrMap(sender, manager)
+                x = pos[0]
+                y = pos[1]
 
-		x = pos[0]
-		y = pos[1]
-		
         if not manager.IsInRange(x, y):
                 SendError(sender, "Out of range.")
                 return True
@@ -435,7 +437,7 @@ def onCommandPclaimAs(sender, args):
                 return False
 
 	try:
-		manager.Claim(x, y, getUUIDFromName(sender, name))
+		manager.Claim(x, y, getUUIDFromName(sender, name), name)
         except Exception as E:
                 SendError(sender, str(E))
                 return True
