@@ -125,7 +125,7 @@ def OnCommandFail(sender, args):
 	
 @hook.enable
 def OnEnable():
-	Load('Plots')
+	Load('Plots', conf=CONFIG)
 	Load('IRCBot', conf=CONFIG)	
 	Load('Inventory')
 	Load('EventHooks', conf=CONFIG)
