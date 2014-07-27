@@ -14,7 +14,7 @@ This readme file is still a work in progress.
 ## Components
 
 ### OREPyUtils (Python)
-* **Plots"*: This is our plot system. It includes an automatically generated plot map, as well as useful plot related functionality.
+* **Plots**: This is our plot system. It includes an automatically generated plot map, as well as useful plot related functionality.
 * **CommandGen**: This takes care of simple commands which are basically just aliases for simple commands. It generates commands from Data/Commands.txt.
 * **IRCBot**: This includes an IRC bot, and is designed to deliver both cross server chat if you have multiple servers, and allowing users to chat with those on the server from IRC clients.
 * **UsefulCommands**: A bundle of useful commands.
