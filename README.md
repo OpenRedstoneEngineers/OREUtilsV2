@@ -15,10 +15,10 @@ This readme file is still a work in progress.
 
 ### OREPyUtils (Python)
 * **Plots**: This is our plot system. It includes an automatically generated plot map, as well as useful plot related functionality.
-* **CommandGen**: This takes care of simple commands which are basically just aliases for simple commands. It generates commands from Data/Commands.txt.
+* **CommandGen**: This takes care of simple commands which are basically just aliases for simple commands. It generates commands from Data/Commands.txt, upon /gencommands.
 * **IRCBot**: This includes an IRC bot, and is designed to deliver both cross server chat if you have multiple servers, and allowing users to chat with those on the server from IRC clients.
 * **UsefulCommands**: A bundle of useful commands.
-* **NameSystem**: A system for letting users decide for themselves how their name should be coloured, without giving them access to the power of /nick.
+* **NameSystem**: A system for letting users decide for themselves how their name should be coloured and formatted, without giving them access to the power of /nick.
 * **Derps**: A utility for telling everyone that you fucked up ("derped").
 * **FunCommands**: Various commands, mostly for fun.
 
@@ -30,14 +30,14 @@ This readme file is still a work in progress.
 ### OREUtils
 OREUtils reads the config file Data/config.json. It's not there by default; however, the example config file Data/config.example.json is. Therefore, before you start, copy Data/config.example.json to Data/config.json.
 
-There are two ways to edit OREUtils' configuration. The recommended way is using the command '/property' in game like this: `/property [name] [value]`, for example `/property IRC.Name 'OREBot'`. The other way is to edit the config file directly. Make sure that the server is offline before you directly edit the config file. If you don't, your changes will be lost.
+There are two ways to edit OREUtils' configuration. The recommended way is using the command '/property' in game like this: `/property [name] [value]`, for example `/property IRC.Name 'OREBot'`. This command may also be used with only a name argument to view config options, or without any arguments to display the entire config. The other way is to edit the config file directly. Make sure that the server is offline before you directly edit the config file. If you don't, your changes will be lost.
 
 Now that that's out of the way, here's the various config options and their meaning:
 
 * **Include**: Contains which modules should be included. If a module is included, its config value is 1, if not, it's 0.
 * **IRC**: Contains configs related to the IRC module.
 	* **IRC.Server**: Which IRC server to connect to.
-	* **IRC.Chan**: Which IRC channel to connect to.
+	* **IRC.Chan**: Which IRC channel to join.
 	* **IRC.Name**: The name of the IRC bot.
 	* **IRC.NamePass**: IRC password, for NickServ.
 	* **IRC.Port**: IRC port.
@@ -51,9 +51,10 @@ Now that that's out of the way, here's the various config options and their mean
 			* **PlotMap.TopBlocks.On**: Which block should represent a claimed plot.
 			* **PlotMap.TopBlocks.Off**: Which block should represent an unclaimed plot.
 			* **PlotMap.TopBlocks.Base**: Which block the base should consist of.
-			* **PlotMap.TopBlocks.Frame.X**: Which block should be on the frame's X.
-			* **PlotMap.TopBlocks.Frame.Y**: Which block should be on the frame's Y.
-			* **PlotMap.TopBlocks.Frame.Cross**: Which block should be on the frame's cross.
+			* **PlotMap.TopBlocks.Frame**: Contains which blocks the frame should consist of.
+				* **PlotMap.TopBlocks.Frame.X**: Which block should be on the frame's X.
+				* **PlotMap.TopBlocks.Frame.Y**: Which block should be on the frame's Y.
+				* **PlotMap.TopBlocks.Frame.Cross**: Which block should be on the frame's cross.
 
 ### Permission Nodes
 * **ore.config**: Access to the `/property` command to edit the config file.
@@ -63,7 +64,7 @@ Now that that's out of the way, here's the various config options and their mean
 ## Usage
 
 ### Plots
-All commands related to the plot system start with a `p`. Many commands do something with the plot you're currently on. Those commands can be used either on the plot map, or on an actual plot in the world.
+All commands related to the plot system start with a `p`. Many commands do something with the plot you're currently on. Those commands can be used either on the plot map, or on an actual plot in the world. Most commands will also work with X and Y coordinates for plots, 
 
 * **User Commands**
 	* **pclaim**: Claim the plot you're standing on.
@@ -71,7 +72,7 @@ All commands related to the plot system start with a `p`. Many commands do somet
 	* **pinfo**: Get info about the plot you're standing on.
 	* **ploc**: Alias for pinfo.
 	* **pwarp**: Warp from the plot you're standing on from the plot map to the actual plot in the world.
-	* **pwarp [name]**: Warp to someone's plot.
+	* **pwarp [name]**: Warp to someone's plot. A number may be given as a second argument to specify a specific plot belonging to that user.
 	* **pmap**: Warp from a real world plot to the plot's representation on the plot map.
 	* **pmap [name]**: Warp to someone's plot's representation on the plot map.
 	* **psearch [name]**: Search for a member's plot.
