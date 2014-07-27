@@ -309,7 +309,7 @@ class PlotManager:
 
 	def MovePlotMap(self, **attributes):
 		for attr, value in attributes.iteritems():
-			self.size[attr] = value
+			self.size.Set(attr, value)
 
 	"""
 	@return Load the plot data.
