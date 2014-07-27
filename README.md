@@ -22,7 +22,7 @@ This readme file is still a work in progress.
 * **Derps**: A utility for telling everyone that you fucked up ("derped").
 * **FunCommands**: Various commands, mostly for fun.
 
-### OTJP** (Java)
+### OTJP (Java)
 * **Plot World**: World generator to generate a world of 256x256 plots.
 
 ## Config
