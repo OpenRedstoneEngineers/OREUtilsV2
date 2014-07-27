@@ -447,7 +447,6 @@ def OnCommandPwarp(sender, args):
 /pclaimas Name
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
-<<<<<<< HEAD
 def onCommandPclaimAs(sender, args):
         try:
                 manager = GetManager_ByPlayer(sender)
