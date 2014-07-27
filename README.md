@@ -51,10 +51,9 @@ Now that that's out of the way, here's the various config options and their mean
 			* **PlotMap.TopBlocks.On**: Which block should represent a claimed plot.
 			* **PlotMap.TopBlocks.Off**: Which block should represent an unclaimed plot.
 			* **PlotMap.TopBlocks.Base**: Which block the base should consist of.
-			* **PlotMap.TopBlocks.Frame**: Contains which blocks the frame should consist of.
-				* **PlotMap.TopBlocks.Frame.X**: Which block should be on the frame's X.
-				* **PlotMap.TopBlocks.Frame.Y**: Which block should be on the frame's Y.
-				* **PlotMap.TopBlocks.Frame.Cross**: Which block should be on the frame's cross.
+			* **PlotMap.TopBlocks.Frame.X**: Which block should be on the frame's X.
+			* **PlotMap.TopBlocks.Frame.Y**: Which block should be on the frame's Y.
+			* **PlotMap.TopBlocks.Frame.Cross**: Which block should be on the frame's cross.
 
 ### Permission Nodes
 * **ore.config**: Access to the `/property` command to edit the config file.
