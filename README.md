@@ -23,7 +23,7 @@ This readme file is still a work in progress.
 * **FunCommands**: Various commands, mostly for fun.
 
 ### OTJP (Java)
-* **Plot World**: World generator to generate a world of 256x256 plots.
+* **Plot World**: World generator to generate a world of plots - each 256x256 in size.
 
 ## Config
 
@@ -34,27 +34,46 @@ There are two ways to edit OREUtils' configuration. The recommended way is using
 
 Now that that's out of the way, here's the various config options and their meaning:
 
-* **Include**: Contains which modules should be included. If a module is included, its config value is 1, if not, it's 0.
-* **IRC**: Contains configs related to the IRC module.
-	* **IRC.Server**: Which IRC server to connect to.
-	* **IRC.Chan**: Which IRC channel to join.
-	* **IRC.Name**: The name of the IRC bot.
-	* **IRC.NamePass**: IRC password, for NickServ.
-	* **IRC.Port**: IRC port.
-* **PlotMap**: Contains configs related to the plot system.
-	* **PlotMap.BottomBlocks**: Contains which blocks should be below the top layer of the plot map. Blocks are defined like this: [ID,Data,Physics]. You probably won't need to care about that last value; it's for very advanced uses.
-			* **PlotMap.BottomBlocks.Reserved**: Which block should be below the top layer under a reserved plot. 
-			* **PlotMap.BottomBlocks.On**: Which block should be below the top layer under a claimed plot.
-			* **PlotMap.BottomBlocks.Off**: Which block should be below the top layer under an unclaimed plot.
-	* **PlotMap.TopBlocks**: Contains which blocks should be in the top layer of the plot map.
-			* **PlotMap.TopBlocks.Reserved**: Which block should represent a reserved plot.
-			* **PlotMap.TopBlocks.On**: Which block should represent a claimed plot.
-			* **PlotMap.TopBlocks.Off**: Which block should represent an unclaimed plot.
-			* **PlotMap.TopBlocks.Base**: Which block the base should consist of.
-			* **PlotMap.TopBlocks.Frame**: Contains which blocks the frame should consist of.
-				* **PlotMap.TopBlocks.Frame.X**: Which block should be on the frame's X.
-				* **PlotMap.TopBlocks.Frame.Y**: Which block should be on the frame's Y.
-				* **PlotMap.TopBlocks.Frame.Cross**: Which block should be on the frame's cross.
+	'PlotMap' : { //Configs related to the plot system.
+		'BottomBlocks' : { //Which blocks should be below the top layer of the plot map. Blocks are defined like this: [ID,Data,Physics]. You probably won't need to care about that last value; it's for very advanced uses.
+			'Reserved' : [0, 0, 0], //Which block should be under the top layer of a reserved plot.
+			'On' : [152, 0, 0], //Which block should be under the top layer of a claimed plot.
+			'Off' : [0, 0, 0], //Which block should be under the top layer of an unclaimed plot.
+		},
+		'TopBlocks' : { Which blocks should be in the top layer of the plot map.
+			'Reserved' : [124, 0, 0], //Which block should represent a reserved plot.
+			'On' : [124, 0, 0],  //Which block should represent a claimed plot.
+			'Off' : [123, 0, 0], //Which block should represent an unclaimed plot.
+			'Base' : [1, 0, 0], //Which block the base should consist of.
+			'Frame' : { //Which blocks the frame should consist of.
+				'Cross' : [1, 0, 0], //Blocks filling the intersections between parts of the frame.
+				'X' : [1, 0, 0], //Blocks filling the x-axis between plots.
+				'Y' : [5, 0, 0], //Blocks filling the y-axis between plots.
+			},
+		},
+	},
+	'IRC' : { //Configs related to the IRC module.
+		'NamePass' : '', //IRC password, for NickServ.
+		'Name' : 'OREBuild', //Name of the IRC bot.
+		'Chan' : '#OREServerChat', //Which IRC channel to join.
+		'Server' : 'irc.freenode.net', //Which server to connect to.
+		'Port' : 6667, //IRC port.
+	}
+	'Include' : { //Which modules to include.
+		'Inventory' : 1,
+		'EventHooks' : 0,
+		'CommandGen' : 1,
+		'Plots' : 1,
+		'NameSystem' : 1,
+		'Aliases' : 1,
+		'Derps' : 1,
+		'UsefulCommands' : 1,
+		'IRCBot' : 1,
+		'Bus' : 0,
+		'FunCommands' : 1,
+		'ChannelChat' : 1,
+		'ResultCode' : 1,
+	},
 
 ### Permission Nodes
 * **ore.config**: Access to the `/property` command to edit the config file.
