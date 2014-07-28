@@ -345,12 +345,41 @@ def onCommandPInfo(sender, args):
 	return True
 
 """
+@brief /pmapmove
+
+/pmapmove X Y Z
+"""
+@hook.command("pmapmove", usage="Usage: /pmapmove [x] [y] [z]")
+def OnCommandPmapmove(sender, args):
+	if not sender.hasPermission("ore.plot.mapmove"):
+		SendError(sender, "No permission!")
+		return True
+		
+	manager = GetManager_ByPlayer(sender)
+	
+	if len(args) != 3:
+		SendError(sender, "Three arguments (x, y, and z) are required")
+		return True
+		
+	try:
+		coords = [int(x) for x in args]
+		
+	except:
+		SendError(sender, "All arguments must be an integer")
+		return True
+		
+	manager.MovePlotMap(**dict(zip(("pos.x", "pos.y", "pos.z"), coords)))
+	
+	SendInfo(sender, "PlotMap moved to "+" ".join(args))
+	return True
+
+"""
 @brief /preserve
 
 /preserve X Z
 /preserve
 """
-@hook.command("preserve", usage="Usage: /preserve [x] [y]")
+@hook.command("preserve", usage="Usage: /preserve [x] [z]")
 def OnCommandPreserve(sender, args):
 	if not sender.hasPermission("ore.plot.reserve"):
 		SendError(sender, "No permission!")
