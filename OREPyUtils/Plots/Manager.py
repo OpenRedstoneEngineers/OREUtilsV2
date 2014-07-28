@@ -317,7 +317,6 @@ class PlotManager:
 	@return the coordinates of the centre of the specified plot.
 	"""
 	def GetPlotCentre(self, x, y):
-		print x, y
 		return ((x * self.size.x) + (self.size.x // 2),
 		        (y * self.size.y) + (self.size.y // 2))
 
