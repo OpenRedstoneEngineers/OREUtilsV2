@@ -153,27 +153,27 @@ def GetPlot(sender, args, manager):
 			pass
 
 		try:
-			index = int(args[1])
-
+			index = int(args[1])-1
 		except:
 			index = 0
 
 		find = str(args[0]).lower()
+                checked = 0
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
 
 			if "ownerid"  in plot and find in str(getNameFromUUID(sender, plot.ownerid)).lower():
-				if index:
+				if index == checked:
 					del args[:2]
 					return pos
-				index += 1
+				checked += 1
 
 			if "reason" in plot and find in plot.reason.lower():
-				if index:
+				if index == checked:
 					del args[:2]
 					return pos
-				index += 1
+				checked += 1
 
 	pos = GetCoords_Player_AbsOrMap(sender, manager)
 
