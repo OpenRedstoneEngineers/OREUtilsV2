@@ -649,21 +649,17 @@ def OnCommandPsearch(sender, args):
 """
 @hook.command("pusers", usage="Usage: /pusers")
 def OnCommandPusers(sender, args):
-        try:
-                manager = GetManager_ByPlayer(sender)
+        manager = GetManager_ByPlayer(sender)
 
-                if not manager.players:
-                        SendError(sender, "No users!")
+        if not manager.players:
+                SendError(sender, "No users!")
 
-                else:
-                        names = []
+        else:
+                names = []
 
-                        for plot in manager.plots:
-                                if "ownerid" in plot and str(getNameFromUUID(sender, plot.ownerid)) not in names:
-                                        names.append(str(getNameFromUUID(sender, plot.ownerid)))
+                for uuid in manager.players:
+                        names.append(str(getNameFromUUID(sender, uuid)))
 
-                        SendInfo(sender, ', '.join(names))
-        except Exception as E:
-                SendError(sender, str(E))
-
+                SendInfo(sender, ', '.join(names))
+                
 	return True
