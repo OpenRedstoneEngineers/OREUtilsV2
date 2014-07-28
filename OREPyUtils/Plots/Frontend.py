@@ -158,12 +158,13 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = ' '.join(args[0]).lower()
+		find = str(args[0]).lower()
+		SendInfo(sender, find)
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
 
-			if "ownerid"  in plot and find in getNameFromUUID(sender, plot.ownerid):
+			if "ownerid"  in plot and find in str(getNameFromUUID(sender, plot.ownerid)).lower():
 				if index:
 					del args[:2]
 					return pos
@@ -419,7 +420,7 @@ def OnCommandPmap(sender, args):
 /pwarp OwnerName
 /pwarp
 """
-@hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner> [plot number]")
+@hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner> <plot number>")
 def OnCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
@@ -649,18 +650,21 @@ def OnCommandPsearch(sender, args):
 """
 @hook.command("pusers", usage="Usage: /pusers")
 def OnCommandPusers(sender, args):
-	manager = GetManager_ByPlayer(sender)
+        try:
+                manager = GetManager_ByPlayer(sender)
 
-	if not manager.players:
-		SendError(sender, "No users!")
+                if not manager.players:
+                        SendError(sender, "No users!")
 
-	else:
-		names = []
+                else:
+                        names = []
 
-		for plot in manager.plots:
-                        if "ownerid" in plot and getNameFromUUID(sender, plot.ownerid)etNameFromUUID(sender, plot.ownerid) not in names:
-                                names.append(getNameFromUUID(sender, plot.ownerid)
+                        for plot in manager.plots:
+                                if "ownerid" in plot and str(getNameFromUUID(sender, plot.ownerid)) not in names:
+                                        names.append(str(getNameFromUUID(sender, plot.ownerid)))
 
-		SendInfo(sender, ', '.join(names))
+                        SendInfo(sender, ', '.join(names))
+        except Exception as E:
+                SendError(sender, str(E))
 
 	return True
