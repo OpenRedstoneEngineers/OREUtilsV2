@@ -159,7 +159,6 @@ def GetPlot(sender, args, manager):
 			index = 0
 
 		find = str(args[0]).lower()
-		SendInfo(sender, find)
 
 		for pos, plot in manager.plots.node.iteritems():
 			pos = (int(x) for x in pos.split("_")[1:])
