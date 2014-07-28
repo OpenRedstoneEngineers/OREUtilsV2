@@ -167,13 +167,13 @@ def GetPlot(sender, args, manager):
 				if index:
 					del args[:2]
 					return pos
-				index -= 1
+				index += 1
 
 			if "reason" in plot and find in plot.reason.lower():
 				if index:
 					del args[:2]
 					return pos
-				index -= 1
+				index += 1
 
 	pos = GetCoords_Player_AbsOrMap(sender, manager)
 
