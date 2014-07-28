@@ -164,13 +164,13 @@ def GetPlot(sender, args, manager):
 			pos = (int(x) for x in pos.split("_")[1:])
 
 			if "ownerid"  in plot and find in getNameFromUUID(sender, plot.ownerid):
-				if not index:
+				if index:
 					del args[:2]
 					return pos
 				index -= 1
 
 			if "reason" in plot and find in plot.reason.lower():
-				if not index:
+				if index:
 					del args[:2]
 					return pos
 				index -= 1
@@ -419,7 +419,7 @@ def OnCommandPmap(sender, args):
 /pwarp OwnerName
 /pwarp
 """
-@hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner>")
+@hook.command("pwarp", usage="Usage: /pwarp [x] [z] OR /pwarp <owner> [plot number]")
 def OnCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
@@ -447,23 +447,6 @@ def OnCommandPwarp(sender, args):
 /pclaimas Name
 """
 @hook.command("pclaimas", usage="Usage: /pclaimas [x] [z] <name>")
-<<<<<<< HEAD
-def onCommandPclaimAs(sender, args):
-        try:
-                manager = GetManager_ByPlayer(sender)
-                x, y = GetPlot(sender, args, manager)
-                name = ''
-
-                if len(args) == 3:
-                        name = str(args[2])
-                elif len(args) == 1:
-                        name = str(args[0])
-                else:
-                        return False
-        except Exception as E:
-                SendError(sender, str(E))
-                return True
-
 def onCommandPclaimAs(sender, args):
         manager = GetManager_ByPlayer(sender)
         x, y = GetPlot(sender, args, manager)
@@ -674,8 +657,9 @@ def OnCommandPusers(sender, args):
 	else:
 		names = []
 
-		for uuid in manager.players:
-                        names.append(getNameFromUUID(sender, uuid))
+		for plot in manager.plots:
+                        if "ownerid" in plot and getNameFromUUID(sender, plot.ownerid)etNameFromUUID(sender, plot.ownerid) not in names:
+                                names.append(getNameFromUUID(sender, plot.ownerid)
 
 		SendInfo(sender, ', '.join(names))
 

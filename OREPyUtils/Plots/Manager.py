@@ -109,6 +109,13 @@ class OwnerError(PlotError):
 			self.args = ('This plot is already owned')
 
 """
+@brief dummy error
+"""
+class DummyError(PlotError):
+        def __init__(self):
+                pass
+
+"""
 @brief Represents a single plot
 """
 class Plot(PersistentData.Node):
@@ -133,9 +140,9 @@ class Plot(PersistentData.Node):
 	"""
 	def Claim(self, owner, ownerUUID, reason):
 		if self.status != PlotStatus.RESERVED and not self.IsClaimable():
-			raise OwnerError(owner)
+			raise DummyError()
 		elif self.status == PlotStatus.RESERVED and str(self.ownerid) != ownerUUID:
-                        raise OwnerError(owner)
+                        raise DummyError()
 
 		if reason:
 			self.reason = reason
@@ -234,7 +241,10 @@ class PlotManager:
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
-                plot.Claim(self.players[str(uuid)].Name, uuid, reason)
+                try:
+                        plot.Claim(self.players[str(uuid)].Name, uuid, reason)
+                except DummyError:
+                        raise OwnerError(players[str(plot.ownerid)])
 
                 owner.remPlots -= 1
 
