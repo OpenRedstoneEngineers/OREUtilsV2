@@ -4,6 +4,8 @@ from JSONBackend import *
 
 from os.path import isfile as Exists
 
+import os
+
 class Backend:
 	def Load(node, data):
 		pass
@@ -61,6 +63,8 @@ class NodeFile(NodeManager):
 			final.close()
 			file.close()
 			return True
+			
+		os.remove(os.getcwd+self.filename+".blah")
 
 		file.close()
 		return False
