@@ -244,13 +244,9 @@ class PlotManager:
                 try:
                         plot.Claim(self.players[str(uuid)].Name, uuid, reason)
                 except DummyError:
-                        raise OwnerError(players[str(plot.ownerid)])
+                        raise OwnerError(str(players[str(plot.ownerid)].Name))
 
-                try:
-                        owner.remPlots -= 1
-                except Exception as E:
-                        SendError(sender, str(E))
-
+                owner.remPlots -= 1
 	"""
 	@brief Unclaim the specified plot.
 	"""
