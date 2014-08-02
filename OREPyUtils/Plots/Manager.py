@@ -241,7 +241,10 @@ class PlotManager:
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
-                plot.Claim(self.players[str(uuid)].Name, uuid, reason)
+                if "ownerid" in plot:
+                        plot.Claim(self.players[str(plot.ownerid)].Name, uuid, reason)
+                else:
+                        plot.Claim(self.players[str(uuid)].Name, uuid, reason)
 
                 owner.remPlots -= 1
 	"""
