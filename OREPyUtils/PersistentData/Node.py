@@ -102,4 +102,3 @@ class Node:
 	def __iadd__(self, node):
 		for item,value in node.iteritems():
 			self[item] = value
-			print item, value
