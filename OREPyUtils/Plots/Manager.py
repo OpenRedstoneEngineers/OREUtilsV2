@@ -140,9 +140,9 @@ class Plot(PersistentData.Node):
 	"""
 	def Claim(self, owner, ownerUUID, reason):
 		if self.status != PlotStatus.RESERVED and not self.IsClaimable():
-			raise DummyError()
+			raise OwnerError(self.ownerid)
 		elif self.status == PlotStatus.RESERVED and str(self.ownerid) != ownerUUID:
-                        raise DummyError()
+                        raise OwnerError(self.ownerid)
 
 		if reason:
 			self.reason = reason
@@ -241,10 +241,7 @@ class PlotManager:
 		if owner.remPlots == 0:
 			raise CannotClaimMoreError() 
 
-                try:
-                        plot.Claim(self.players[str(uuid)].Name, uuid, reason)
-                except DummyError:
-                        raise OwnerError(str(players[str(plot.ownerid)].Name))
+                plot.Claim(self.players[str(uuid)].Name, uuid, reason)
 
                 owner.remPlots -= 1
 	"""
