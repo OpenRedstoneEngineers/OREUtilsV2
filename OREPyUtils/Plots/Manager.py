@@ -111,7 +111,7 @@ class OwnerError(PlotError):
 """
 @brief dummy error
 """
-class DummyError(PlotError):
+class DummyError(Exception):
         def __init__(self):
                 pass
 
@@ -246,7 +246,10 @@ class PlotManager:
                 except DummyError:
                         raise OwnerError(players[str(plot.ownerid)])
 
-                owner.remPlots -= 1
+                try:
+                        owner.remPlots -= 1
+                except Exception as E:
+                        SendError(sender, str(E))
 
 	"""
 	@brief Unclaim the specified plot.
