@@ -605,7 +605,7 @@ def OnCommandPgive(sender, args):
                 SendError(sender, 'User does not appear in our database!')
                 return True
 
-	info.remPlots += 1
+	info.remPlots += int(args[1])
 
 	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
