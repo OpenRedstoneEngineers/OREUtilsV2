@@ -605,7 +605,10 @@ def OnCommandPgive(sender, args):
                 SendError(sender, 'User does not appear in our database!')
                 return True
 
-	info.remPlots += int(args[1])
+	if args[1]:
+                info.remPlots += int(args[1])
+        else:
+                nfo.remPlots += 1info.remPlots += int(args[1])
 
 	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
@@ -632,8 +635,10 @@ def OnCommandPtake(sender, args):
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
-        
-	info.remPlots -= 1
+        if args[1]:
+                info.remPlots -= int(args[1])
+        else:
+                nfo.remPlots -= 1
 
 	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
