@@ -411,6 +411,7 @@ def OnCommandPreserve(sender, args):
 		return True
 	
 	SendInfo(sender, "Plot reserved.")
+        print("%s reserved plot %s,%s"%(sender.getName(), x, y))	
 
 	manager.MarkReserved(x, y)
 	
@@ -498,6 +499,7 @@ def onCommandPclaimAs(sender, args):
 		return True
         try:
                 SendInfo(sender, "Plot claimed.")
+                print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, name))  
                 manager.MarkClaimed(x, y)
         except Exception as E:
                 SendError(sender, str(E))
@@ -528,6 +530,7 @@ def OnCommandPclaim(sender, args):
 		return True
 
 	SendInfo(sender, "Plot claimed.")
+	print("%s claimed plot %s,%s"%(sender.getName(), x, y))
 	manager.MarkClaimed(x, y)
 
 	return True
@@ -550,6 +553,7 @@ def onCommandPunclaim(sender, args):
 		return True
 	
         SendInfo(sender, "Plot unclaimed.")
+        print("%s unclaimed plot %s,%s"%(sender.getName(), x, y))
         manager.MarkUnclaimed(x, y)
                 
 	return True
