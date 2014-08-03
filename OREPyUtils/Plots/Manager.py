@@ -140,9 +140,9 @@ class Plot(PersistentData.Node):
 	"""
 	def Claim(self, owner, ownerUUID, reason):
 		if self.status != PlotStatus.RESERVED and not self.IsClaimable():
-			raise OwnerError(self.ownerid)
+			raise OwnerError(owner)
 		elif self.status == PlotStatus.RESERVED and str(self.ownerid) != ownerUUID:
-                        raise OwnerError(self.ownerid)
+                        raise OwnerError(owner)
 
 		if reason:
 			self.reason = reason
