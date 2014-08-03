@@ -608,7 +608,7 @@ def OnCommandPgive(sender, args):
 	if args[1]:
                 info.remPlots += int(args[1])
         else:
-                info.remPlots += info.remPlots += int(args[1])
+                info.remPlots += int(args[1])
 
 	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
