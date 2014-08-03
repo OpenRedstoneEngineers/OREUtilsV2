@@ -80,10 +80,10 @@ def OnCommandLeave(sender, args):
 		SendError(sender, "No permission!")
 		return True
 
-	if not len(args):
+	if len(args) < 1:
 		return False
 
-	Bukkit.broadcastMessage(color("e") + args[0] + " left the game.")
+	Bukkit.broadcastMessage(Color("e") + args[0] + " left the game.")
 
 	return True
 
