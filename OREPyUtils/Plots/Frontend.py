@@ -110,7 +110,10 @@ def GetAllCoords_Owner(owner, manager):
 @brief Get the plot manager responsible for the world the specified player is in.
 """
 def GetManager_ByPlayer(sender):
-	return Managers[str(sender.getWorld().getName())]
+        try:
+                return Managers[str(sender.getWorld().getName())]
+        except:
+                SendError(sender, "Cannot run command as console!")
 
 """
 @brief Initialize the plot manager of the specified world.
@@ -640,7 +643,10 @@ def OnCommandPtake(sender, args):
         else:
                 info.remPlots -= 1
 
-	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+        if info.remPlots < 0:
+                SendInfo(sender, "User already at 0 plots!")
+        else:
+                SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
 
 	return True
 
