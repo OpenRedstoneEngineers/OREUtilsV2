@@ -1,5 +1,5 @@
 /**
- *  ORE's Tiny Java Plugin 
+ *  ORE's Tiny Java Plugin
  *  Copyright (C) 2013 OpenRedstone
  *
  *  This program is free software: you can redistribute it and/or modify
