@@ -218,7 +218,7 @@ def OnPlayerJoinEvent(event):
                 uuid = str(uuid)
            	
                 if uuid in manager.players and "Name" in manager.players[str(uuid)] and manager.players[str(uuid)].Name != sender.getName():
-                        SendInfo(sender, 'Change in name detected! Old name: %s' % manager.players[str(uuid)].Name)
+                        SendF(sender, '{/c}Change in name detected! Old name: {/c}%s' % manager.players[str(uuid)].Name, '6', '9')
                         manager.players[str(uuid)].Name = sender.getName()
                 elif uuid in manager.players and "Name" not in manager.players[str(uuid)]:
                         manager.players[str(uuid)].Name = sender.getName()
@@ -241,11 +241,11 @@ def OnCommandPallow(sender, args):
 	else:
 		if not args:
 			manager.AddAllowed(uuid, '*')
-			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
+			SendF(sender, '{/c}All players, unless specifed by {/c}/punallow{/c}, can build on your plot(s)', '6', 'c', '6')
 		else:
                         try:
                                 manager.AddAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendInfo(sender, args[0]+' can build on your plot(s)')
+                                SendF(sender, '{/c}'+args[0]+'{/c} can build on your plot(s)', '9', '6')
                         except Exception as E:
                                 SendError(sender, 'User does not appear in our database!')
 
@@ -267,11 +267,11 @@ def OnCommandPunallow(sender, args):
 	else:
 		if not args:
 			manager.RemAllowed(uuid, '*')
-			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
+			SendF(sender, '{/c}Players cannot build on your plot unless otherwise specified', '6')
 		else:
                         try:
                                 manager.RemAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
+                                SendF(sender, '{/c}'+args[0]+'{/c} cannot build on your plot unless otherwise specified', '6', '9')
                         except Exception:
                                 SendError(sender, 'Player does not appear in our database!')
 
@@ -305,15 +305,15 @@ def OnCommandPWho(sender, args):
 	allowed.sort()
 	banned.sort()
 
-	SendInfo(sender, 'Allowed players:')
+	SendF(sender, '{/c}Allowed players:', '6')
 
 	for allow in allowed:
-		 SendInfo(sender, ' ' + allow)
+		 SendF(sender, '{/c} ' + allow, '9')
 
-	SendInfo(sender, 'Banned players:')
+	SendF(sender, '{/c}Banned players:', '6')
 
 	for ban in banned:
-		SendInfo(sender, ' ' + ban)
+		SendF(sender, '{/c} ' + ban, '9')
 
 	return True	
 
@@ -339,7 +339,7 @@ def onCommandPInfo(sender, args):
                         SendError(sender, "Out of range.")
                         return True
 
-                SendInfo(sender, manager.Info(x, y))
+                SendF(sender, manager.Info(x, y), 'e')
 	except Exception as E:
                 SendError(sender ,str(E))
 
@@ -371,7 +371,7 @@ def OnCommandPmapmove(sender, args):
 		
 	manager.MovePlotMap(**dict(zip(("pos.x", "pos.y", "pos.z"), coords)))
 	
-	SendInfo(sender, "PlotMap moved to "+" ".join(args))
+	SendF(sender, "{/c}PlotMap moved to {/c}"+" ".join(args), 'e', '5')
 	return True
 
 """
@@ -411,7 +411,7 @@ def OnCommandPreserve(sender, args):
 		SendError(sender, str(E))
 		return True
 	
-	SendInfo(sender, "Plot reserved.")
+	SendF(sender, "{/c}Plot reserved.", '6')
         print("%s reserved plot %s,%s"%(sender.getName(), x, y))	
 
 	manager.MarkReserved(x, y)
@@ -499,7 +499,7 @@ def onCommandPclaimAs(sender, args):
 		SendError(sender, str(E))
 		return True
         try:
-                SendInfo(sender, "Plot claimed.")
+                SendF(sender, "{/c}Plot claimed.", '6')
                 print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, name))  
                 manager.MarkClaimed(x, y)
         except Exception as E:
@@ -530,7 +530,7 @@ def OnCommandPclaim(sender, args):
 		SendError(sender, str(E))
 		return True
 
-	SendInfo(sender, "Plot claimed.")
+	SendF(sender, "{/c}Plot claimed.", '6')
 	print("%s claimed plot %s,%s"%(sender.getName(), x, y))
 	manager.MarkClaimed(x, y)
 
@@ -553,7 +553,7 @@ def onCommandPunclaim(sender, args):
 		SendError(sender, str(E))
 		return True
 	
-        SendInfo(sender, "Plot unclaimed.")
+        SendF(sender, "{/c}Plot unclaimed.", '6')
         print("%s unclaimed plot %s,%s"%(sender.getName(), x, y))
         manager.MarkUnclaimed(x, y)
                 
@@ -581,7 +581,7 @@ def OnCommandPgenerate(sender, args):
 
 	manager.Generate()
 
-	SendInfo(sender, "Generated " + str(manager.GetNumPlots()) + " plots")
+	SendF(sender, "{/c}Generated {/c}" + str(manager.GetNumPlots()) + "{/c} plots", 'e', '5', 'e')
 
 	return True
 
@@ -611,7 +611,7 @@ def OnCommandPgive(sender, args):
         else:
                 info.remPlots += 1
 
-	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+	SendF(sender, "{/c}User {/c}" + args[0] + "{/c} can now claim {/c}" + str(info.remPlots) + "{/c} additional plots.", 'e', '9', 'e', '5', 'e')
 
 	return True
 
@@ -642,9 +642,9 @@ def OnCommandPtake(sender, args):
                 info.remPlots -= 1
 
         if info.remPlots < 0:
-                SendInfo(sender, "User already at 0 plots!")
+                SendF(sender, "{/c}User already at {/c}0{/c} plots!", 'e', '5', 'e')
         else:
-                SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+                SendF(sender, "{/c}User {/c}" + args[0] + "{/c} can now claim {/c}" + str(info.remPlots) + "{/c} additional plots.", 'e', '9', 'e', '5', 'e')
 
 	return True
 
@@ -664,13 +664,13 @@ def OnCommandPsearch(sender, args):
 
 	reasonMatch = []
 
-	SendInfo(sender, "Matches for owner:")
+	SendF(sender, "{/c}Matches for owner:", '6')
 	for pos, plot in manager.plots.node.iteritems():
 
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
                         if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, find)):
-                                SendInfo(sender, pos+"\n"+plot.Info(find))
+                                SendF(sender, "{/c}"+pos+"\n{/c}"+plot.Info(find), '5', 'e')
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
@@ -702,6 +702,6 @@ def OnCommandPusers(sender, args):
                 for uuid in manager.players:
                         names.append(str(getNameFromUUID(sender, uuid)))
 
-                SendInfo(sender, ', '.join(names))
+                SendF(sender, '{/c}'+', '.join(names), '9')
                 
 	return True
