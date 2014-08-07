@@ -4,7 +4,7 @@ import Map
 
 from .. import Helper
 
-Info, SendError, SendInfo = Helper.Info, Helper.SendError, Helper.SendInfo
+Info, SendError, SendInfo, SendF = Helper.Info, Helper.SendError, Helper.SendInfo, Helper.SendF
 
 from collections import defaultdict
 
@@ -216,9 +216,7 @@ def OnPlayerJoinEvent(event):
                 manager = GetManager_ByPlayer(sender)
                 uuid = sender.getUniqueId()
                 uuid = str(uuid)
-                if "Name" in manager.players[str(uuid)]:
-                        SendInfo(sender, manager.players[str(uuid)].Name)
-
+           	
                 if uuid in manager.players and "Name" in manager.players[str(uuid)] and manager.players[str(uuid)].Name != sender.getName():
                         SendInfo(sender, 'Change in name detected! Old name: %s' % manager.players[str(uuid)].Name)
                         manager.players[str(uuid)].Name = sender.getName()
