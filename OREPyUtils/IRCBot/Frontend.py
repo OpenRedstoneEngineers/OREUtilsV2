@@ -79,7 +79,16 @@ class OREBot(IRCBot.IRCBot):
 			else:
 				Bukkit.broadcastMessage(str(ChatColor.YELLOW) + " ".join(args[:2]) + " " + alias.Name.lower())
 		else:
-			Bukkit.broadcastMessage(alias.GetTag(name) + message)		
+			args = message.split(' ')
+			
+			if args[0].startswith('@'):
+				reciever = args[0][1:]
+				
+				for player in Bukkit.getServer().getOnlinePlayers():
+					if player.getName() == reciever:
+						player.sendMessage(str(ChatColor.BLUE) + "[" + str(ChatColor.AQUA) + "IRC " + name + " -> me" + str(ChatColor.BLUE) + "]" + str(ChatColor.WHITE) + " " + " ".join(args[1:]));
+			else:
+				Bukkit.broadcastMessage(alias.GetTag(name) + message)		
 
 def Init(host, port, name, nickPass, chan):
 	global Bot
