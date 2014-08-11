@@ -3,6 +3,8 @@ from collections import defaultdict
 from .. import PersistentData
 
 import time.ctime as ctime
+import org.bukkit.Bukkit.dispatchCommand as dispatchCommand
+import org.bukkit.Bukkit.getConsoleSender as getConsoleSender
 
 class PlotStatus:
 	FREE     = 0
@@ -195,8 +197,8 @@ class PlotManager:
 	def AddAllowed(self, allower, allowed):
 		loc = allower.getLocation()
 		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
-		id = ','.join(str(plotX), str(plotY))
-		return dispatchCommand(' '.join('/region addmember', id, allowed))
+		id = str(plotX) + ',' + str(plotY)
+		return dispatchCommand(allower, '/region addmember ' + id + ' ' + str(allowed))
 	
 	"""
 	@brief no longer allow allowed to build on allower's plots
@@ -204,8 +206,8 @@ class PlotManager:
 	def RemAllowed(self, allower, allowed):
 		loc = allower.getLocation()
 		plotX, plotY = self.GetPlotCoords(loc.getX(), loc.getZ())
-		id = ','.join(str(plotX), str(plotY))
-		return dispatchCommand(' '.join('/region removemember', id, allowed))
+		id = str(plotX) + ',' + str(plotY)
+		return dispatchCommand(allower, '/region removemember ' + id + ' ' + str(allowed))
 	"""
 	@return whether someone can build on a plot
 	"""

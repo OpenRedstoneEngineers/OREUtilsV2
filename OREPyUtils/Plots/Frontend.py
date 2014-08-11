@@ -246,7 +246,7 @@ def OnCommandPallow(sender, args):
 		else:
 			manager.AddAllowed(sender, args[0])
 			SendInfo(sender, args[0]+' can now build on your plot')
-
+	
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
