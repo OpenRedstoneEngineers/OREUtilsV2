@@ -183,19 +183,20 @@ class PlotManager:
 	@brief allow allowed to build on allower's plots 
 	"""
 	def AddAllowed(self, allower, allowed):
-		self.players[allower].Ensure('allowed', [])
-		if allowed not in self.players[allower].allowed:
-			self.players[allower].allowed.append(allowed)
+		loc = allower.getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
+		id = ','.join(str(plotX), str(plotY))
+		return dispatchCommand(' '.join('/region addmember', id, allowed))
 	
 	"""
 	@brief no longer allow allowed to build on allower's plots
 	"""
 	def RemAllowed(self, allower, allowed):
-		if 'allowed' in self.players[allower]:
-			if allowed in self.players[allower].allowed:
-				self.players[allower].allowed.remove(allowed)
-			if self.players[allower].allowed:
-				del self.players[allower].allowed
+		loc = allower.getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getX(), loc.getZ())
+		id = ','.join(str(plotX), str(plotY))
+		return dispatchCommand(' '.join('/region removemember', id, allowed))
+
 	"""
 	@return whether someone can build on a plot
 	"""

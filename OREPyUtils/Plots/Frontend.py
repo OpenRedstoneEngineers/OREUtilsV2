@@ -189,18 +189,17 @@ def OnCommandPallow(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	name = sender.getName()
-	
+
 	if name not in manager.players:
 		SendError(sender, 'You do not own any plots')
 		return False
 
 	else:
 		if not args:
-			manager.AddAllowed(str(name), '*')
-			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
+			SendError(sender, 'You must specifiy a person to allow')
 		else:
-			manager.AddAllowed(name, args[0])
-			SendInfo(sender, args[0] + ' can build on your plot(s)')
+			manager.AddAllowed(sender, args[0])
+			SendInfo(sender, args[0] + ' can build on your plot')
 
 	return True
 
@@ -216,53 +215,12 @@ def OnCommandPunallow(sender, args):
 
 	else:
 		if not args:
-			manager.RemAllowed(str(name), '*')
-			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
+			SendError(sender, 'You must specifiy a person to disallow')
 		else:
-			manager.RemAllowed(name, args[0])
-			SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
+			manager.RemAllowed(sender, args[0])
+			SendInfo(sender, args[0]+' cannot build on your plot')
 
 	return True
-
-@hook.command("pwho", usage="Usage: /pwho")
-def OnCommandPWho(sender, args):
-	manager = GetManager_ByPlayer(sender)
-	
-	name = sender.getName()
-
-	if name not in manager.players:
-		SendError(sender, 'You do not own any plots')
-		return True
-
-	allowed = []
-	banned  = []
-
-	player = manager.players[name]
-
-	if 'allowed' not in player:
-		SendError(sender, "You do not have any permissions set up")
-
-	else:
-		for allow in player.allowed:
-			if allow.startswith('- '):
-				banned.append(allow)
-			else:
-				allowed.append(allow)
-
-	allowed.sort()
-	banned.sort()
-
-	SendInfo(sender, 'Allowed players:')
-
-	for allow in allowed:
-		 SendInfo(sender, ' ' + allow)
-
-	SendInfo(sender, 'Banned players:')
-
-	for ban in banned:
-		SendInfo(sender, ' ' + ban)
-
-	return True	
 
 """
 @brief /pinfo
