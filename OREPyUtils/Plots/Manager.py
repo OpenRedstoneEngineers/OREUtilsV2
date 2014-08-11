@@ -5,6 +5,7 @@ from .. import PersistentData
 import time.ctime as ctime
 import org.bukkit.Bukkit.dispatchCommand as dispatchCommand
 import org.bukkit.Bukkit.getConsoleSender as getConsoleSender
+import org.bukkit.Bukkit.getPlayer as getPlayer
 
 class PlotStatus:
 	FREE     = 0
@@ -205,7 +206,7 @@ class PlotManager:
 	"""
 	def RemAllowed(self, allower, allowed):
 		loc = allower.getLocation()
-		plotX, plotY = self.GetPlotCoords(loc.getX(), loc.getZ())
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
 		id = str(plotX) + ',' + str(plotY)
 		return dispatchCommand(allower, '/region removemember ' + id + ' ' + str(allowed))
 	"""
@@ -249,10 +250,15 @@ class PlotManager:
                         plot.Claim(self.players[str(uuid)].Name, uuid, reason)
 
                 owner.remPlots -= 1
+
+		loc = getPlayer(name).getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		dispatchCommand(getConsoleSender(), '/region addowner ' + id + ' ' + name)
 	"""
 	@brief Unclaim the specified plot.
 	"""
-	def Unclaim(self, x, y, uuid):
+	def Unclaim(self, x, y, uuid, name):
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
@@ -266,6 +272,11 @@ class PlotManager:
 				raise OwnerError(self.players[str(plot.ownerid)].Name)
 		else:
 			raise UnclaimedError()
+		
+		loc = getPlayer(name)
+		plotX, plotY = self.GetPlotCoords(loc.GetBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		dispatchCommand(getConsoleSender(), '/region removeowner ' + id + ' ' + name)
 
 	"""
 	@brief Forcefully unclaim the specified plot.

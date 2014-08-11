@@ -499,7 +499,7 @@ def onCommandPunclaim(sender, args):
         x, y = GetPlot(sender, args, manager)
 
 	try:
-		manager.Unclaim(x, y, sender.getUniqueId())
+		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
