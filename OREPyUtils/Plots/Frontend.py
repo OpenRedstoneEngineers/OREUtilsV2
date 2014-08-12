@@ -76,7 +76,7 @@ def GetCoords_Owner(owner, manager):
 def GetPlayer_Match(player, manager):
 	player = player.lower()
 
-	players = dict((s.lower(), s) for s in manager.players.playerNode)
+	players = dict((s.lower(), s.Name) for s in manager.players.playerNode)
 	
 	# Full match
 	if player in players:
@@ -160,7 +160,7 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = str(args[0]).lower()
+		find = GetPlayer_Match(str(args[0]).lower())
                 checked = 0
 
 		for pos, plot in manager.plots.node.iteritems():
@@ -402,22 +402,19 @@ def OnCommandPmap(sender, args):
 def OnCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
-	try:
-		x, y = GetPlot(sender, args, manager)
+	x, y = GetPlot(sender, args, manager)
 
-		pos = manager.GetPlotCentre(x, y)
+	pos = manager.GetPlotCentre(x, y)
 
-		loc = sender.getLocation()
+	loc = sender.getLocation()
 
-		loc.setX(pos[0])
-		loc.setZ(pos[1])
+	loc.setX(pos[0])
+	loc.setZ(pos[1])
 
-		sender.teleport(loc)
+	sender.teleport(loc)
 
-		return True
+	return True
 
-	except:
-		traceback.print_exc()
 
 """
 @brief /pclaimas
@@ -549,7 +546,7 @@ def OnCommandPgive(sender, args):
 	if len(args) < 1:
 		return False
         try:
-                info = manager.players[getUUIDFromName(sender, args[0])]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0]))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -580,7 +577,7 @@ def OnCommandPtake(sender, args):
 		return False
 
         try:
-                info = manager.players[getUUIDFromName(sender, args[0])]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0]))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -617,13 +614,13 @@ def OnCommandPsearch(sender, args):
 
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
-                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, find)):
-                                SendF(sender, "{/c}"+pos+"\n{/c}"+plot.Info(find), '5', 'e')
+                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, GetPlayer_Match(find))):
+                                SendF(sender, "{/c}"+pos+"\n{/c}"+plot.Info(GetPlayer_Match(find)), '5', 'e')
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
 		if "reason" in plot and find in plot.reason.lower():
-			reasonMatch.append(pos+"\n"+plot.Info(find))
+			reasonMatch.append(pos+"\n"+plot.Info(GetPlayer_Match(find)))
 
 	SendInfo(sender, "Matches for reason:")
 
