@@ -240,18 +240,10 @@ def OnCommandPallow(sender, args):
 
 	else:
 		if not args:
-			manager.AddAllowed(uuid, '*')
-			SendF(sender, '{/c}All players, unless specifed by {/c}/punallow{/c}, can build on your plot(s)', '6', 'c', '6')
+			SendError(sender, 'You must specifiy a person to allow')
 		else:
-                        try:
-                                manager.AddAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendF(sender, '{/c}'+args[0]+'{/c} can build on your plot(s)', '9', '6')
-                        except Exception as E:
-                                SendError(sender, 'User does not appear in our database!')
-
-			manager.AddAllowed(name, args[0])
-			SendInfo(sender, args[0] + ' can build on your plot(s)')
-
+			manager.AddAllowed(sender, args[0])
+			SendF(sender, '{/c}'+args[0]+'{/c} can now build on your plot', '9', '6')
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
@@ -266,56 +258,12 @@ def OnCommandPunallow(sender, args):
 
 	else:
 		if not args:
-			manager.RemAllowed(uuid, '*')
-			SendF(sender, '{/c}Players cannot build on your plot unless otherwise specified', '6')
+			SendError(sender, 'You must specifiy a person to disallow')
 		else:
-                        try:
-                                manager.RemAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendF(sender, '{/c}'+args[0]+'{/c} cannot build on your plot unless otherwise specified', '6', '9')
-                        except Exception:
-                                SendError(sender, 'Player does not appear in our database!')
+			manager.RemAllowed(sender, args[0])
+			SendF(sender, '{/c}'+args[0]+'{/c} cannot build on your plot', '9', '6')
 
 	return True
-
-@hook.command("pwho", usage="Usage: /pwho")
-def OnCommandPWho(sender, args):
-	manager = GetManager_ByPlayer(sender)
-	
-	uuid = str(sender.getUniqueId())
-
-	if uuid not in manager.players:
-		SendError(sender, 'You do not own any plots')
-		return True
-
-	allowed = []
-	banned  = []
-
-	player = manager.players[str(uuid)]
-
-	if 'allowed' not in player:
-		SendError(sender, "You do not have any permissions set up")
-
-	else:
-		for allow in player.allowed:
-			if allow.startswith('- '):
-				banned.append(getNameFromUUID(sender, allow))
-			else:
-				allowed.append(getNameFromUUID(sender, allow))
-
-	allowed.sort()
-	banned.sort()
-
-	SendF(sender, '{/c}Allowed players:', '6')
-
-	for allow in allowed:
-		 SendF(sender, '{/c} ' + allow, '9')
-
-	SendF(sender, '{/c}Banned players:', '6')
-
-	for ban in banned:
-		SendF(sender, '{/c} ' + ban, '9')
-
-	return True	
 
 """
 @brief /pinfo
@@ -548,7 +496,7 @@ def onCommandPunclaim(sender, args):
         x, y = GetPlot(sender, args, manager)
 
 	try:
-		manager.Unclaim(x, y, sender.getUniqueId())
+		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True

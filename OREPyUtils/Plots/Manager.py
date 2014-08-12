@@ -3,6 +3,9 @@ from collections import defaultdict
 from .. import PersistentData
 
 import time.ctime as ctime
+import org.bukkit.Bukkit.dispatchCommand as dispatchCommand
+import org.bukkit.Bukkit.getConsoleSender as getConsoleSender
+import org.bukkit.Bukkit.getPlayer as getPlayer
 
 class PlotStatus:
 	FREE     = 0
@@ -193,19 +196,19 @@ class PlotManager:
 	@brief allow allowed to build on allower's plots 
 	"""
 	def AddAllowed(self, allower, allowed):
-		self.players[str(allower)].Ensure('allowed', [])
-		if allowed not in self.players[str(allower)].allowed:
-			self.players[str(allower)].allowed.append(allowed)
+		loc = allower.getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		return dispatchCommand(allower, '/region addmember ' + id + ' ' + str(allowed))
 	
 	"""
 	@brief no longer allow allowed to build on allower's plots
 	"""
 	def RemAllowed(self, allower, allowed):
-		if 'allowed' in self.players[str(allower)]:
-			if allowed in self.players[str(allower)].allowed:
-				self.players[str(allower)].allowed.remove(allowed)
-			if self.players[str(allower)].allowed:
-				del self.players[str(allower)].allowed
+		loc = allower.getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		return dispatchCommand(allower, '/region removemember ' + id + ' ' + str(allowed))
 	"""
 	@return whether someone can build on a plot
 	"""
@@ -247,10 +250,15 @@ class PlotManager:
                         plot.Claim(self.players[str(uuid)].Name, uuid, reason)
 
                 owner.remPlots -= 1
+
+		loc = getPlayer(name).getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		dispatchCommand(getConsoleSender(), '/region addowner ' + id + ' ' + name)
 	"""
 	@brief Unclaim the specified plot.
 	"""
-	def Unclaim(self, x, y, uuid):
+	def Unclaim(self, x, y, uuid, name):
 		plot = self.plots[(x, y)]
 
 		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
@@ -264,6 +272,11 @@ class PlotManager:
 				raise OwnerError(self.players[str(plot.ownerid)].Name)
 		else:
 			raise UnclaimedError()
+		
+		loc = getPlayer(name)
+		plotX, plotY = self.GetPlotCoords(loc.GetBlockX(), loc.getBlockZ())
+		id = str(plotX) + ',' + str(plotY)
+		dispatchCommand(getConsoleSender(), '/region removeowner ' + id + ' ' + name)
 
 	"""
 	@brief Forcefully unclaim the specified plot.
