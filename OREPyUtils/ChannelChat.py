@@ -1,6 +1,8 @@
 from collections import defaultdict
 
 from Helper import Color, SendInfo, SendError, Colorify
+import org.bukkit.Bukkit.getPlayer as getPlayer
+import org.bukkit.Bukkit.getOnlinePlayers as getOnlinePlayers
 
 class ChannelMode:
 	PUBLIC	 = 0
@@ -13,6 +15,8 @@ class Channel:
 		self.name    = name
 		self.players = []
 		self.uuid = creator
+		self.invites = {}
+		self.pass = ''
 
 	def Join(self, player):
 		if player in self.players:
@@ -51,6 +55,9 @@ class Channel:
 	def BroadcastLeave(self, playerName):
 		msg = self.FormatPrefix() + playerName + " has left the channel"
 
+	def Invite(self, player):
+		self.invites.append(player)
+
 	def FormatPrefix(self):
 		return Color('b') + '[' + Color('8') + Color('o') + self.name + Color('r') + Color('b') + '] ' + Color('f')
 
@@ -76,16 +83,32 @@ class ChannelManager:
 
 		return chan
 
-	def Join(self, player, chanName):
+	def Join(self, player, chanName, pss=' '):
 		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
 
+		if chan.mode == ChannelMode.INVITE and player not in chan.invites:
+			SendError(player, 'Channel is invite only!')
+			return False
+
+		if chan.mode == ChannelMode.PASSWORD and pss == ' ':
+			SendError(player, 'Channel needs a password!')
+			return False
+		
+		if chan.mode == ChannelMode.PASSWORD and pss != chan.pass:
+			SendError(player, 'Incorrect password!')
+			return False
+		
 		if not chan.Join(player):
+			SendError(player, 'Already in channel')
 			return False
 
 		self.ActiveChannel[str(player.getUniqueId())] = chanName
+
+		if chan.mode == ChannelMode.INVITE:
+			del self.invites[player]
 
 		return True
 
@@ -132,20 +155,21 @@ class ChannelManager:
 
 Chans = ChannelManager()
 
-@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel>")
+@hook.command("cchat", usage="/<command> <join|leave|info|switch|modify|invite> <channel|player> [pass|PUBLIC|PASSWORD|INVITE] [pass]")
 def OnCommandCChat(sender, args):
-	if len(args) != 2:
+	if len(args) < 2:
 		return False
 
 	cmd  = args[0]
 	chan = args[1]
 
 	if cmd == "join":
-		if Chans.Join(sender, chan):
+		if len(args) < 3:
+			args[2] = ' '
+		
+		if Chans.Join(sender, chan, args[2]):
 			SendInfo(sender, "Welcome to channel " + Color("9") + chan)
-		else:
-			SendError(sender, "You are already in that channel")
-
+		
 		return True
 
 	elif cmd == "leave":
@@ -179,6 +203,54 @@ def OnCommandCChat(sender, args):
 		Chans.ActiveChannel[sender.getName()] = chan
 
 		return True
+
+	elif cmd == "modify":
+		if chan not in Chans.Channels:
+			SendError(sender, 'No such channels')
+			return True
+
+		if str(sender.getUniqueId()) != Chans.Channels[chan].uuid:
+			SendError(sender, 'You are not owner of the channel!')
+			return True
+
+		if len(args) < 3:
+			return False
+
+		if args[2] == "PASSWORD":
+			if len(args) < 4:
+				SendError(sender, 'No password set!')
+				return True
+			
+			Chans.Channels[chan].mode = ChannelModes.PASSWORD		
+			Chans.Channels[chan].pass = args[3]
+		elif args[2] == "INVITE":
+			Chans.Channels[chan].mode = ChannelModes.INVITE
+		elif args[2] == "PUBLIC":
+			Chans.Channels[chan].mode = ChannelModes.PUBLIC
+		else:
+			SendError(sender, 'Error! Unrecongnized modify!')
+
+		return True
+	
+	elif cmd == "invite":
+		if len(args) < 3:
+			return False
+		
+		if chan not in Chans.Channels:
+			SendError('No such channel!')
+			return True
+		
+		online = False
+		for plyr in getOnlinePlayers():
+			if plyr.getName() == args[2]:
+				online = True
+		if not online:
+			SendError(sender, 'Player not found!')
+			return True	
+		
+		invitee = getPlayer(args[2])
+		Chans.Channels[chan].Invite(invitee)
+		invitee.sendMessage(Color('8')+'You have been invited to join chat channel '+Color('4')+chan)
 	
 	return False
 
@@ -242,7 +314,7 @@ def OnCommandCCAdmin(sender, args):
 def OnCommandCC(sender, args):
 	msg = ' '.join(args)
 
-	chan = Chans.ActiveChannel.get(sender.getName())
+	chan = Chans.ActiveChannel.get(str(sender.getUniqueId()))
 
 	if chan == None or chan == "":
 		SendError(sender, "You are not in a channel")
