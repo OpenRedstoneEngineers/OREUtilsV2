@@ -246,7 +246,7 @@ def OnCommandPallow(sender, args):
 		else:
 			manager.AddAllowed(sender, args[0])
 			SendInfo(sender, args[0]+' can now build on your plot')
-
+	
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
@@ -499,7 +499,7 @@ def onCommandPunclaim(sender, args):
         x, y = GetPlot(sender, args, manager)
 
 	try:
-		manager.Unclaim(x, y, sender.getUniqueId())
+		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
