@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from Helper import Color, SendInfo, SendError
+from Helper import Color, SendInfo, SendError, Colorify
 
 class ChannelMode:
 	PUBLIC	 = 0
@@ -38,7 +38,7 @@ class Channel:
 			player.sendMessage(msg)
 
 	def BroadcastMsg(self, playerName, chanMsg):
-		msg = self.FormatPrefix() + playerName + ": " + chanMsg
+		msg = self.FormatPrefix() + playerName + ": " + Colorify(chanMsg)
 
 		self.Broadcast(msg) 
 
