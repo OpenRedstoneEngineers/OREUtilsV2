@@ -114,6 +114,14 @@ class ChannelManager:
 		if player in chan.players:
 			chan.BroadcastMsg(player.getName(), msg)
 		
+	def ChanMsgIRC(self, name, chanName, msg):
+		chan = self.getOrCreate(chanName)
+
+		if chan == None:
+			return False
+
+		chan.BroadcastMsg(name, msg)
+
 	def LeaveAll(self, player):
 		for chan in self.Channels.itervalues():
 			chan.Leave(player)

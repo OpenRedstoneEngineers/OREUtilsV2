@@ -5,6 +5,7 @@ ore.irc.admin
 """
 
 import IRCBot
+from .. import ChannelChat
 
 from org.bukkit import Bukkit
 from org.bukkit import ChatColor
@@ -84,8 +85,7 @@ class OREBot(IRCBot.IRCBot):
 			if args[0].startswith('%'):
 				channel = args[0][1:]
 
-				ChannelManager.Join(name, channel)
-				ChannelManager.ChanMsg(name, channel, ' '.join(args[1:]))
+				ChannelManager.ChanMsgIRC('&1[&3IRC&1]&f'+name, channel, ' '.join(args[1:]))
 			if args[0].startswith('@'):
 				reciever = args[0][1:]
 				
