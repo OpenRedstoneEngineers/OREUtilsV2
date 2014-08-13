@@ -8,10 +8,11 @@ class ChannelMode:
 	INVITE   = 2
 
 class Channel:
-	def __init__(self, name, mode):
+	def __init__(self, name, mode, creator):
 		self.mode    = mode
 		self.name    = name
 		self.players = []
+		self.uuid = creator
 
 	def Join(self, player):
 		if player in self.players:
@@ -62,21 +63,21 @@ class ChannelManager:
 		self.Channels      = {}
 		self.ActiveChannel = defaultdict(str)
 
-	def GetOrCreate(self, chanName):
+	def GetOrCreate(self, sender, chanName):
 		chan = self.Channels.get(chanName)
 
-		if chan == None:
+		if chan == None and sender != 0:
 			if len(self.Channels) >= self.MAX_CHANS:
 				return None
 
-			chan = Channel(chanName, ChannelMode.PUBLIC)
+			chan = Channel(chanName, ChannelMode.PUBLIC, str(sender.getUniqueId()))
 
 			self.Channels[chanName] = chan
 
 		return chan
 
 	def Join(self, player, chanName):
-		chan = self.GetOrCreate(chanName)
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
@@ -84,7 +85,7 @@ class ChannelManager:
 		if not chan.Join(player):
 			return False
 
-		self.ActiveChannel[player.getName()] = chanName
+		self.ActiveChannel[str(player.getUniqueId())] = chanName
 
 		return True
 
@@ -97,8 +98,8 @@ class ChannelManager:
 		if not chan.Leave(player):
 			return False
 
-		if self.ActiveChannel[player.getName()] == chanName:
-			del self.ActiveChannel[player.getName()]
+		if self.ActiveChannel[str(player.getUniqueId())] == chanName:
+			del self.ActiveChannel[str(player.getUniqueId())]
 
 		if not chan.players:
 			del self.Channels[chanName]
@@ -106,7 +107,7 @@ class ChannelManager:
 		return True
 
 	def ChanMsg(self, player, chanName, msg):
-		chan = self.GetOrCreate(chanName)
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
@@ -115,7 +116,7 @@ class ChannelManager:
 			chan.BroadcastMsg(player.getName(), msg)
 		
 	def ChanMsgIRC(self, name, chanName, msg):
-		chan = self.getOrCreate(chanName)
+		chan = self.getOrCreate(0, chanName)
 
 		if chan == None:
 			return False
@@ -126,8 +127,8 @@ class ChannelManager:
 		for chan in self.Channels.itervalues():
 			chan.Leave(player)
 
-		if player.getName() in self.ActiveChannel:
-			del self.ActiveChannel[player.getName()]
+		if str(player.getUniqueId()) in self.ActiveChannel:
+			del self.ActiveChannel[str(player.getUniqueId())]
 
 Chans = ChannelManager()
 
