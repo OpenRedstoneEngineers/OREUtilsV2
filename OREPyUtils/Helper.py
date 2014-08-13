@@ -65,23 +65,3 @@ Give an item to the specified player.
 '''
 def GiveItem(Player, Type, Meta=0, Amount=1):
 	Player.getInventory().addItem(ItemStack(Type, Amount, Meta))
-
-'''
-printf like function for color formatting strings to send
-'''
-def SendF(player, msg, *args):
-	if len(args) == 0:
-		formats = 'e'
-	else:
-		formats = args
-
-	max = len(formats) - 1
-	out = ' '
-
-	for ind, i in enumerate(msg.split("{/c}")):
-		if ind <= max:
-			out = out + i + Color(formats[ind])
-		else:
-			out = out + i + Color(formats[max])
-	
-	player.sendMessage(out[1:])
