@@ -38,17 +38,20 @@ class Channel:
 			player.sendMessage(msg)
 
 	def BroadcastMsg(self, playerName, chanMsg):
-		msg = "[" + self.name + "] " + playerName + ": " + chanMsg
+		msg = self.FormatPrefix() + playerName + ": " + chanMsg
 
 		self.Broadcast(msg) 
 
 	def BroadcastJoin(self, playerName):
-		msg = "[" + self.name + "] " + playerName + " has joined the channel"
+		msg = self.FormatPrefix() + playerName + " has joined the channel"
 
 		self.Broadcast(msg) 
 
 	def BroadcastLeave(self, playerName):
-		msg = "[" + self.name + "] " + playerName + " has left the channel"
+		msg = self.FormatPrefix() + playerName + " has left the channel"
+
+	def FormatPrefix(self):
+		return Color('b') + '[' + Color('8') + Color('o') + self.name + Color('r') + Color('b') + '] ' + Color('f')
 
 		self.Broadcast(msg) 
 
