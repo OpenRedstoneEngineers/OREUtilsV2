@@ -81,6 +81,11 @@ class OREBot(IRCBot.IRCBot):
 		else:
 			args = message.split(' ')
 			
+			if args[0].startswith('%'):
+				channel = args[0][1:]
+
+				ChannelManager.Join(name, channel)
+				ChannelManager.ChanMsg(name, channel, ' '.join(args[1:]))
 			if args[0].startswith('@'):
 				reciever = args[0][1:]
 				
