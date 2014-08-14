@@ -15,7 +15,7 @@ class Channel:
 		self.name    = name
 		self.players = []
 		self.uuid = creator
-		self.invites = {}
+		self.invites = []
 		self.pass = ''
 
 	def Join(self, player):
@@ -43,7 +43,7 @@ class Channel:
 			player.sendMessage(msg)
 
 	def BroadcastMsg(self, playerName, chanMsg):
-		msg = self.FormatPrefix() + playerName + ": " + Colorify(chanMsg)
+		msg = self.FormatPrefix() + Colorify(playerName) + ": " + Colorify(chanMsg)
 
 		self.Broadcast(msg) 
 
@@ -61,8 +61,6 @@ class Channel:
 
 	def FormatPrefix(self):
 		return Color('b') + '[' + Color('8') + Color('o') + self.name + Color('r') + Color('b') + '] ' + Color('f')
-
-		self.Broadcast(msg) 
 
 class ChannelManager:
 	MAX_CHANS = 10
@@ -108,8 +106,8 @@ class ChannelManager:
 
 		self.ActiveChannel[str(player.getUniqueId())] = chanName
 
-		if chan.mode == ChannelMode.INVITE:
-			del self.invites[player]
+		if chan.mode == ChannelMode.INVITE or player in chan.invites:
+			del chan.invites[player]
 
 		return True
 
@@ -140,7 +138,8 @@ class ChannelManager:
 			chan.BroadcastMsg(player.getName(), msg)
 		
 	def ChanMsgIRC(self, name, chanName, msg):
-		chan = self.getOrCreate(0, chanName)
+		chan = self.GetOrCreate(0, chanName)
+
 
 		if chan == None:
 			return False
@@ -156,7 +155,10 @@ class ChannelManager:
 
 Chans = ChannelManager()
 
-@hook.command("cchat", usage="/<command> <join|leave|info|switch|modify|invite> <channel|player> [pass|PUBLIC|PASSWORD|INVITE] [pass]")
+def GetChan():
+	return Chans
+
+@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel> [pass]/<command> modify <channel> <PUBLIC|PASSWORD|INVITE> [pass]\n/<command> invite <channel> <user>")
 def OnCommandCChat(sender, args):
 	if len(args) < 2:
 		return False
@@ -166,9 +168,10 @@ def OnCommandCChat(sender, args):
 
 	if cmd == "join":
 		if len(args) < 3:
-			args[2] = ' '
+			if Chans.Join(sender, chan, ' '):
+				SendInfo(sender, "Welcome to channel " + Color('9') + chan)
 		
-		if Chans.Join(sender, chan, args[2]):
+		elif Chans.Join(sender, chan, args[2]):
 			SendInfo(sender, "Welcome to channel " + Color("9") + chan)
 		
 		return True
@@ -222,12 +225,12 @@ def OnCommandCChat(sender, args):
 				SendError(sender, 'No password set!')
 				return True
 			
-			Chans.Channels[chan].mode = ChannelModes.PASSWORD		
+			Chans.Channels[chan].mode = ChannelMode.PASSWORD		
 			Chans.Channels[chan].pass = args[3]
 		elif args[2] == "INVITE":
-			Chans.Channels[chan].mode = ChannelModes.INVITE
+			Chans.Channels[chan].mode = ChannelMode.INVITE
 		elif args[2] == "PUBLIC":
-			Chans.Channels[chan].mode = ChannelModes.PUBLIC
+			Chans.Channels[chan].mode = ChannelMode.PUBLIC
 		else:
 			SendError(sender, 'Error! Unrecongnized modify!')
 
@@ -240,19 +243,20 @@ def OnCommandCChat(sender, args):
 		if chan not in Chans.Channels:
 			SendError('No such channel!')
 			return True
+
+		if sender not in Chans.Channels[chan].players:
+			SendError('You have to be in the channel to send invites!')
+			return True
 		
 		online = False
 		for plyr in getOnlinePlayers():
 			if plyr.getName() == args[2]:
-				online = True
-		if not online:
-			SendError(sender, 'Player not found!')
-			return True	
-		
-		invitee = getPlayer(args[2])
-		Chans.Channels[chan].Invite(invitee)
-		invitee.sendMessage(Color('8')+'You have been invited to join chat channel '+Color('4')+chan)
-	
+				Chans.Channels[chan].Invite(plyr)
+				plyr.sendMessage(Color('8')+'You have been invited to join chat channel '+Color('4')+chan)
+				return True
+
+		SendError(sender, 'Player not found!')
+			
 	return False
 
 @hook.command("ccadmin", usage="/<command> <list|playerinfo|kick>")

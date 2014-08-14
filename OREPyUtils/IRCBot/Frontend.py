@@ -5,12 +5,12 @@ ore.irc.admin
 """
 
 import IRCBot
-from .. import ChannelChat
 
 from org.bukkit import Bukkit
 from org.bukkit import ChatColor
 
 from .. import Helper
+from .. import ChannelChat
 
 SendInfo, SendWarning, SendError = Helper.SendInfo, Helper.SendWarning, Helper.SendError # Hack
 
@@ -85,13 +85,13 @@ class OREBot(IRCBot.IRCBot):
 			if args[0].startswith('%'):
 				channel = args[0][1:]
 
-				ChannelManager.ChanMsgIRC('&1[&3IRC&1]&f'+name, channel, ' '.join(args[1:]))
-			if args[0].startswith('@'):
+				ChannelChat.GetChan().ChanMsgIRC('&1[&3IRC&1]&f'+name, channel, ' '.join(args[1:]))
+			elif args[0].startswith('@'):
 				reciever = args[0][1:]
 				
 				for player in Bukkit.getServer().getOnlinePlayers():
 					if player.getName() == reciever:
-						player.sendMessage(str(ChatColor.BLUE) + "[" + str(ChatColor.AQUA) + "IRC " + name + " -> me" + str(ChatColor.BLUE) + "]" + str(ChatColor.WHITE) + " " + " ".join(args[1:]));
+						player.sendMessage(str(ChatColor.BLUE) + "[" + str(ChatColor.AQUA) + "IRC " + name + " -> me" + str(ChatColor.BLUE) + "]" + str(ChatColor.WHITE) + " " + " ".join(args[1:]))
 			else:
 				Bukkit.broadcastMessage(alias.GetTag(name) + message)		
 
