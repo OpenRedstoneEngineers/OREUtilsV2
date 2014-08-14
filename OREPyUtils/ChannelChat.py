@@ -112,7 +112,7 @@ class ChannelManager:
 		return True
 
 	def Leave(self, player, chanName):
-		chan = self.GetOrCreate(chanName)
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
@@ -158,7 +158,7 @@ Chans = ChannelManager()
 def GetChan():
 	return Chans
 
-@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel> [pass]/<command> modify <channel> <PUBLIC|PASSWORD|INVITE> [pass]\n/<command> invite <channel> <user>")
+@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel> [pass]\n/<command> modify <channel> <PUBLIC|PASSWORD|INVITE> [pass]\n/<command> invite <channel> <user>")
 def OnCommandCChat(sender, args):
 	if len(args) < 2:
 		return False
@@ -181,7 +181,7 @@ def OnCommandCChat(sender, args):
 			SendInfo(sender, "You have left the channel")
 		else:
 			SendError(sender, "You are not in that channel")
-
+		
 		return True
 
 	elif cmd == "info":
