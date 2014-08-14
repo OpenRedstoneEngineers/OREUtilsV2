@@ -54,6 +54,7 @@ class Channel:
 
 	def BroadcastLeave(self, playerName):
 		msg = self.FormatPrefix() + playerName + " has left the channel"
+		self.Broadcast(msg)
 
 	def Invite(self, player):
 		self.invites.append(player)
