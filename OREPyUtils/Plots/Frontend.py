@@ -73,10 +73,15 @@ def GetCoords_Owner(owner, manager):
 """
 @brief Retrieve the full name of a player from a partial one.
 """
-def GetPlayer_Match(player, manager):
-	player = player.lower()
+def GetPlayer_Match(player, sender):
+	manager = GetManager_ByPlayer(sender)
+	player = str(player).lower()
 
-	players = dict((s.lower(), s.Name) for s in manager.players.playerNode)
+
+	players = {}
+	for s in manager.players:
+		name = getNameFromUUID(sender, str(s))
+		players[name.lower()] = name
 	
 	# Full match
 	if player in players:
@@ -160,7 +165,7 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = GetPlayer_Match(str(args[0]).lower())
+		find = GetPlayer_Match(str(args[0]).lower(), sender)
                 checked = 0
 
 		for pos, plot in manager.plots.node.iteritems():
@@ -242,21 +247,13 @@ def OnCommandPallow(sender, args):
 		if not args:
 			SendError(sender, 'You must specifiy a person to allow')
 		else:
-			manager.AddAllowed(sender, args[0])
-			sender.sendMessage(Colorify('&9'+args[0]+'&6 can now build on your plot'))
+			if '*' not in args[0]:
+				manager.AddAllowed(sender, GetPlayer_Match(args[0], sender))
+				sender.sendMessage(Colorify('&9'+GetPlayer_Match(args[0], sender)+'&6 can now build on your plot'))
+			else:
+				manager.AddAllowed(uuid, '*')
+				sender.sendMessage(Colorify('&6All players, unless specifed by &c/punallow&6, can build on your plot(s)'))
 	
-			manager.AddAllowed(uuid, '*')
-			sender.sendMessage(Colorify('&6All players, unless specifed by &c/punallow&6, can build on your plot(s)'))
-		else:
-                        try:
-                                manager.AddAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                sender.sendMessage(Colorify('&9'+args[0]+'&6 can build on your plot(s)'))
-                        except Exception as E:
-                                SendError(sender, 'User does not appear in our database!')
-
-			manager.AddAllowed(name, args[0])
-			sender.sendMessage(Colorify('&9'+args[0] + '&6 can build on your plot(s)'))
-
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
@@ -273,8 +270,8 @@ def OnCommandPunallow(sender, args):
 		if not args:
 			SendError(sender, 'You must specifiy a person to disallow')
 		else:
-			manager.RemAllowed(sender, args[0])
-			sender.sendMessage(Colorify('&9'+args[0]+'&6 cannot build on your plot'))
+			manager.RemAllowed(sender, GetPlayer_Match(args[0], sender))
+			sender.sendMessage(Colorify('&9'+GetPlayer_Match(args[0], sender)+'&6 cannot build on your plot'))
 
 	return True
 """
@@ -415,7 +412,10 @@ def OnCommandPmap(sender, args):
 def OnCommandPwarp(sender, args):
 	manager = GetManager_ByPlayer(sender)
 	
-	x, y = GetPlot(sender, args, manager)
+	try:
+		x, y = GetPlot(sender, args, manager)
+	except Exception as E:
+		SendError(sender, str(E))
 
 	pos = manager.GetPlotCentre(x, y)
 
@@ -450,19 +450,17 @@ def onCommandPclaimAs(sender, args):
                 return False
 
 	try:
-		manager.Claim(x, y, getUUIDFromName(sender, name), name)
+		manager.Claim(x, y, getUUIDFromName(sender, str(sender.getUniqueId()), GetPlayer_Match(name, sender)))
         except Exception as E:
                 SendError(sender, str(E))
                 return True
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
-        try:
-		sender.sendMessage(Colorify('&6Plot claimed.'))
-                print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, name))  
-                manager.MarkClaimed(x, y)
-        except Exception as E:
-                SendError(sender, str(E))
+	
+	sender.sendMessage(Colorify('&6Plot claimed.'))
+        print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, GetPlayer_Match(name, sender)))  
+	manager.MarkClaimed(x, y)
 
 	return True
 
@@ -560,7 +558,7 @@ def OnCommandPgive(sender, args):
 	if len(args) < 1:
 		return False
         try:
-                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0]))]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0], sender))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -570,7 +568,7 @@ def OnCommandPgive(sender, args):
         else:
                 info.remPlots += 1
 
-	sender.sendMessage(Colorify('&eUser &9'+args[0]+'&e can now claim &5'+str(info.remPlots)+'&e additional plots'))
+	sender.sendMessage(Colorify('&eUser &9'+GetPlayer_Match(args[0], sender)+'&e can now claim &5'+str(info.remPlots)+'&e additional plots'))
 
 	return True
 
@@ -591,7 +589,7 @@ def OnCommandPtake(sender, args):
 		return False
 
         try:
-                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0]))]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0], sender))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -603,7 +601,7 @@ def OnCommandPtake(sender, args):
         if info.remPlots < 0:
 		sender.sendMessage(Colorify('&eUser already at &50&e plots!'))
         else:
-		sender.sendMessage(Colorify('&eUser &9+'args[0]+'&e can now claim &5'+str(info.remPlots)+'&e additional plots.'))
+		sender.sendMessage(Colorify('&eUser &9'+GetPlayer_Match(args[0], sender)+'&e can now claim &5'+str(info.remPlots)+'&e additional plots.'))
 
 	return True
 
@@ -629,13 +627,13 @@ def OnCommandPsearch(sender, args):
 
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
-                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, GetPlayer_Match(find))):
-				sender.sendMessage(Colorify('&5'+pos+'\n&e'+plot.Info(GetPlayer_Match(find))))
+                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, GetPlayer_Match(find, sender))):
+				sender.sendMessage(Colorify('&5'+pos+'\n&e'+plot.Info(GetPlayer_Match(find, sender))))
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
 		if "reason" in plot and find in plot.reason.lower():
-			reasonMatch.append(pos+"\n"+plot.Info(GetPlayer_Match(find)))
+			reasonMatch.append(pos+"\n"+plot.Info(GetPlayer_Match(find, sender)))
 
 	sender.sendMessage(Colorify('&6Matches for reason:'))
 
