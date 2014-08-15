@@ -165,7 +165,7 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = GetPlayer_Match(str(args[0]).lower(), sender)
+		find = GetPlayer_Match(str(args[0]).lower(), sender).lower()
                 checked = 0
 
 		for pos, plot in manager.plots.node.iteritems():
@@ -223,8 +223,7 @@ def OnPlayerJoinEvent(event):
                 uuid = str(uuid)
            	
                 if uuid in manager.players and "Name" in manager.players[str(uuid)] and manager.players[str(uuid)].Name != sender.getName():
-                        sender.sendMessage(Colorify('&6Change in name detected! Old name: &9%s'%manager.players[str(uuid)].Name))
-                        manager.players[str(uuid)].Name = sender.getName()
+
                 elif uuid in manager.players and "Name" not in manager.players[str(uuid)]:
                         manager.players[str(uuid)].Name = sender.getName()
         
