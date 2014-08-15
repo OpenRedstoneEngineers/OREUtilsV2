@@ -223,6 +223,8 @@ def OnPlayerJoinEvent(event):
                 uuid = str(uuid)
            	
                 if uuid in manager.players and "Name" in manager.players[str(uuid)] and manager.players[str(uuid)].Name != sender.getName():
+			sender.sendMessage(Colorify('&6Change in name detected! Old name: &9'+sender.getName()))
+			manager.players[str(uuid)].Name = str(sender.getName())
 
                 elif uuid in manager.players and "Name" not in manager.players[str(uuid)]:
                         manager.players[str(uuid)].Name = sender.getName()
