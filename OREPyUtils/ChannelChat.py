@@ -3,6 +3,7 @@ from collections import defaultdict
 from Helper import Color, SendInfo, SendError, Colorify
 import org.bukkit.Bukkit.getPlayer as getPlayer
 import org.bukkit.Bukkit.getOnlinePlayers as getOnlinePlayers
+import PersistentData
 
 class ChannelMode:
 	PUBLIC	 = 0
@@ -10,13 +11,13 @@ class ChannelMode:
 	INVITE   = 2
 
 class Channel:
-	def __init__(self, name, mode, creator):
-		self.mode    = mode
-		self.name    = name
+	def __init__(self, node):
+		self.mode    = int(node.mode)
+		self.name    = str(node.name)
 		self.players = []
-		self.uuid = creator
+		self.uuid = str(node.creator)
 		self.invites = []
-		self.pass = ''
+		self.pass = str(node.pass)
 
 	def Join(self, player):
 		if player in self.players:
@@ -65,21 +66,50 @@ class Channel:
 class ChannelManager:
 	MAX_CHANS = 10
 
-	def __init__(self):
+	def LoadOrCreate(self):
+		self.file = PersistentData.NodeFile("plugins/OREUtilsV2.py.dir/Data/Channels.json")
+		self.node = self.file.node
+
+		self.node.Ensure("ChannelManager")
+		
 		self.Channels = {}
-		self.ActiveChannel = defaultdict(str)
-		self.ActivePlayers = []
+		self.ChanNode = self.node.ChannelManager.Ensure("ChanNode")
+		self.ActiveChannel = self.node.ChannelManager.Ensure("ActiveChannel")
+		self.ActivePlayers = self.node.ChannelManager.Ensure("ActivePlayers")
+
+		for chan in self.ChanNode:
+			self.ChanNode[chan].Ensure("mode", ChannelMode.PUBLIC)
+			self.ChanNode[chan].Ensure("name", str(chan))
+			self.ChanNode[chan].Ensure("creator", '')
+			self.ChanNode[chan].Ensure("pass", '')
+
+			self.Channels[str(chan)] = Channel(self.ChanNode[chan])
+
+		for player in getOnlinePlayers():
+			if str(player.getUniqueId()) in self.ActiveChannel:
+				print(player.getName())
+				chan = self.GetOrCreate(player, self.ActiveChannel[str(player.getUniqueId())])
+				self.Join(player, self.ActiveChannel[str(player.getUniqueId())], chan.pass)
+
+	def Save(self):
+		self.file.Dump()
 
 	def GetOrCreate(self, sender, chanName):
-		chan = self.Channels.get(chanName)
-
+		chan = self.Channels.get(str(chanName))
+		
 		if chan == None and sender != 0:
 			if len(self.Channels) >= self.MAX_CHANS:
 				return None
+			
+			self.ChanNode.Ensure(str(chanName))
+			self.ChanNode[chanName].Ensure("mode", ChannelMode.PUBLIC)
+			self.ChanNode[chanName].Ensure("name", str(chanName))
+			self.ChanNode[chanName].Ensure("creator", str(sender.getUniqueId()))
+			self.ChanNode[chanName].Ensure("pass", '')
 
-			chan = Channel(chanName, ChannelMode.PUBLIC, str(sender.getUniqueId()))
+			chan = Channel(self.ChanNode[str(chanName)])
 
-			self.Channels[chanName] = chan
+			self.Channels[str(chanName)] = chan
 
 		return chan
 
@@ -92,7 +122,7 @@ class ChannelManager:
 		if chan.mode == ChannelMode.INVITE and player not in chan.invites:
 			SendError(player, 'Channel is invite only!')
 			return False
-
+	
 		if chan.mode == ChannelMode.PASSWORD and pss == ' ':
 			SendError(player, 'Channel needs a password!')
 			return False
@@ -104,12 +134,12 @@ class ChannelManager:
 		if not chan.Join(player):
 			SendError(player, 'Already in channel')
 			return False
-
+	
 		self.ActiveChannel[str(player.getUniqueId())] = chanName
-
+	
 		if chan.mode == ChannelMode.INVITE or player in chan.invites:
 			del chan.invites[player]
-
+		
 		return True
 
 	def Leave(self, player, chanName):
@@ -171,7 +201,7 @@ def OnCommandCChat(sender, args):
 	if cmd == "join":
 		if len(args) < 3:
 			if Chans.Join(sender, chan, ' '):
-				sender.sendMessage(Colorify("&8&0Welcome to channel " + Color('9') + chan))
+				sender.sendMessage(Colorify("&8&oWelcome to channel " + Color('9') + chan))
 		
 		elif Chans.Join(sender, chan, args[2]):
 			sender.sendMessage(Colorify("&8&oWelcome to channel " + Color("9") + chan))
@@ -321,18 +351,18 @@ def OnCommandCCAdmin(sender, args):
 def OnCommandCC(sender, args):
 	msg = ' '.join(args)
 
-	chan = Chans.ActiveChannel.get(str(sender.getUniqueId()))
-
-	if chan == None or chan == "":
+	if str(sender.getUniqueId()) not in Chans.ActiveChannel:
 		SendError(sender, "You are not in a channel")
 		return True
 
+	chan = Chans.ActiveChannel[str(sender.getUniqueId())]
+
 	if str(sender.getUniqueId()) in Chans.ActivePlayers:
 		sender.sendMessage(Colorify('&8&oNow chatting in public chat.'))
-		Chans.ActivePlayers.remove(str(sender.getUniqueId()))
+		del Chans.ActivePlayers[str(sender.getUniqueId())]
 	else:
 		sender.sendMessage(Colorify('&8&oNow chatting in channel &9'+chan))
-		Chans.ActivePlayers.append(str(sender.getUniqueId()))
+		Chans.ActivePlayers.Ensure(str(sender.getUniqueId()))
 
 	return True
 
@@ -348,5 +378,17 @@ def onEventPlayerChat(event):
 	if str(event.getPlayer().getUniqueId()) not in Chans.ActivePlayers:
 		return True
 
-	event.setCancelled(True)
 	Chans.ChanMsg(event.getPlayer(), Chans.ActiveChannel[str(event.getPlayer().getUniqueId())], event.getMessage())
+	event.setCancelled(True)
+	
+@hook.event("player.PlayerJoinEvent", "Normal")
+def joinPlayer(event):
+	if str(event.getPlayer().getUniqueId()) in Chans.ActiveChannel:
+		uuid = str(event.getPlayer().getUniqueId())
+		Chans.GetOrCreate(event.getPlayer(), Chans.ActiveChannel[uuid]).Join(event.getPlayer())
+
+def OnEnable():
+	Chans.LoadOrCreate()
+
+def OnDisable():
+	Chans.Save()
