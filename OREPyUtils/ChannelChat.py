@@ -66,8 +66,9 @@ class ChannelManager:
 	MAX_CHANS = 10
 
 	def __init__(self):
-		self.Channels      = {}
+		self.Channels = {}
 		self.ActiveChannel = defaultdict(str)
+		self.ActivePlayers = []
 
 	def GetOrCreate(self, sender, chanName):
 		chan = self.Channels.get(chanName)
@@ -152,6 +153,7 @@ class ChannelManager:
 
 		if str(player.getUniqueId()) in self.ActiveChannel:
 			del self.ActiveChannel[str(player.getUniqueId())]
+		
 
 Chans = ChannelManager()
 
@@ -325,10 +327,26 @@ def OnCommandCC(sender, args):
 		SendError(sender, "You are not in a channel")
 		return True
 
-	Chans.ChanMsg(sender, chan, msg)
+	if str(sender.getUniqueId()) in Chans.ActivePlayers:
+		sender.sendMessage(Colorify('&8&oNow chatting in public chat.'))
+		Chans.ActivePlayers.remove(str(sender.getUniqueId()))
+	else:
+		sender.sendMessage(Colorify('&8&oNow chatting in channel &9'+chan))
+		Chans.ActivePlayers.append(str(sender.getUniqueId()))
 
 	return True
 
 @hook.event("player.PlayerQuitEvent", "monitor")
 def OnEventQuit(event):
 	Chans.LeaveAll(event.getPlayer())
+
+@hook.event("player.PlayerChatEvent", "Monitor")
+def onEventPlayerChat(event):
+	if str(event.getPlayer().getUniqueId()) not in Chans.ActiveChannel:
+		return True
+
+	if str(event.getPlayer().getUniqueId()) not in Chans.ActivePlayers:
+		return True
+
+	event.setCancelled(True)
+	Chans.ChanMsg(event.getPlayer(), Chans.ActiveChannel[str(event.getPlayer().getUniqueId())], event.getMessage())
