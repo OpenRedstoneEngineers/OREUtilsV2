@@ -4,7 +4,7 @@ import Map
 
 from .. import Helper
 
-Info, SendError, SendInfo = Helper.Info, Helper.SendError, Helper.SendInfo
+Info, SendError, SendInfo, Colorify = Helper.Info, Helper.SendError, Helper.SendInfo, Helper.Colorify
 
 from collections import defaultdict
 
@@ -73,10 +73,15 @@ def GetCoords_Owner(owner, manager):
 """
 @brief Retrieve the full name of a player from a partial one.
 """
-def GetPlayer_Match(player, manager):
-	player = player.lower()
+def GetPlayer_Match(player, sender):
+	manager = GetManager_ByPlayer(sender)
+	player = str(player).lower()
 
-	players = dict((s.lower(), s) for s in manager.players.playerNode)
+
+	players = {}
+	for s in manager.players:
+		name = getNameFromUUID(sender, str(s))
+		players[name.lower()] = name
 	
 	# Full match
 	if player in players:
@@ -160,7 +165,7 @@ def GetPlot(sender, args, manager):
 		except:
 			index = 0
 
-		find = str(args[0]).lower()
+		find = GetPlayer_Match(str(args[0]).lower(), sender).lower()
                 checked = 0
 
 		for pos, plot in manager.plots.node.iteritems():
@@ -216,12 +221,11 @@ def OnPlayerJoinEvent(event):
                 manager = GetManager_ByPlayer(sender)
                 uuid = sender.getUniqueId()
                 uuid = str(uuid)
-                if "Name" in manager.players[str(uuid)]:
-                        SendInfo(sender, manager.players[str(uuid)].Name)
-
+           	
                 if uuid in manager.players and "Name" in manager.players[str(uuid)] and manager.players[str(uuid)].Name != sender.getName():
-                        SendInfo(sender, 'Change in name detected! Old name: %s' % manager.players[str(uuid)].Name)
-                        manager.players[str(uuid)].Name = sender.getName()
+			sender.sendMessage(Colorify('&6Change in name detected! Old name: &9'+sender.getName()))
+			manager.players[str(uuid)].Name = str(sender.getName())
+
                 elif uuid in manager.players and "Name" not in manager.players[str(uuid)]:
                         manager.players[str(uuid)].Name = sender.getName()
         
@@ -242,18 +246,15 @@ def OnCommandPallow(sender, args):
 
 	else:
 		if not args:
-			manager.AddAllowed(uuid, '*')
-			SendInfo(sender, 'All players, unless specifed by /punallow, can build on your plot(s)')
+			SendError(sender, 'You must specifiy a person to allow')
 		else:
-                        try:
-                                manager.AddAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendInfo(sender, args[0]+' can build on your plot(s)')
-                        except Exception as E:
-                                SendError(sender, 'User does not appear in our database!')
-
-			manager.AddAllowed(name, args[0])
-			SendInfo(sender, args[0] + ' can build on your plot(s)')
-
+			if '*' not in args[0]:
+				manager.AddAllowed(sender, GetPlayer_Match(args[0], sender))
+				sender.sendMessage(Colorify('&9'+GetPlayer_Match(args[0], sender)+'&6 can now build on your plot'))
+			else:
+				manager.AddAllowed(uuid, '*')
+				sender.sendMessage(Colorify('&6All players, unless specifed by &c/punallow&6, can build on your plot(s)'))
+	
 	return True
 
 @hook.command("punallow", usage="Usage: /punallow <name>")
@@ -268,57 +269,12 @@ def OnCommandPunallow(sender, args):
 
 	else:
 		if not args:
-			manager.RemAllowed(uuid, '*')
-			SendInfo(sender, 'Players cannot build on your plot unless otherwise specified')
+			SendError(sender, 'You must specifiy a person to disallow')
 		else:
-                        try:
-                                manager.RemAllowed(uuid, getUUIDFromName(sender, str(args[0])))
-                                SendInfo(sender, args[0]+' cannot build on your plot unless otherwise specified')
-                        except Exception:
-                                SendError(sender, 'Player does not appear in our database!')
+			manager.RemAllowed(sender, GetPlayer_Match(args[0], sender))
+			sender.sendMessage(Colorify('&9'+GetPlayer_Match(args[0], sender)+'&6 cannot build on your plot'))
 
 	return True
-
-@hook.command("pwho", usage="Usage: /pwho")
-def OnCommandPWho(sender, args):
-	manager = GetManager_ByPlayer(sender)
-	
-	uuid = str(sender.getUniqueId())
-
-	if uuid not in manager.players:
-		SendError(sender, 'You do not own any plots')
-		return True
-
-	allowed = []
-	banned  = []
-
-	player = manager.players[str(uuid)]
-
-	if 'allowed' not in player:
-		SendError(sender, "You do not have any permissions set up")
-
-	else:
-		for allow in player.allowed:
-			if allow.startswith('- '):
-				banned.append(getNameFromUUID(sender, allow))
-			else:
-				allowed.append(getNameFromUUID(sender, allow))
-
-	allowed.sort()
-	banned.sort()
-
-	SendInfo(sender, 'Allowed players:')
-
-	for allow in allowed:
-		 SendInfo(sender, ' ' + allow)
-
-	SendInfo(sender, 'Banned players:')
-
-	for ban in banned:
-		SendInfo(sender, ' ' + ban)
-
-	return True	
-
 """
 @brief /pinfo
 
@@ -341,7 +297,7 @@ def onCommandPInfo(sender, args):
                         SendError(sender, "Out of range.")
                         return True
 
-                SendInfo(sender, manager.Info(x, y))
+                sender.sendMessage(Colorify('&e'+manager.Info(x, y)))
 	except Exception as E:
                 SendError(sender ,str(E))
 
@@ -373,7 +329,8 @@ def OnCommandPmapmove(sender, args):
 		
 	manager.MovePlotMap(**dict(zip(("pos.x", "pos.y", "pos.z"), coords)))
 	
-	SendInfo(sender, "PlotMap moved to "+" ".join(args))
+	sender.sendMessage(Colorify("&ePlotMap moved to &5"+" ".join(args)))
+
 	return True
 
 """
@@ -413,7 +370,7 @@ def OnCommandPreserve(sender, args):
 		SendError(sender, str(E))
 		return True
 	
-	SendInfo(sender, "Plot reserved.")
+	sender.sendMessage(Colorify("&6Plot reserved."))
         print("%s reserved plot %s,%s"%(sender.getName(), x, y))	
 
 	manager.MarkReserved(x, y)
@@ -458,20 +415,21 @@ def OnCommandPwarp(sender, args):
 	
 	try:
 		x, y = GetPlot(sender, args, manager)
+	except Exception as E:
+		SendError(sender, str(E))
 
-		pos = manager.GetPlotCentre(x, y)
+	pos = manager.GetPlotCentre(x, y)
 
-		loc = sender.getLocation()
+	loc = sender.getLocation()
 
-		loc.setX(pos[0])
-		loc.setZ(pos[1])
+	loc.setX(pos[0])
+	loc.setY(manager.size.pos.y + 1)
+	loc.setZ(pos[1])
 
-		sender.teleport(loc)
+	sender.teleport(loc)
 
-		return True
+	return True
 
-	except:
-		traceback.print_exc()
 
 """
 @brief /pclaimas
@@ -493,19 +451,17 @@ def onCommandPclaimAs(sender, args):
                 return False
 
 	try:
-		manager.Claim(x, y, getUUIDFromName(sender, name), name)
+		manager.Claim(x, y, getUUIDFromName(sender, str(sender.getUniqueId()), GetPlayer_Match(name, sender)))
         except Exception as E:
                 SendError(sender, str(E))
                 return True
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
-        try:
-                SendInfo(sender, "Plot claimed.")
-                print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, name))  
-                manager.MarkClaimed(x, y)
-        except Exception as E:
-                SendError(sender, str(E))
+	
+	sender.sendMessage(Colorify('&6Plot claimed.'))
+        print("%s claimed plot %s,%s as %s"%(sender.getName(), x, y, GetPlayer_Match(name, sender)))  
+	manager.MarkClaimed(x, y)
 
 	return True
 
@@ -532,7 +488,7 @@ def OnCommandPclaim(sender, args):
 		SendError(sender, str(E))
 		return True
 
-	SendInfo(sender, "Plot claimed.")
+	sender.sendMessage(Colorify('&6Plot claimed.'))
 	print("%s claimed plot %s,%s"%(sender.getName(), x, y))
 	manager.MarkClaimed(x, y)
 
@@ -550,12 +506,12 @@ def onCommandPunclaim(sender, args):
         x, y = GetPlot(sender, args, manager)
 
 	try:
-		manager.Unclaim(x, y, sender.getUniqueId())
+		manager.Unclaim(x, y, sender.getUniqueId(), sender.getName())
 	except Manager.PlotError, E:
 		SendError(sender, str(E))
 		return True
 	
-        SendInfo(sender, "Plot unclaimed.")
+	sender.sendMessage(Colorify('&6Plot unclaimed.'))
         print("%s unclaimed plot %s,%s"%(sender.getName(), x, y))
         manager.MarkUnclaimed(x, y)
                 
@@ -583,7 +539,7 @@ def OnCommandPgenerate(sender, args):
 
 	manager.Generate()
 
-	SendInfo(sender, "Generated " + str(manager.GetNumPlots()) + " plots")
+	sender.sendMessage(Colorify('&eGenerated &5' + str(manager.GetNumPlots()) + '&e plots'))
 
 	return True
 
@@ -603,7 +559,7 @@ def OnCommandPgive(sender, args):
 	if len(args) < 1:
 		return False
         try:
-                info = manager.players[getUUIDFromName(sender, args[0])]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0], sender))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -613,7 +569,7 @@ def OnCommandPgive(sender, args):
         else:
                 info.remPlots += 1
 
-	SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+	sender.sendMessage(Colorify('&eUser &9'+GetPlayer_Match(args[0], sender)+'&e can now claim &5'+str(info.remPlots)+'&e additional plots'))
 
 	return True
 
@@ -634,7 +590,7 @@ def OnCommandPtake(sender, args):
 		return False
 
         try:
-                info = manager.players[getUUIDFromName(sender, args[0])]
+                info = manager.players[getUUIDFromName(sender, GetPlayer_Match(args[0], sender))]
         except Exception:
                 SendError(sender, 'User does not appear in our database!')
                 return True
@@ -644,9 +600,9 @@ def OnCommandPtake(sender, args):
                 info.remPlots -= 1
 
         if info.remPlots < 0:
-                SendInfo(sender, "User already at 0 plots!")
+		sender.sendMessage(Colorify('&eUser already at &50&e plots!'))
         else:
-                SendInfo(sender, "User " + args[0] + " can now claim " + str(info.remPlots) + " additional plots.")
+		sender.sendMessage(Colorify('&eUser &9'+GetPlayer_Match(args[0], sender)+'&e can now claim &5'+str(info.remPlots)+'&e additional plots.'))
 
 	return True
 
@@ -666,23 +622,24 @@ def OnCommandPsearch(sender, args):
 
 	reasonMatch = []
 
-	SendInfo(sender, "Matches for owner:")
+	sender.sendMessage(Colorify('&6Matches for owner:'))
+
 	for pos, plot in manager.plots.node.iteritems():
 
 		pos = "%s, %s"%tuple(pos.split("_")[1:])
 		try:
-                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, find)):
-                                SendInfo(sender, pos+"\n"+plot.Info(find))
+                        if "ownerid"  in plot and str(plot.ownerid) == str(getUUIDFromName(sender, GetPlayer_Match(find, sender))):
+				sender.sendMessage(Colorify('&5'+pos+'\n&e'+plot.Info(GetPlayer_Match(find, sender))))
                 except Exception as E:
                         SendError(sender, str(E))
                         return True
 		if "reason" in plot and find in plot.reason.lower():
-			reasonMatch.append(pos+"\n"+plot.Info(find))
+			reasonMatch.append(pos+"\n"+plot.Info(GetPlayer_Match(find, sender)))
 
-	SendInfo(sender, "Matches for reason:")
+	sender.sendMessage(Colorify('&6Matches for reason:'))
 
 	for reason in reasonMatch:
-		SendInfo(sender, reason)
+		sender.sendMessage(Colorify('&e'+reason))
 
 	return True
 
@@ -704,6 +661,6 @@ def OnCommandPusers(sender, args):
                 for uuid in manager.players:
                         names.append(str(getNameFromUUID(sender, uuid)))
 
-                SendInfo(sender, ', '.join(names))
+		sender.sendMessage(Colorify('&9'+', '.join(names)))
                 
 	return True

@@ -13,7 +13,7 @@ def OnEnable(conf=None):
 # TNT
 @hook.event("entity.ExplosionPrimeEvent", "high")
 def OnExplosionPrimeEvent(event):
-	if TNT:
+	if val.TNT:
 		event.setCancelled(True)
 
 # TNT Carts

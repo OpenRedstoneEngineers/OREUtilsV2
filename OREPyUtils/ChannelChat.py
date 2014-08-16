@@ -1,6 +1,8 @@
 from collections import defaultdict
 
-from Helper import Color, SendInfo, SendError
+from Helper import Color, SendInfo, SendError, Colorify
+import org.bukkit.Bukkit.getPlayer as getPlayer
+import org.bukkit.Bukkit.getOnlinePlayers as getOnlinePlayers
 
 class ChannelMode:
 	PUBLIC	 = 0
@@ -8,10 +10,13 @@ class ChannelMode:
 	INVITE   = 2
 
 class Channel:
-	def __init__(self, name, mode):
+	def __init__(self, name, mode, creator):
 		self.mode    = mode
 		self.name    = name
 		self.players = []
+		self.uuid = creator
+		self.invites = []
+		self.pass = ''
 
 	def Join(self, player):
 		if player in self.players:
@@ -38,19 +43,24 @@ class Channel:
 			player.sendMessage(msg)
 
 	def BroadcastMsg(self, playerName, chanMsg):
-		msg = "[" + self.name + "] " + playerName + ": " + chanMsg
+		msg = self.FormatPrefix() + Colorify(playerName) + ": " + Colorify(chanMsg)
 
 		self.Broadcast(msg) 
 
 	def BroadcastJoin(self, playerName):
-		msg = "[" + self.name + "] " + playerName + " has joined the channel"
+		msg = self.FormatPrefix() + playerName + " has joined the channel"
 
 		self.Broadcast(msg) 
 
 	def BroadcastLeave(self, playerName):
-		msg = "[" + self.name + "] " + playerName + " has left the channel"
+		msg = self.FormatPrefix() + playerName + " has left the channel"
+		self.Broadcast(msg)
 
-		self.Broadcast(msg) 
+	def Invite(self, player):
+		self.invites.append(player)
+
+	def FormatPrefix(self):
+		return Color('b') + '[' + Color('8') + Color('o') + self.name + Color('r') + Color('b') + '] ' + Color('f')
 
 class ChannelManager:
 	MAX_CHANS = 10
@@ -59,34 +69,50 @@ class ChannelManager:
 		self.Channels      = {}
 		self.ActiveChannel = defaultdict(str)
 
-	def GetOrCreate(self, chanName):
+	def GetOrCreate(self, sender, chanName):
 		chan = self.Channels.get(chanName)
 
-		if chan == None:
+		if chan == None and sender != 0:
 			if len(self.Channels) >= self.MAX_CHANS:
 				return None
 
-			chan = Channel(chanName, ChannelMode.PUBLIC)
+			chan = Channel(chanName, ChannelMode.PUBLIC, str(sender.getUniqueId()))
 
 			self.Channels[chanName] = chan
 
 		return chan
 
-	def Join(self, player, chanName):
-		chan = self.GetOrCreate(chanName)
+	def Join(self, player, chanName, pss=' '):
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
 
-		if not chan.Join(player):
+		if chan.mode == ChannelMode.INVITE and player not in chan.invites:
+			SendError(player, 'Channel is invite only!')
 			return False
 
-		self.ActiveChannel[player.getName()] = chanName
+		if chan.mode == ChannelMode.PASSWORD and pss == ' ':
+			SendError(player, 'Channel needs a password!')
+			return False
+		
+		if chan.mode == ChannelMode.PASSWORD and pss != chan.pass:
+			SendError(player, 'Incorrect password!')
+			return False
+		
+		if not chan.Join(player):
+			SendError(player, 'Already in channel')
+			return False
+
+		self.ActiveChannel[str(player.getUniqueId())] = chanName
+
+		if chan.mode == ChannelMode.INVITE or player in chan.invites:
+			del chan.invites[player]
 
 		return True
 
 	def Leave(self, player, chanName):
-		chan = self.GetOrCreate(chanName)
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
@@ -94,8 +120,8 @@ class ChannelManager:
 		if not chan.Leave(player):
 			return False
 
-		if self.ActiveChannel[player.getName()] == chanName:
-			del self.ActiveChannel[player.getName()]
+		if self.ActiveChannel[str(player.getUniqueId())] == chanName:
+			del self.ActiveChannel[str(player.getUniqueId())]
 
 		if not chan.players:
 			del self.Channels[chanName]
@@ -103,7 +129,7 @@ class ChannelManager:
 		return True
 
 	def ChanMsg(self, player, chanName, msg):
-		chan = self.GetOrCreate(chanName)
+		chan = self.GetOrCreate(player, chanName)
 
 		if chan == None:
 			return False
@@ -111,29 +137,43 @@ class ChannelManager:
 		if player in chan.players:
 			chan.BroadcastMsg(player.getName(), msg)
 		
+	def ChanMsgIRC(self, name, chanName, msg):
+		chan = self.GetOrCreate(0, chanName)
+
+
+		if chan == None:
+			return False
+
+		chan.BroadcastMsg(name, msg)
+
 	def LeaveAll(self, player):
 		for chan in self.Channels.itervalues():
 			chan.Leave(player)
 
-		if player.getName() in self.ActiveChannel:
-			del self.ActiveChannel[player.getName()]
+		if str(player.getUniqueId()) in self.ActiveChannel:
+			del self.ActiveChannel[str(player.getUniqueId())]
 
 Chans = ChannelManager()
 
-@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel>")
+def GetChan():
+	return Chans
+
+@hook.command("cchat", usage="/<command> <join|leave|info|switch> <channel> [pass]\n/<command> modify <channel> <PUBLIC|PASSWORD|INVITE> [pass]\n/<command> invite <channel> <user>")
 def OnCommandCChat(sender, args):
-	if len(args) != 2:
+	if len(args) < 2:
 		return False
 
 	cmd  = args[0]
 	chan = args[1]
 
 	if cmd == "join":
-		if Chans.Join(sender, chan):
+		if len(args) < 3:
+			if Chans.Join(sender, chan, ' '):
+				SendInfo(sender, "Welcome to channel " + Color('9') + chan)
+		
+		elif Chans.Join(sender, chan, args[2]):
 			SendInfo(sender, "Welcome to channel " + Color("9") + chan)
-		else:
-			SendError(sender, "You are already in that channel")
-
+		
 		return True
 
 	elif cmd == "leave":
@@ -141,7 +181,7 @@ def OnCommandCChat(sender, args):
 			SendInfo(sender, "You have left the channel")
 		else:
 			SendError(sender, "You are not in that channel")
-
+		
 		return True
 
 	elif cmd == "info":
@@ -167,7 +207,56 @@ def OnCommandCChat(sender, args):
 		Chans.ActiveChannel[sender.getName()] = chan
 
 		return True
+
+	elif cmd == "modify":
+		if chan not in Chans.Channels:
+			SendError(sender, 'No such channels')
+			return True
+
+		if str(sender.getUniqueId()) != Chans.Channels[chan].uuid:
+			SendError(sender, 'You are not owner of the channel!')
+			return True
+
+		if len(args) < 3:
+			return False
+
+		if args[2] == "PASSWORD":
+			if len(args) < 4:
+				SendError(sender, 'No password set!')
+				return True
+			
+			Chans.Channels[chan].mode = ChannelMode.PASSWORD		
+			Chans.Channels[chan].pass = args[3]
+		elif args[2] == "INVITE":
+			Chans.Channels[chan].mode = ChannelMode.INVITE
+		elif args[2] == "PUBLIC":
+			Chans.Channels[chan].mode = ChannelMode.PUBLIC
+		else:
+			SendError(sender, 'Error! Unrecongnized modify!')
+
+		return True
 	
+	elif cmd == "invite":
+		if len(args) < 3:
+			return False
+		
+		if chan not in Chans.Channels:
+			SendError('No such channel!')
+			return True
+
+		if sender not in Chans.Channels[chan].players:
+			SendError('You have to be in the channel to send invites!')
+			return True
+		
+		online = False
+		for plyr in getOnlinePlayers():
+			if plyr.getName() == args[2]:
+				Chans.Channels[chan].Invite(plyr)
+				plyr.sendMessage(Color('8')+'You have been invited to join chat channel '+Color('4')+chan)
+				return True
+
+		SendError(sender, 'Player not found!')
+			
 	return False
 
 @hook.command("ccadmin", usage="/<command> <list|playerinfo|kick>")
@@ -230,7 +319,7 @@ def OnCommandCCAdmin(sender, args):
 def OnCommandCC(sender, args):
 	msg = ' '.join(args)
 
-	chan = Chans.ActiveChannel.get(sender.getName())
+	chan = Chans.ActiveChannel.get(str(sender.getUniqueId()))
 
 	if chan == None or chan == "":
 		SendError(sender, "You are not in a channel")
