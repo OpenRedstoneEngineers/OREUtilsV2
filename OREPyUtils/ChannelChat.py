@@ -171,16 +171,16 @@ def OnCommandCChat(sender, args):
 	if cmd == "join":
 		if len(args) < 3:
 			if Chans.Join(sender, chan, ' '):
-				SendInfo(sender, "Welcome to channel " + Color('9') + chan)
+				sender.sendMessage(Colorify("&8&0Welcome to channel " + Color('9') + chan))
 		
 		elif Chans.Join(sender, chan, args[2]):
-			SendInfo(sender, "Welcome to channel " + Color("9") + chan)
+			sender.sendMessage(Colorify("&8&oWelcome to channel " + Color("9") + chan))
 		
 		return True
 
 	elif cmd == "leave":
 		if Chans.Leave(sender, chan):
-			SendInfo(sender, "You have left the channel")
+			sender.sendMessage(Colorify("&8&oYou have left the channel"))
 		else:
 			SendError(sender, "You are not in that channel")
 		
@@ -193,7 +193,7 @@ def OnCommandCChat(sender, args):
 
 		msg = ', '.join([x.getName() for x in Chans.Channels[chan].players])
 
-		SendInfo(sender, "Players in channel " + chan + ": " + msg) 
+		sender.sendMessage(Colorify("&8&oPlayers in channel &9" + chan + ": &6" + msg))
 
 		return True
 
