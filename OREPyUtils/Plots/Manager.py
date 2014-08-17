@@ -273,8 +273,8 @@ class PlotManager:
 		else:
 			raise UnclaimedError()
 		
-		loc = getPlayer(name)
-		plotX, plotY = self.GetPlotCoords(loc.GetBlockX(), loc.getBlockZ())
+		loc = getPlayer(name).getLocation()
+		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
 		id = str(plotX) + ',' + str(plotY)
 		dispatchCommand(getConsoleSender(), '/region removeowner ' + id + ' ' + name)
 

@@ -445,13 +445,13 @@ def onCommandPclaimAs(sender, args):
 
         if len(args) == 3:
                 name = str(args[2])
-        elif len(args) == 1:
+        elif len(args) > 0:
                 name = str(args[0])
         else:
                 return False
 
 	try:
-		manager.Claim(x, y, getUUIDFromName(sender, str(sender.getUniqueId()), GetPlayer_Match(name, sender)))
+		manager.Claim(x, y, getUUIDFromName(sender, GetPlayer_Match(name, sender)), GetPlayer_Match(name, sender))
         except Exception as E:
                 SendError(sender, str(E))
                 return True
@@ -601,7 +601,8 @@ def OnCommandPtake(sender, args):
 
         if info.remPlots < 0:
 		sender.sendMessage(Colorify('&eUser already at &50&e plots!'))
-        else:
+        	info.remPlots = 0
+	else:
 		sender.sendMessage(Colorify('&eUser &9'+GetPlayer_Match(args[0], sender)+'&e can now claim &5'+str(info.remPlots)+'&e additional plots.'))
 
 	return True

@@ -131,6 +131,7 @@ def OnEnable():
 	Load('EventHooks', conf=CONFIG)
 	Load('Derps', conf=CONFIG)
 	Load('UsefulCommands', conf=CONFIG)
+	Load('ChannelChat')
 
 @hook.disable
 def OnDisable():
@@ -139,3 +140,4 @@ def OnDisable():
 	Unload('Plots')
 	Unload('IRCBot')
 	Unload('Inventory')
+	Unload('ChannelChat')
