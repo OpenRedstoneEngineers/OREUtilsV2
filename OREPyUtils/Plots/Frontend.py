@@ -197,7 +197,9 @@ def getNameFromUUID(sender, uuid):
         manager = GetManager_ByPlayer(sender)
         if uuid in manager.players:
                 return manager.players[str(uuid)].Name
-        
+        else:
+                return ""
+
         raise Exception
         
 """
