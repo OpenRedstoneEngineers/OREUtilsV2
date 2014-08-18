@@ -46,6 +46,7 @@ class Channel:
 	def BroadcastMsg(self, playerName, chanMsg):
 		msg = self.FormatPrefix() + Colorify(playerName) + ": " + Colorify(chanMsg)
 
+		print(msg)
 		self.Broadcast(msg) 
 
 	def BroadcastJoin(self, playerName):
