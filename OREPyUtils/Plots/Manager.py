@@ -277,7 +277,19 @@ class PlotManager:
 		plotX, plotY = self.GetPlotCoords(loc.getBlockX(), loc.getBlockZ())
 		id = str(plotX) + ',' + str(plotY)
 		dispatchCommand(getConsoleSender(), '/region removeowner ' + id + ' ' + name)
-
+	
+	"""
+	@brief Force Unclaim the specified plot.
+	"""
+	def AdminUnclaim(self, x, y, uuid, name):
+		plot = self.plots[(x, y)]
+		
+		if plot.status in (PlotStatus.CLAIMED, PlotStatus.RESERVED):
+			owner = self.players[str(plot.ownerid)]
+			owner.remPlots += 1
+			del self.plots[(x, y)]
+		else:
+			raise UnclaimedError()
 	"""
 	@brief Forcefully unclaim the specified plot.
 	"""
