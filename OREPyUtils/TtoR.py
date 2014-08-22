@@ -51,6 +51,9 @@ class TtoR:
 					color = color + 1
 					continue
 
+				if color > 15:
+					color = color - 16
+
 				world.getBlockAt(loc.getBlockX() + line*movement[dir][0] + (place+1)*left[dir][0], \
                                                  loc.getBlockY() - 1, \
                                                  loc.getBlockZ() + line*movement[dir][1] + \
