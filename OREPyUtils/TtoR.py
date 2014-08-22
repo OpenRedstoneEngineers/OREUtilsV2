@@ -47,6 +47,8 @@ class TtoR:
 			place = 0
 			redLength = 15
 			for ch in data[line]:
+				if ch != ' ' and ch != '1' and ch != '0':
+					raise AsmError()
 				if ch == ' ':
 					color = color + 1
 					continue
@@ -109,9 +111,6 @@ class TtoR:
                                                  + torchp[dir][0], loc.getBlockY() - 2, \
                                                  loc.getBlockZ() + line*movement[dir][1] + (place+1)*left[dir][1] \
                                                  + torchp[dir][1]).setTypeIdAndData(55, 0, True)
-
-				if ch != ' ' and ch != '1' and ch != '0':
-					raise AmsError()
 				
 				place = place+2
 
