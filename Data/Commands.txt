@@ -52,5 +52,5 @@ rankup  |Increment a rank:    [r]pex promote [a|0]
 rankdown|Decrement a rank:    [r]pex demote [a|0]
 ploc    |Info about plot:     [r]pinfo [a]
 pwho    |See who can build:   [r]region info
-!!padd    |Add a member:        [r]pallow [a]
-!!premove |Remove a member:     [r]punallow [a]
+padd    |Add a member:        [r]pallow [a]
+premove |Remove a member:     [r]punallow [a]
