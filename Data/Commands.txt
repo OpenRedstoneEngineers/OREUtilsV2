@@ -39,7 +39,7 @@ cp      |Such lag:            [t]OMG, lagggg
 rage    |grrrr:               [c|red][c|l][n] [c|lred][c|l]rages
 hap     |haphap:              [c|pink][n] [c|purple]haphaphap'd
 facepalm|..No:                [c|aqua][n] [c|lblue]facepalms
-love    |Awww :3:             [c|pink][n] [c|red][c|bold]<3 [c|pink][a]
+love    |D'awww:             [c|pink][n] [c|red][c|bold]<3 [c|pink][a]
 hug     |for someone you love:[c|d][n] [c|4][c|l]hugged [c|d][a|n|0]
 mistake |odder:               [c|4]Ohder [c|6][c|l][n] [c|5]made a mistake
 waffle  |tasty...:            [c|e]Guess who likes waffles; [c|6][c|l][n] [c|e]does!
@@ -52,5 +52,5 @@ rankup  |Increment a rank:    [r]pex promote [a|0]
 rankdown|Decrement a rank:    [r]pex demote [a|0]
 ploc    |Info about plot:     [r]pinfo [a]
 pwho    |See who can build:   [r]region info
-!!padd    |Add a member:        [r]pallow [a]
-!!premove |Remove a member:     [r]punallow [a]
+padd    |Add a member:        [r]pallow [a]
+premove |Remove a member:     [r]punallow [a]
