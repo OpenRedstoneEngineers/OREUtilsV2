@@ -87,10 +87,10 @@ def OnCommandFoodfight(sender,args):
 							Sudo(' '.join(('give',receiver.getName(),i[:len(i)-2],number)))
 
 					else:
-						Sudo(' '.join(('give ',receiver.getName(),i,number)))
+						Sudo(' '.join(('give',receiver.getName(),i,number)))
 
 				else:  
-					Sudo(' '.join(('give ',receiver.getName(),i,'1')))
+					Sudo(' '.join(('give',receiver.getName(),i,'1')))
 
 			number = 1
 

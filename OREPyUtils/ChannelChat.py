@@ -46,7 +46,7 @@ class Channel:
 	def BroadcastMsg(self, playerName, chanMsg):
 		msg = self.FormatPrefix() + Colorify(playerName) + ": " + Colorify(chanMsg)
 
-		print(msg)
+		print("[CChat] "+self.name+'->'+playerName+': '+chanMsg)
 		self.Broadcast(msg) 
 
 	def BroadcastJoin(self, playerName):
