@@ -60,7 +60,7 @@ class IRCBot(Connection.Connection):
 		elif len(args) > 1 and args[1] == "JOIN":
 			self.OnJoin(args[0].split('!')[0][1:])
 
-		elif len(args) > 1 and args[1] == "PART":
+		elif len(args) > 1 and args[1] in ("PART", "QUIT", "KICK"):
 			self.OnLeave(args[0].split('!')[0][1:])
 
 		elif len(args) > 3 and args[1] == "PRIVMSG":
