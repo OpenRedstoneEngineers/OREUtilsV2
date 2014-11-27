@@ -66,6 +66,20 @@ class OREBot(IRCBot.IRCBot):
 	def OnPrivMsg(self, name, message):
 		Helper.Info("Private IRC message from %s: %s" % (name, message))
 
+		alias = self.GetAlias(name)
+		args = message.split(' ')
+
+		if args[0].startswith('%'):
+			channel = args[0][1:]
+
+			ChannelChat.GetChan().ChanMsgIRC('&1[&3IRC&1]&f'+name, channel, ' '.join(args[1:]))
+		elif args[0].startswith('@'):
+			reciever = args[0][1:]
+
+			for player in Bukkit.getServer().getOnlinePlayers():
+				if player.getName() == reciever:
+					player.sendMessage(str(ChatColor.BLUE) + "[" + str(ChatColor.AQUA) + "IRC " + name + " -> me" + str(ChatColor.BLUE) + "]" + str(ChatColor.WHITE) + " " + " ".join(args[1:]))
+
 	def OnChanMsg(self, name, message):
 		if name in self.Muted:
 			return
