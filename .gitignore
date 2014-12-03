@@ -18,6 +18,14 @@
 # Log files
 *.log
 
+# OTJP
+OTJP/.idea
+OTJP/out
+
+# Misc
+*.iml
+
+# OREd
 OREd/OREd
 
 # Config

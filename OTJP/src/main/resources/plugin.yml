@@ -5,3 +5,32 @@ load: STARTUP
 author: OREStaff
 website: openredstone.org
 main: org.openredstone.OTJP
+
+commands:
+  pusers:
+    description: Wow
+  pgive:
+    description: Wow
+  ptake:
+    description: Wow
+  psearch:
+    description: Wow
+  pinfo:
+    description: Wow
+  pmapmove:
+    description: Wow
+  pgenerate:
+    description: Wow
+  preserve:
+    description: Wow
+  pclaim:
+    description: Wow
+  pclaimas:
+    description: Wow
+  punclaim:
+    description: Wow
+  pmap:
+    description: Wow
+  pwarp:
+    description: Wow
+  
