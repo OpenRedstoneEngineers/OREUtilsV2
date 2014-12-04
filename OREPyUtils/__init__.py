@@ -116,7 +116,7 @@ def OnCommandProperty(sender, args):
 def OnCommandFail(sender, args):
     if len(args) == 1:
         if args[0] in Failiures:
-            sender.sendMessage('[!!]Module failed: ' + Failiures[Args[0]])
+            sender.sendMessage('[!!]Module failed: ' + Failiures[args[0]])
 
         elif args[0] in Include:
             sender.sendMessage('All is good')
