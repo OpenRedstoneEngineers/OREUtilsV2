@@ -58,7 +58,7 @@ class Hooks:
 	def Event(self, event):
 		for eventType, scripts  in self.events.items():
 			if isinstance(event, eventType):
-				scripts.Exec(event))
+				scripts.Exec(event)
 
 	#Execute the scripts relating to a command
 	def Exec(self, name, args):
