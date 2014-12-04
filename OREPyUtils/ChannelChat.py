@@ -17,7 +17,7 @@ class Channel:
 		self.players = []
 		self.uuid = str(node.creator)
 		self.invites = []
-		self.pass = str(node.pass)
+		self.password = str(node.password)
 
 	def Join(self, player):
 		if player in self.players:
@@ -90,7 +90,7 @@ class ChannelManager:
 			if str(player.getUniqueId()) in self.ActiveChannel:
 				print(player.getName())
 				chan = self.GetOrCreate(player, self.ActiveChannel[str(player.getUniqueId())])
-				self.Join(player, self.ActiveChannel[str(player.getUniqueId())], chan.pass)
+				self.Join(player, self.ActiveChannel[str(player.getUniqueId())], chan.password)
 
 	def Save(self):
 		self.file.Dump()
@@ -128,7 +128,7 @@ class ChannelManager:
 			SendError(player, 'Channel needs a password!')
 			return False
 		
-		if chan.mode == ChannelMode.PASSWORD and pss != chan.pass:
+		if chan.mode == ChannelMode.PASSWORD and pss != chan.password:
 			SendError(player, 'Incorrect password!')
 			return False
 		
@@ -259,7 +259,7 @@ def OnCommandCChat(sender, args):
 				return True
 			
 			Chans.Channels[chan].mode = ChannelMode.PASSWORD		
-			Chans.Channels[chan].pass = args[3]
+			Chans.Channels[chan].password = args[3]
 		elif args[2] == "INVITE":
 			Chans.Channels[chan].mode = ChannelMode.INVITE
 		elif args[2] == "PUBLIC":
