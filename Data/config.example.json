@@ -1,47 +1,47 @@
 {
-'properties' : {
-	'PlotMap' : {
-		'BottomBlocks' : {
-			'Reserved' : [0, 0, 0],
-			'On' : [152, 0, 0],
-			'Off' : [0, 0, 0],
+"properties": {
+	"PlotMap": {
+		"BottomBlocks": {
+			"Reserved": [0, 0, 0],
+			"On": [152, 0, 0],
+			"Off": [0, 0, 0]
 			},
-		'TopBlocks' : {
-			'Frame' : {
-				'Cross' : [1, 0, 0],
-				'X' : [1, 0, 0],
-				'Y' : [5, 0, 0],
+		"TopBlocks": {
+			"Frame": {
+				"Cross": [1, 0, 0],
+				"X": [1, 0, 0],
+				"Y": [5, 0, 0]
 				},
-			'Reserved' : [124, 0, 0],
-			'Base' : [1, 0, 0],
-			'On' : [124, 0, 0],
-			'Off' : [123, 0, 0],
-			},
+			"Reserved": [124, 0, 0],
+			"Base": [1, 0, 0],
+			"On": [124, 0, 0],
+			"Off": [123, 0, 0]
+			}
 		},
-	'MainPath' : 'plugins/OREUtilsV2.py.dir/Data/',
-	'DerpPath' : '[path]Derps.txt',
-	'HelpPath' : '[path]Help.txt',
-	'Include' : {
-		'Inventory' : 1,
-		'EventHooks' : 0,
-		'CommandGen' : 1,
-		'Plots' : 1,
-		'NameSystem' : 1,
-		'Aliases' : 1,
-		'Derps' : 1,
-		'UsefulCommands' : 1,
-		'IRCBot' : 1,
-		'Bus' : 0,
-		'FunCommands' : 1,
-		'ChannelChat' : 1,
-		'ResultCode' : 1,
+	"MainPath": "plugins/OREUtilsV2.py.dir/Data/",
+	"DerpPath": "[path]Derps.txt",
+	"HelpPath": "[path]Help.txt",
+	"Include": {
+		"Inventory": 1,
+		"EventHooks": 0,
+		"CommandGen": 1,
+		"Plots": 1,
+		"NameSystem": 1,
+		"Aliases": 1,
+		"Derps": 1,
+		"UsefulCommands": 1,
+		"IRCBot": 1,
+		"Bus": 0,
+		"FunCommands": 1,
+		"ChannelChat": 1,
+		"ResultCode": 1
 		},
-	'IRC' : {
-		'NamePass' : '',
-		'Name' : 'OREBuild',
-		'Chan' : '#OREServerChat',
-		'Server' : 'irc.freenode.net',
-		'Port' : 6667,
-		},
-	},
+	"IRC": {
+		"NamePass": "",
+		"Name": "OREBuild",
+		"Chan": "#OREServerChat",
+		"Server": "irc.freenode.net",
+		"Port": 6667
+		}
+	}
 }
