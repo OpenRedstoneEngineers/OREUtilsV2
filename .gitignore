@@ -3,6 +3,9 @@
 .\#*
 *~
 
+# PyCharm stuff
+.idea/
+
 # Temp
 *.save
 
