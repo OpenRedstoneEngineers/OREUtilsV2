@@ -1,44 +1,50 @@
 from Events.Events import Event
 
-#Something has gone wrong.
+# Something has gone wrong.
 class ServerException(Event):
-	pass
+    pass
 
-#An error produced by a plugin
+
+# An error produced by a plugin
 class PluginException(ServerException):
-	pass
+    pass
 
-#An error produced by a plugin while enabling @@@
+
+# An error produced by a plugin while enabling @@@
 class EnableException(PluginException):
-	pass
+    pass
 
-#An error produced by a plugin while disabling @@@
+
+# An error produced by a plugin while disabling @@@
 class DisableException(PluginException):
-	pass
+    pass
 
-#The server has become inoperable
+
+# The server has become inoperable
 class CriticalException(ServerException):
-	pass
+    pass
 
-#The server is no longer responding @@@
+
+# The server is no longer responding @@@
 class TimeoutException(CriticalException):
-	pass
+    pass
 
-#The server has eaten all the RAM
+
+# The server has eaten all the RAM
 class RAMException(CriticalException):
-	pass
+    pass
 
-#The server has eaten all RAM and Java is stupid @@@
+
+# The server has eaten all RAM and Java is stupid @@@
 class UnhandledRAMException(RAMException):
-	pass
+    pass
 
-#The server has eaten all RAM and Java has killed itself @@@
+
+# The server has eaten all RAM and Java has killed itself @@@
 class HandledRAMException(RAMException):
-	pass
+    pass
 
-#The server is eating all CPU @@@
+
+# The server is eating all CPU @@@
 class CPUException(CriticalException):
-	pass
-
-
-    
+    pass

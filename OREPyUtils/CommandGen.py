@@ -1,4 +1,5 @@
-import re, sys
+import re
+import sys
 
 Arg = re.compile('\[[^\]]+\]'  )
 Gap = re.compile("[\+]*''[\+]*")
