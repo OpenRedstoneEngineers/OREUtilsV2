@@ -18,6 +18,7 @@ Permission nodes:
 ore.plot.give
 ore.plot.claimas
 ore.plot.generate
+ore.plot.claim
 """
 
 """
@@ -478,6 +479,10 @@ def OnCommandPclaim(sender, args):
 	manager = GetManager_ByPlayer(sender)
 
 	x, y = GetPlot(sender, args, manager)
+	
+	if not sender.hasPermission("ore.plot.claim"):
+		SendError(sender, "You do not have permission to do this")
+		return True
 
 	try:
 
