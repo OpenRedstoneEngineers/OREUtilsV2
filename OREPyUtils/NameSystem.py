@@ -1,9 +1,9 @@
-from __future__ import division 
+from __future__ import division
 
 from Helper import Sudo, SendError
 
-import org.bukkit.Bukkit.dispatchCommand as dispatchCommand 
-import org.bukkit.Bukkit.getPlayerExact	 as getPlayerExact
+import org.bukkit.Bukkit.dispatchCommand as dispatchCommand
+import org.bukkit.Bukkit.getPlayerExact     as getPlayerExact
 
 '''
 Permission nodes:
@@ -16,66 +16,68 @@ Colours = '123456789abcdef'
 Fonts = 'lnor'
 
 Presets = {
-	'rainbow'   : '4c6e23915d',
-	'ice'       : 'f7b3b7f',
-	'greyscale' : '87f',
-	'england'   : 'f4f4f4f4f4f4f4f4f4f',
-	'pink'      : 'dl',
-	'reset'     : 'f',
-	'fire'      : 'e646e'
+    'rainbow': '4c6e23915d',
+    'ice': 'f7b3b7f',
+    'greyscale': '87f',
+    'england': 'f4f4f4f4f4f4f4f4f4f',
+    'pink': 'dl',
+    'reset': 'f',
+    'fire': 'e646e'
 }
 
+
 def Distribute(list1, list2):
-	len1   = len(list1)
-	change = len1 / float(len(list2))
-	
-	while len1 > 0:
-		len1 -= change
+    len1 = len(list1)
+    change = len1 / float(len(list2))
 
-		list1.insert(int(len1), list2.pop())
+    while len1 > 0:
+        len1 -= change
 
-	return ''.join(list1)
+        list1.insert(int(len1), list2.pop())
+
+    return ''.join(list1)
+
 
 @hook.command("nameformat", description="Colourify your name", usage="Usage: /nameformat [name] <format...>")
 def OnCommandNameFormat(sender, args):
-	if not args:
-		return False
+    if not args:
+        return False
 
-	target = sender
+    target = sender
 
-	if target.hasPermission('ore.nameformat.others'):
-		player = getPlayerExact(args[0])
+    if target.hasPermission('ore.nameformat.others'):
+        player = getPlayerExact(args[0])
 
-		if player != None:
-			target = player
+        if player != None:
+            target = player
 
-			del args[0]
+            del args[0]
 
-	for argi, arg in enumerate(args):	
-		preset = Presets.get(arg)
+    for argi, arg in enumerate(args):
+        preset = Presets.get(arg)
 
-		if preset:
-			args[argi] = preset
+        if preset:
+            args[argi] = preset
 
-	formats = []
+    formats = []
 
-	for format in ''.join(args):
-		if format in Colours:
-			formats.append('&' + format)
+    for format in ''.join(args):
+        if format in Colours:
+            formats.append('&' + format)
 
-		elif format in Fonts:
-			formats[-1] += '&' + format
+        elif format in Fonts:
+            formats[-1] += '&' + format
 
-		elif format == ' ' and formats[-1]:
-			formats.append('')
+        elif format == ' ' and formats[-1]:
+            formats.append('')
 
-		else:
-			SendError(sender, 'Invalid colour code (' + format + ')')
-			return True
+        else:
+            SendError(sender, 'Invalid colour code (' + format + ')')
+            return True
 
-	name = target.getName()
+    name = target.getName()
 
-	if formats:
-		Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
+    if formats:
+        Sudo('nick ' + name + ' ' + Distribute(list(name), formats))
 
-	return True
+    return True
